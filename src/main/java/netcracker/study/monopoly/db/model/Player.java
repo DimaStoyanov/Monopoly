@@ -3,6 +3,7 @@ package netcracker.study.monopoly.db.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
@@ -10,7 +11,7 @@ import java.util.Set;
 @Table(name = "players")
 @ToString(exclude = {"gamesWon"})
 @NoArgsConstructor
-public class Player {
+public class Player implements Serializable {
     public Player(String nickname, Date dateCreated) {
         this.nickname = nickname;
         this.dateCreated = dateCreated;
@@ -52,4 +53,10 @@ public class Player {
     @Setter
     @NonNull
     private Integer totalGames;
+
+    @OneToMany(mappedBy = "player")
+    @Getter
+    @NonNull
+    private Set<Score> scores;
+
 }

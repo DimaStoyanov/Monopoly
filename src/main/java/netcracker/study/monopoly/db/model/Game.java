@@ -3,14 +3,16 @@ package netcracker.study.monopoly.db.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "games")
 @NoArgsConstructor
 @RequiredArgsConstructor
 @ToString
-public class Game {
+public class Game implements Serializable {
     @Id
     @GeneratedValue
     @Column(name = "game_id")
@@ -31,4 +33,8 @@ public class Game {
     @Getter
     @NonNull
     private Player winner;
+
+    @OneToMany(mappedBy = "game")
+    @Getter
+    private Set<Score> scores;
 }
