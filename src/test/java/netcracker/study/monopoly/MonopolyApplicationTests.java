@@ -3,6 +3,7 @@ package netcracker.study.monopoly;
 import netcracker.study.monopoly.db.repository.GameRepository;
 import netcracker.study.monopoly.db.repository.PlayerRepository;
 import netcracker.study.monopoly.db.repository.ScoreRepository;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
@@ -22,6 +23,7 @@ public class MonopolyApplicationTests implements ApplicationContextAware {
     @Test
     public void contextLoads() {
         System.out.println("hello");
+        Assert.assertFalse(true);
     }
 
 
