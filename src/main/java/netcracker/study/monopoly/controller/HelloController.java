@@ -34,7 +34,6 @@ public class HelloController {
     @ResponseBody
     public String insert(@RequestParam(name = "nickname", defaultValue = "Anonymous") String nickname,
                          @RequestParam(name = "duration", defaultValue = "10") Integer duration) {
-        // TODO some shit happening
         if (playerRepository.findByNickname(nickname) != null) {
             System.out.println(playerRepository.findByNickname(nickname));
             return "Not unique nickname";
@@ -81,7 +80,6 @@ public class HelloController {
     @RequestMapping(value = "stuff")
     @ResponseBody
     public String stuff() {
-        // TODO Тут что-то ленивое
         Date date = new Date();
 
         Player john = new Player("john", date);
