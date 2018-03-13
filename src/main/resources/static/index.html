@@ -61,8 +61,9 @@
 
 <div id="map"></div>
 <div align="center">
-    <p> Game state. Some hint</p>
-    <button> doSmth</button>
+    <p> Your turn. It's first phase - now you can sell you owns. When you are ready, click "Go" to go to the second
+        phase</p>
+    <button> Go!</button>
 </div>
 <br>
 <div id="chatbox" align="center" style="height:38%; width:100%; background-color: azure">
@@ -73,6 +74,16 @@
         <input name="usermsg" type="text" id="message" style="width: 1080px">
         <input type="button" name="submitmsg" value="Send" onclick="sendMessage();">
     </form>
+
+    <details>
+        <summary>Game steps</summary>
+        <p>Player1 buy home...</p>
+        <p>Player2 buy home...</p>
+        <p>Player3 sell home...</p>
+        <p>Player4 pass...</p>
+        <p>Player1 buy home...</p>
+        <p>Player1 buy home...</p>
+    </details>
 </div>
 
 </body>
@@ -255,6 +266,56 @@
         });
 
 
+        // Создаем круг.
+        var myCircle = new ymaps.Circle([
+            // Координаты центра круга.
+            [55.67, 37.62],
+            // Радиус круга в метрах.
+            300
+        ], {
+            // Описываем свойства круга.
+            // Содержимое балуна.
+            balloonContent: '<img height="100px" src="https://pp.userapi.com/c841133/v841133895/1a3d4/TxeNVM5X_RA.jpg">\<' +
+            'br><div align="center">Dima Stoyanov</div>',
+            // Содержимое хинта.
+            hintContent: "Player1"
+        }, {
+            // Задаем опции круга.
+            // Включаем возможность перетаскивания круга.
+            // draggable: true,
+            // Цвет заливки.
+            // Последний байт (77) определяет прозрачность.
+            // Прозрачность заливки также можно задать используя опцию "fillOpacity".
+            iconImageHref: 'https://pp.userapi.com/c841133/v841133895/1a3d4/TxeNVM5X_RA.jpg',
+            fillOpacity: 0.3,
+
+            fillColor: "#DB709377",
+            // Цвет обводки.
+            strokeColor: "#391066",
+            // Прозрачность обводки.
+            strokeOpacity: 0.5,
+            // Ширина обводки в пикселях.
+            strokeWidth: 5
+
+        });
+
+        // var pointA = [55.61, 37.66],
+        //     pointB = [55.61, 37.59],
+        //     multiRoute = new ymaps.multiRouter.MultiRoute({
+        //         referencePoints: [
+        //             pointA,
+        //             pointB
+        //         ],
+        //         params: {
+        //             //Тип маршрутизации - пешеходная маршрутизация.
+        //             routingMode: 'pedestrian'
+        //
+        //         }
+        //     }, {
+        //         // Автоматически устанавливать границы карты так, чтобы маршрут был виден целиком.
+        //         // boundsAutoApply: true
+        //     });
+
         myMap.geoObjects
             .add(myRectangle)
             .add(myRectangle2)
@@ -265,7 +326,11 @@
             .add(myPolyline2)
             .add(myPolyline3)
             .add(myPolyline4)
-            .add(myPolyline5);
+            .add(myPolyline5)
+            .add(myCircle)
+        // .add(multiRoute);
+
+
     }
 
 
