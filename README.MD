@@ -1,5 +1,5 @@
 # Board game
-[![Build Status](https://travis-ci.com/DimaStoyanov/Monopoly.svg?token=en9NkkdFCMtXssrvxGvM&branch=master)](https://travis-ci.com/DimaStoyanov/Monopoly)
+[![Build Status](https://travis-ci.com/DimaStoyanov/Monopoly.svg?token=LLNhtHyFAvz6aQpUpJQy&branch=master)](https://travis-ci.com/DimaStoyanov/Monopoly)
 [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/DimaStoyanov/Monopoly/blob/master/LICENSE)
 
 ### Database
