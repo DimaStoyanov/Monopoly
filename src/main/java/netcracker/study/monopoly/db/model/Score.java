@@ -35,12 +35,10 @@ public class Score {
     private Integer score;
 
 
-//    @PostPersist
-//    void updatePlayerStat(){
-//        System.out.println("On score post persist");
-//        player.getStat().incrementTotalGames();
-//        player.getStat().setTotalScore(player.getStat().getTotalScore() + score);
-//        System.out.println(player);
-//    }
+    @PrePersist
+    void updatePlayerStat() {
+        player.getStat().incrementTotalGames();
+        player.getStat().addTotalScore(score);
+    }
 
 }

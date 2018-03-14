@@ -39,11 +39,10 @@ public class Game implements Serializable {
     @Getter
     private Set<Score> scores;
 
-//    @PostPersist
-//    private void update(){
-//        System.out.println("On game post persist");
-//        winner.getStat().incrementTotalWins();
-//    }
+    @PrePersist
+    private void update() {
+        winner.getStat().incrementTotalWins();
+    }
 
 
 }

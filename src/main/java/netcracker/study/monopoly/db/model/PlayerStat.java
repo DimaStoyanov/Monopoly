@@ -13,7 +13,7 @@ import java.util.UUID;
 @Entity
 @ToString(exclude = {"id", "player"})
 @NoArgsConstructor
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class PlayerStat implements Serializable {
 
 
@@ -23,7 +23,6 @@ public class PlayerStat implements Serializable {
     private UUID id;
 
     @Getter
-    @Setter
     @NonNull
     private Integer totalScore;
 
@@ -46,6 +45,10 @@ public class PlayerStat implements Serializable {
 
     public void incrementTotalGames() {
         totalGames++;
+    }
+
+    public void addTotalScore(int score) {
+        totalScore += score;
     }
 
 }

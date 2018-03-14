@@ -73,20 +73,11 @@ public class HelloController {
         Player player = playerRepository.findByNickname(nickname);
         if (player == null)
             return "Player not found";
-        player.getStat().setTotalScore(score);
-        player.getStat().incrementTotalGames();
-        player.getStat().incrementTotalWins();
+        player.getStat().addTotalScore(score);
         playerRepository.save(player);
         return "OK";
     }
 
-    @RequestMapping(value = "/readuser")
-    @ResponseBody
-    public String checkStuff() {
-        Player player = playerRepository.findByNickname("john");
-        return player
-                + "<br>" + player.getGamesWon();
-    }
 
     @RequestMapping(value = "/stuff")
     @ResponseBody

@@ -1,6 +1,8 @@
 package netcracker.study.monopoly;
 
+import netcracker.study.monopoly.db.model.Game;
 import netcracker.study.monopoly.db.model.Player;
+import netcracker.study.monopoly.db.model.Score;
 import netcracker.study.monopoly.db.repository.GameRepository;
 import netcracker.study.monopoly.db.repository.PlayerRepository;
 import netcracker.study.monopoly.db.repository.ScoreRepository;
@@ -30,11 +32,21 @@ public class MonopolyApplicationTests implements ApplicationContextAware {
 
     @Test
     @Transactional
-    public void readDB() {
+    public void insertAndReadDB() {
         String nickname = "sdjv4j32wsdt43904235";
         Player player = new Player(nickname, new Date());
+        Game game = new Game(10, new Date(), player);
+        Score score = new Score(game, player, 100);
+
         playerRepository.save(player);
-        Assert.assertEquals(playerRepository.findByNickname(nickname), player);
+        gameRepository.save(game);
+        scoreRepository.save(score);
+
+        Player playerFromDB = playerRepository.findByNickname(nickname);
+        Assert.assertTrue(playerFromDB.getStat().getTotalScore() == 100);
+        Assert.assertTrue(playerFromDB.getStat().getTotalGames() == 1);
+        Assert.assertTrue(playerFromDB.getStat().getTotalWins() == 1);
+        Assert.assertEquals(player, playerFromDB);
     }
 
 
