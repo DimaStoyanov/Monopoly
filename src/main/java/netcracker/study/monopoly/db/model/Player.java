@@ -1,27 +1,27 @@
 package netcracker.study.monopoly.db.model;
 
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
-@Table(name = "players")
-@ToString(exclude = {"gamesWon"})
+@ToString(exclude = {"gamesWon", "id"})
 @NoArgsConstructor
 public class Player implements Serializable {
-    public Player(String nickname, Date dateCreated) {
-        this.nickname = nickname;
-        this.dateCreated = dateCreated;
-        totalGames = totalWins = totalScore = 0;
-    }
-
     @Id
-    @GeneratedValue
-    @Column(name = "player_id")
-    private long playerID;
+    @GeneratedValue(generator = "custom-uuid")
+    @GenericGenerator(name = "custom-uuid", strategy = "org.hibernate.id.UUIDGenerator")
+    private UUID id;
+
+    @Temporal(TemporalType.DATE)
+    @Getter
+    @NonNull
+    private Date createdAt;
 
     @Column(unique = true)
     @Getter
@@ -34,29 +34,20 @@ public class Player implements Serializable {
     @NonNull
     private Set<Game> gamesWon;
 
-    @Temporal(TemporalType.DATE)
     @Getter
-    @NonNull
-    private Date dateCreated;
-
-    @Getter
-    @Setter
-    @NonNull
-    private Integer totalScore;
-
-    @Getter
-    @Setter
-    @NonNull
-    private Integer totalWins;
-
-    @Getter
-    @Setter
-    @NonNull
-    private Integer totalGames;
+    @OneToOne(cascade = CascadeType.PERSIST, optional = false)
+    @JoinColumn
+    private PlayerStat stat;
 
     @OneToMany(mappedBy = "player")
     @Getter
     @NonNull
     private Set<Score> scores;
+
+    public Player(String nickname, Date createdAt) {
+        this.nickname = nickname;
+        this.createdAt = createdAt;
+        stat = new PlayerStat(0, 0, 0, this);
+    }
 
 }

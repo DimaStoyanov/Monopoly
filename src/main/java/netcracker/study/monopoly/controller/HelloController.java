@@ -8,6 +8,8 @@ import netcracker.study.monopoly.db.repository.PlayerRepository;
 import netcracker.study.monopoly.db.repository.ScoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -49,7 +51,6 @@ public class HelloController {
     @RequestMapping(value = "/cleanup")
     @ResponseBody
     public String clean() {
-        // Тоже лениво как-то
         scoreRepository.deleteAll();
         gameRepository.deleteAll();
         playerRepository.deleteAll();
@@ -72,14 +73,35 @@ public class HelloController {
         Player player = playerRepository.findByNickname(nickname);
         if (player == null)
             return "Player not found";
-        player.setTotalScore(score);
+        player.getStat().setTotalScore(score);
+        player.getStat().incrementTotalGames();
+        player.getStat().incrementTotalWins();
         playerRepository.save(player);
         return "OK";
     }
 
-    @RequestMapping(value = "stuff")
+    @RequestMapping(value = "/readuser")
+    @ResponseBody
+    public String checkStuff() {
+        Player player = playerRepository.findByNickname("john");
+        return player
+                + "<br>" + player.getGamesWon();
+    }
+
+    @RequestMapping(value = "/stuff")
     @ResponseBody
     public String stuff() {
+        prepossess();
+
+        Player player = playerRepository.findByNickname("john");
+        return player + "<br>"
+                + player.getGamesWon() + "<br>"
+                + player.getScores();
+
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    void prepossess() {
         Date date = new Date();
 
         Player john = new Player("john", date);
@@ -98,10 +120,10 @@ public class HelloController {
         Score alexScore = new Score(game, alex, 78);
         Score alisaScore = new Score(game, alisa, 53);
         Score xXxNAGIBATORxXxScore = new Score(game, xXxNAGIBATORxXx, 99);
-        Score johnScore2 = new Score(game, john, 1);
-        Score alexScore2 = new Score(game, alex, 13);
-        Score alisaScore2 = new Score(game, alisa, 22);
-        Score xXxNAGIBATORxXxScore2 = new Score(game, xXxNAGIBATORxXx, 19);
+        Score johnScore2 = new Score(game2, john, 1);
+        Score alexScore2 = new Score(game2, alex, 13);
+        Score alisaScore2 = new Score(game2, alisa, 22);
+        Score xXxNAGIBATORxXxScore2 = new Score(game2, xXxNAGIBATORxXx, 19);
 
 
         List<Score> scores = Arrays.asList(johnScore, alexScore, alisaScore, xXxNAGIBATORxXxScore,
@@ -110,12 +132,6 @@ public class HelloController {
         playerRepository.saveAll(players);
         gameRepository.saveAll(games);
         scoreRepository.saveAll(scores);
-
-
-        Player player = playerRepository.findByNickname("john");
-        return player + "<br>"
-                + player.getGamesWon() + "<br>"
-                + player.getScores();
 
     }
 }

@@ -1,30 +1,31 @@
 package netcracker.study.monopoly.db.model;
 
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Entity
-@Table(name = "game_user_score")
 @RequiredArgsConstructor
 @NoArgsConstructor
-@ToString(of = {"scoreID", "score"})
+@ToString(of = "score")
 public class Score {
 
     @Id
-    @GeneratedValue
-    @Column(name = "score_id")
-    private long scoreID;
+    @GeneratedValue(generator = "custom-uuid")
+    @GenericGenerator(name = "custom-uuid", strategy = "org.hibernate.id.UUIDGenerator")
+    private UUID id;
 
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "game_id")
     @Getter
     @NonNull
     private Game game;
 
-    @ManyToOne
-    @JoinColumn(name = "player_id")
+    @ManyToOne(optional = false)
+    @JoinColumn
     @Getter
     @NonNull
     private Player player;
@@ -32,5 +33,14 @@ public class Score {
     @Getter
     @NonNull
     private Integer score;
+
+
+//    @PostPersist
+//    void updatePlayerStat(){
+//        System.out.println("On score post persist");
+//        player.getStat().incrementTotalGames();
+//        player.getStat().setTotalScore(player.getStat().getTotalScore() + score);
+//        System.out.println(player);
+//    }
 
 }

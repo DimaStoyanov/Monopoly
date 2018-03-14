@@ -1,22 +1,23 @@
 package netcracker.study.monopoly.db.model;
 
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
-@Table(name = "games")
 @NoArgsConstructor
 @RequiredArgsConstructor
-@ToString
+@ToString(exclude = "id")
 public class Game implements Serializable {
     @Id
-    @GeneratedValue
-    @Column(name = "game_id")
-    private long gameID;
+    @GeneratedValue(generator = "custom-uuid")
+    @GenericGenerator(name = "custom-uuid", strategy = "org.hibernate.id.UUIDGenerator")
+    private UUID id;
 
     @Getter
     @NonNull
@@ -28,8 +29,8 @@ public class Game implements Serializable {
     @NonNull
     private Date dateStarted;
 
-    @ManyToOne
-    @JoinColumn(name = "player_id")
+    @ManyToOne(optional = false)
+    @JoinColumn
     @Getter
     @NonNull
     private Player winner;
@@ -37,4 +38,12 @@ public class Game implements Serializable {
     @OneToMany(mappedBy = "game")
     @Getter
     private Set<Score> scores;
+
+//    @PostPersist
+//    private void update(){
+//        System.out.println("On game post persist");
+//        winner.getStat().incrementTotalWins();
+//    }
+
+
 }
