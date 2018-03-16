@@ -1,53 +1,46 @@
 package netcracker.study.monopoly.db.model;
 
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
-@ToString(exclude = {"gamesWon", "id"})
+@ToString(exclude = {"gamesWon"})
 @NoArgsConstructor
-public class Player implements Serializable {
-    @Id
-    @GeneratedValue(generator = "custom-uuid")
-    @GenericGenerator(name = "custom-uuid", strategy = "org.hibernate.id.UUIDGenerator")
-    private UUID id;
+@Getter
+public class Player extends AbstractIdentifiableObject implements Serializable {
 
     @Temporal(TemporalType.DATE)
-    @Getter
     @NonNull
+    @Column(updatable = false)
     private Date createdAt;
 
-    @Column(unique = true)
-    @Getter
     @Setter
     @NonNull
+    @Column(unique = true)
     private String nickname;
 
-    @OneToMany(mappedBy = "winner")
-    @Getter
-    @NonNull
-    private Set<Game> gamesWon;
+    @OneToMany(mappedBy = "winner", cascade = CascadeType.REFRESH)
+    private Set<GameStatistic> gamesWon;
 
-    @Getter
-    @OneToOne(cascade = CascadeType.PERSIST, optional = false)
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH}, optional = false)
     @JoinColumn
-    private PlayerStat stat;
+    private PlayerStatistic stat;
 
-    @OneToMany(mappedBy = "player")
-    @Getter
-    @NonNull
+    @OneToMany(mappedBy = "player", cascade = CascadeType.REFRESH)
     private Set<Score> scores;
+
+    @ManyToOne
+    @JoinColumn
+    private Game currentGame;
 
     public Player(String nickname, Date createdAt) {
         this.nickname = nickname;
         this.createdAt = createdAt;
-        stat = new PlayerStat(0, 0, 0, this);
+        stat = new PlayerStatistic(0, 0, 0, this);
     }
 
 }

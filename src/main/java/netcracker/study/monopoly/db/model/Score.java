@@ -1,42 +1,36 @@
 package netcracker.study.monopoly.db.model;
 
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
-import java.util.UUID;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import java.io.Serializable;
 
 @Entity
 @RequiredArgsConstructor
 @NoArgsConstructor
 @ToString(of = "score")
-public class Score {
-
-    @Id
-    @GeneratedValue(generator = "custom-uuid")
-    @GenericGenerator(name = "custom-uuid", strategy = "org.hibernate.id.UUIDGenerator")
-    private UUID id;
-
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "game_id")
-    @Getter
-    @NonNull
-    private Game game;
+@Getter
+public class Score extends AbstractIdentifiableObject implements Serializable {
 
     @ManyToOne(optional = false)
     @JoinColumn
-    @Getter
+    @NonNull
+    private GameStatistic game;
+
+    @ManyToOne(optional = false)
+    @JoinColumn
     @NonNull
     private Player player;
 
-    @Getter
     @NonNull
     private Integer score;
 
 
     @PrePersist
-    void updatePlayerStat() {
+    private void updatePlayerStat() {
         player.getStat().incrementTotalGames();
         player.getStat().addTotalScore(score);
     }

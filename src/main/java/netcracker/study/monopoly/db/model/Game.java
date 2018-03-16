@@ -1,48 +1,29 @@
 package netcracker.study.monopoly.db.model;
 
-import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
+import lombok.Getter;
+import lombok.Setter;
+import netcracker.study.monopoly.util.JSONBUserType;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Set;
-import java.util.UUID;
 
+@TypeDef(name = "jsonb", typeClass = JSONBUserType.class,
+        parameters = @Parameter(name = JSONBUserType.CLASS,
+                value = "netcracker.study.monopoly.db.model.json.GameState"))
 @Entity
-@NoArgsConstructor
-@RequiredArgsConstructor
-@ToString(exclude = "id")
-public class Game implements Serializable {
-    @Id
-    @GeneratedValue(generator = "custom-uuid")
-    @GenericGenerator(name = "custom-uuid", strategy = "org.hibernate.id.UUIDGenerator")
-    private UUID id;
+@Getter
+public class Game extends AbstractIdentifiableObject implements Serializable {
 
-    @Getter
-    @NonNull
-    @Column(updatable = false)
-    private Integer durationMinutes;
+    @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "currentGame")
+    private Set<Player> players;
 
-    @Temporal(TemporalType.DATE)
-    @Getter
-    @NonNull
-    private Date dateStarted;
-
-    @ManyToOne(optional = false)
-    @JoinColumn
-    @Getter
-    @NonNull
-    private Player winner;
-
-    @OneToMany(mappedBy = "game")
-    @Getter
-    private Set<Score> scores;
-
-    @PrePersist
-    private void update() {
-        winner.getStat().incrementTotalWins();
-    }
-
-
+    @Type(type = "jsonb")
+    @Setter
+    private netcracker.study.monopoly.db.model.json.GameState state;
 }

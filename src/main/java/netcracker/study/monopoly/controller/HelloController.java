@@ -1,6 +1,6 @@
 package netcracker.study.monopoly.controller;
 
-import netcracker.study.monopoly.db.model.Game;
+import netcracker.study.monopoly.db.model.GameStatistic;
 import netcracker.study.monopoly.db.model.Player;
 import netcracker.study.monopoly.db.model.Score;
 import netcracker.study.monopoly.db.repository.GameRepository;
@@ -41,7 +41,7 @@ public class HelloController {
             return "Not unique nickname";
         }
         Player player = new Player(nickname, new Date());
-        Game game = new Game(duration, new Date(), player);
+        GameStatistic game = new GameStatistic(duration, new Date(), player);
         playerRepository.save(player);
         gameRepository.save(game);
         scoreRepository.save(new Score(game, player, 100));
@@ -92,7 +92,7 @@ public class HelloController {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void prepossess() {
+    protected void prepossess() {
         Date date = new Date();
 
         Player john = new Player("john", date);
@@ -102,10 +102,11 @@ public class HelloController {
 
         List<Player> players = Arrays.asList(john, alex, alisa, xXxNAGIBATORxXx);
 
-        Game game = new Game(35, new Date(), john);
-        Game game2 = new Game(5, date, alisa);
+        GameStatistic game = new GameStatistic(35, new Date(), john);
+        GameStatistic game2 = new GameStatistic(5, date, alisa);
 
-        List<Game> games = Arrays.asList(game, game2);
+
+        List<GameStatistic> games = Arrays.asList(game, game2);
 
         Score johnScore = new Score(game, john, 100);
         Score alexScore = new Score(game, alex, 78);
@@ -123,6 +124,7 @@ public class HelloController {
         playerRepository.saveAll(players);
         gameRepository.saveAll(games);
         scoreRepository.saveAll(scores);
+
 
     }
 }
