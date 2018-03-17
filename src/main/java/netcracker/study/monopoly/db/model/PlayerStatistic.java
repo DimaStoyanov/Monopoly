@@ -1,5 +1,6 @@
 package netcracker.study.monopoly.db.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.CascadeType;
@@ -26,6 +27,7 @@ public class PlayerStatistic extends AbstractIdentifiableObject implements Seria
 
     @OneToOne(mappedBy = "stat", optional = false, cascade = CascadeType.REFRESH)
     @NonNull
+    @JsonIgnore
     private Player player;
 
     public void incrementTotalWins() {

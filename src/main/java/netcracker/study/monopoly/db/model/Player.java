@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.Set;
 
 @Entity
-@ToString(exclude = {"gamesWon"})
+@ToString
 @NoArgsConstructor
 @Getter
 public class Player extends AbstractIdentifiableObject implements Serializable {

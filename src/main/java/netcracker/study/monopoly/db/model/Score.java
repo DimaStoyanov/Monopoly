@@ -1,5 +1,6 @@
 package netcracker.study.monopoly.db.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -18,11 +19,13 @@ public class Score extends AbstractIdentifiableObject implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn
     @NonNull
+    @JsonIgnore
     private GameStatistic game;
 
     @ManyToOne(optional = false)
     @JoinColumn
     @NonNull
+    @JsonIgnore
     private Player player;
 
     @NonNull

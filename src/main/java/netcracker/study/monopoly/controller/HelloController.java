@@ -7,18 +7,16 @@ import netcracker.study.monopoly.db.repository.GameRepository;
 import netcracker.study.monopoly.db.repository.PlayerRepository;
 import netcracker.study.monopoly.db.repository.ScoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-@Controller
+@RestController
 public class HelloController {
 
     private final PlayerRepository playerRepository;
@@ -33,23 +31,22 @@ public class HelloController {
     }
 
     @RequestMapping(value = "/insert")
-    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
     public String insert(@RequestParam(name = "nickname", defaultValue = "Anonymous") String nickname,
-                         @RequestParam(name = "duration", defaultValue = "10") Integer duration) {
-        if (playerRepository.findByNickname(nickname) != null) {
-            System.out.println(playerRepository.findByNickname(nickname));
-            return "Not unique nickname";
+                         @RequestParam(name = "score", defaultValue = "100") int score,
+                         @RequestParam(name = "duration", defaultValue = "10") int duration) {
+        if (playerRepository.findByNickname(nickname).isPresent()) {
+            throw new BadRequestException(nickname);
         }
         Player player = new Player(nickname, new Date());
         GameStatistic game = new GameStatistic(duration, new Date(), player);
         playerRepository.save(player);
         gameRepository.save(game);
-        scoreRepository.save(new Score(game, player, 100));
+        scoreRepository.save(new Score(game, player, score));
         return "OK";
     }
 
     @RequestMapping(value = "/cleanup")
-    @ResponseBody
     public String clean() {
         scoreRepository.deleteAll();
         gameRepository.deleteAll();
@@ -57,22 +54,21 @@ public class HelloController {
         return "OK";
     }
 
-    @RequestMapping(value = "/read")
-    @ResponseBody
-    public String read() {
-        return "Players: <br>" +
-                playerRepository.findAll().toString() +
-                "<br> Games: <br>" + gameRepository.findAll().toString()
-                + "<br> Scores: <br>" + scoreRepository.findAll().toString();
+    @RequestMapping(value = "/read/{nickname}")
+    public Player read(@PathVariable String nickname) {
+        return playerRepository.findByNickname(nickname).orElseThrow(() -> new PlayerNotFoundException(nickname));
+    }
+
+    @RequestMapping("/read")
+    public Iterable<Player> readAll() {
+        return playerRepository.findAll();
     }
 
     @RequestMapping(value = "/update")
-    @ResponseBody
     public String updateScore(@RequestParam(name = "nickname") String nickname,
                               @RequestParam(name = "score") Integer score) {
-        Player player = playerRepository.findByNickname(nickname);
-        if (player == null)
-            return "Player not found";
+        Player player = playerRepository.findByNickname(nickname).
+                orElseThrow(() -> new PlayerNotFoundException(nickname));
         player.getStat().addTotalScore(score);
         playerRepository.save(player);
         return "OK";
@@ -80,14 +76,9 @@ public class HelloController {
 
 
     @RequestMapping(value = "/stuff")
-    @ResponseBody
-    public String stuff() {
+    public Player stuff() {
         prepossess();
-
-        Player player = playerRepository.findByNickname("john");
-        return player + "<br>"
-                + player.getGamesWon() + "<br>"
-                + player.getScores();
+        return playerRepository.findByNickname("john").orElseThrow(() -> new PlayerNotFoundException("john"));
 
     }
 
@@ -126,5 +117,20 @@ public class HelloController {
         scoreRepository.saveAll(scores);
 
 
+    }
+}
+
+
+@ResponseStatus(HttpStatus.NOT_FOUND)
+class PlayerNotFoundException extends RuntimeException {
+    PlayerNotFoundException(String nickname) {
+        super("Could not find player " + nickname);
+    }
+}
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BadRequestException extends RuntimeException {
+    BadRequestException(String nickname) {
+        super("Not unique nickname: " + nickname);
     }
 }

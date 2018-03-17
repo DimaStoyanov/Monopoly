@@ -8,7 +8,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @ToString(exclude = "id")
-class PlayerState {
+public class PlayerState {
 
     private UUID id;
 
