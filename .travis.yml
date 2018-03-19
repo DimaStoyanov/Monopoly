@@ -1,6 +1,18 @@
 language: java
+install: true
+addons:
+  sonarcloud:
+    organization: "dimastoyanov-github"
+    token:
+      secure: "99e3ed9db65e2c04cf45f010312181089e209c29"
 jdk:
  - oraclejdk8
+script:
+   - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.sonar/cache'
 services:
  - postgresql
 before_script:

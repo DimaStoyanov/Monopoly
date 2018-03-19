@@ -1,7 +1,8 @@
 # Board game
 [![Build Status](https://travis-ci.org/DimaStoyanov/Monopoly.svg?branch=master)](https://travis-ci.org/DimaStoyanov/Monopoly)
 [![BCH compliance](https://bettercodehub.com/edge/badge/DimaStoyanov/Monopoly?branch=master)](https://bettercodehub.com/results/DimaStoyanov/Monopoly)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a5d8e1a6805f4028ad9599d295644dc0)](https://app.codacy.com/app/sdima11101/Monopoly?utm_source=github.com&utm_medium=referral&utm_content=DimaStoyanov/Monopoly&utm_campaign=badger)
+[![Code smells](https://sonarcloud.io/api/project_badges/measure?project=netcracker.study%3Amonopoly&metric=code_smells)](https://sonarcloud.io/project/issues?id=netcracker.study%3Amonopoly&resolved=false&types=CODE_SMELL)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=netcracker.study%3Amonopoly&metric=coverage)](https://sonarcloud.io/component_measures?id=netcracker.study%3Amonopoly&metric=coverage)
 [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/DimaStoyanov/Monopoly/blob/master/LICENSE)
 
 ### Database
