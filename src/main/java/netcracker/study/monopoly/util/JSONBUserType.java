@@ -26,7 +26,7 @@ import java.util.Properties;
  */
 public class JSONBUserType implements UserType, ParameterizedType {
 
-    public final static String CLASS = "CLASS";
+    public static final String CLASS = "CLASS";
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private Class forClass;
 
@@ -41,17 +41,17 @@ public class JSONBUserType implements UserType, ParameterizedType {
     }
 
     @Override
-    public boolean equals(Object x, Object y) throws HibernateException {
+    public boolean equals(Object x, Object y) {
         return Objects.equals(x, y);
     }
 
     @Override
-    public int hashCode(Object x) throws HibernateException {
+    public int hashCode(Object x) {
         return Objects.hashCode(x);
     }
 
     @Override
-    public Object nullSafeGet(ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner) throws HibernateException, SQLException {
+    public Object nullSafeGet(ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner) throws SQLException {
         try {
             final String json = rs.getString(names[0]);
             return json == null
@@ -63,7 +63,7 @@ public class JSONBUserType implements UserType, ParameterizedType {
     }
 
     @Override
-    public void nullSafeSet(PreparedStatement st, Object value, int index, SharedSessionContractImplementor session) throws HibernateException, SQLException {
+    public void nullSafeSet(PreparedStatement st, Object value, int index, SharedSessionContractImplementor session) throws SQLException {
         try {
             final String json = value == null ? null : objectMapper.writeValueAsString(value);
             st.setObject(index, json, Types.OTHER);
@@ -73,7 +73,7 @@ public class JSONBUserType implements UserType, ParameterizedType {
     }
 
     @Override
-    public Object deepCopy(Object value) throws HibernateException {
+    public Object deepCopy(Object value) {
         return value;
     }
 
@@ -88,12 +88,12 @@ public class JSONBUserType implements UserType, ParameterizedType {
     }
 
     @Override
-    public Object assemble(Serializable cached, Object owner) throws HibernateException {
+    public Object assemble(Serializable cached, Object owner) {
         return cached;
     }
 
     @Override
-    public Object replace(Object original, Object target, Object owner) throws HibernateException {
+    public Object replace(Object original, Object target, Object owner) {
         return original;
     }
 

@@ -2,6 +2,7 @@ package netcracker.study.monopoly.db.model.json;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,7 +10,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @ToString(exclude = "turnOf")
-public class GameState {
+public class GameState implements Serializable {
 
     @Setter
     private UUID turnOf;

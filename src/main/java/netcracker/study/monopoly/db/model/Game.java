@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import netcracker.study.monopoly.db.model.json.GameState;
 import netcracker.study.monopoly.util.JSONBUserType;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -29,5 +30,5 @@ public class Game extends AbstractIdentifiableObject implements Serializable {
 
     @Type(type = "jsonb")
     @Setter
-    private netcracker.study.monopoly.db.model.json.GameState state;
+    private GameState state;
 }

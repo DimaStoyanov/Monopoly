@@ -1,8 +1,8 @@
 package netcracker.study.monopoly;
 
+import netcracker.study.monopoly.db.model.GamePlayerScore;
 import netcracker.study.monopoly.db.model.GameStatistic;
 import netcracker.study.monopoly.db.model.Player;
-import netcracker.study.monopoly.db.model.Score;
 import netcracker.study.monopoly.db.repository.GameRepository;
 import netcracker.study.monopoly.db.repository.PlayerRepository;
 import netcracker.study.monopoly.db.repository.ScoreRepository;
@@ -38,6 +38,7 @@ public class MonopolyApplicationTests {
     @Autowired
     private WebApplicationContext webApplicationContext;
     private MockMvc mockMvc;
+    private final Random random = new Random();
 
 
     @Before
@@ -69,22 +70,76 @@ public class MonopolyApplicationTests {
     @Test
     @Transactional
     public void insertAndReadDB() {
-        String nickname = "sdjv4j32wsdt43904235";
+        String nickname = "u" + random.nextLong();
         Player player = new Player(nickname, new Date());
         GameStatistic game = new GameStatistic(10, new Date(), player);
-        Score score = new Score(game, player, 100);
+        GamePlayerScore score = new GamePlayerScore(game, player, 100);
 
         playerRepository.save(player);
         gameRepository.save(game);
         scoreRepository.save(score);
 
         Player playerFromDB = playerRepository.findByNickname(nickname).orElse(null);
+        assert playerFromDB != null;
         Assert.assertEquals(player, playerFromDB);
         Assert.assertTrue(playerFromDB.getStat().getTotalScore() == 100);
         Assert.assertTrue(playerFromDB.getStat().getTotalGames() == 1);
         Assert.assertTrue(playerFromDB.getStat().getTotalWins() == 1);
         Assert.assertEquals(game, gameRepository.findById(game.getId()).orElse(null));
         Assert.assertEquals(score, scoreRepository.findById(score.getId()).orElse(null));
+    }
+
+
+    @Test
+    @Transactional
+    public void duplicateInsertViaRest() throws Exception {
+        String nickname = "u" + random.nextLong();
+        String request = String.format("/insert?nickname=%s", nickname);
+
+
+        mockMvc.perform(get(request))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get(request))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Transactional
+    public void findNotExistPlayerViaRest() throws Exception {
+        String nickname = "u" + random.nextLong();
+        String request = String.format("/read/%s", nickname);
+
+        mockMvc.perform(get(request))
+                .andExpect(status().isNotFound());
+    }
+
+
+    @Test
+    @Transactional
+    public void updateViaRest() throws Exception {
+        String nickname = "u" + random.nextLong();
+        int defaultScore = 100;
+        int newScore = 42;
+        String insertRequest = String.format("/insert?nickname=%s", nickname);
+        String updateRequest = String.format("/update?nickname=%s&score=%s", nickname, newScore);
+        String readRequest = String.format("/read/%s", nickname);
+
+        mockMvc.perform(get(insertRequest))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get(readRequest))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.stat.totalScore", is(defaultScore)));
+
+        mockMvc.perform(get(updateRequest))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get(readRequest))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nickname", is(nickname)))
+                .andExpect(jsonPath("$.stat.totalScore", is(defaultScore + newScore)));
+
     }
 }
 

@@ -2,13 +2,14 @@ package netcracker.study.monopoly.db.model.json;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @ToString(exclude = "id")
-public class PlayerState {
+class PlayerState implements Serializable {
 
     private UUID id;
 

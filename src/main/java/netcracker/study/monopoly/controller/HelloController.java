@@ -1,8 +1,8 @@
 package netcracker.study.monopoly.controller;
 
+import netcracker.study.monopoly.db.model.GamePlayerScore;
 import netcracker.study.monopoly.db.model.GameStatistic;
 import netcracker.study.monopoly.db.model.Player;
-import netcracker.study.monopoly.db.model.Score;
 import netcracker.study.monopoly.db.repository.GameRepository;
 import netcracker.study.monopoly.db.repository.PlayerRepository;
 import netcracker.study.monopoly.db.repository.ScoreRepository;
@@ -24,7 +24,8 @@ public class HelloController {
     private final ScoreRepository scoreRepository;
 
     @Autowired
-    public HelloController(PlayerRepository playerRepository, GameRepository gameRepository, ScoreRepository scoreRepository) {
+    public HelloController(PlayerRepository playerRepository,
+                           GameRepository gameRepository, ScoreRepository scoreRepository) {
         this.playerRepository = playerRepository;
         this.gameRepository = gameRepository;
         this.scoreRepository = scoreRepository;
@@ -36,13 +37,13 @@ public class HelloController {
                          @RequestParam(name = "score", defaultValue = "100") int score,
                          @RequestParam(name = "duration", defaultValue = "10") int duration) {
         if (playerRepository.findByNickname(nickname).isPresent()) {
-            throw new BadRequestException(nickname);
+            throw new PlayerAlreadyExistException(nickname);
         }
         Player player = new Player(nickname, new Date());
         GameStatistic game = new GameStatistic(duration, new Date(), player);
         playerRepository.save(player);
         gameRepository.save(game);
-        scoreRepository.save(new Score(game, player, score));
+        scoreRepository.save(new GamePlayerScore(game, player, score));
         return "OK";
     }
 
@@ -56,7 +57,8 @@ public class HelloController {
 
     @RequestMapping(value = "/read/{nickname}")
     public Player read(@PathVariable String nickname) {
-        return playerRepository.findByNickname(nickname).orElseThrow(() -> new PlayerNotFoundException(nickname));
+        return playerRepository.findByNickname(nickname).orElseThrow(() ->
+                new PlayerNotFoundException(nickname));
     }
 
     @RequestMapping("/read")
@@ -83,7 +85,7 @@ public class HelloController {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    protected void prepossess() {
+    public void prepossess() {
         Date date = new Date();
 
         Player john = new Player("john", date);
@@ -99,17 +101,17 @@ public class HelloController {
 
         List<GameStatistic> games = Arrays.asList(game, game2);
 
-        Score johnScore = new Score(game, john, 100);
-        Score alexScore = new Score(game, alex, 78);
-        Score alisaScore = new Score(game, alisa, 53);
-        Score xXxNAGIBATORxXxScore = new Score(game, xXxNAGIBATORxXx, 99);
-        Score johnScore2 = new Score(game2, john, 1);
-        Score alexScore2 = new Score(game2, alex, 13);
-        Score alisaScore2 = new Score(game2, alisa, 22);
-        Score xXxNAGIBATORxXxScore2 = new Score(game2, xXxNAGIBATORxXx, 19);
+        GamePlayerScore johnScore = new GamePlayerScore(game, john, 100);
+        GamePlayerScore alexScore = new GamePlayerScore(game, alex, 78);
+        GamePlayerScore alisaScore = new GamePlayerScore(game, alisa, 53);
+        GamePlayerScore xXxNAGIBATORxXxScore = new GamePlayerScore(game, xXxNAGIBATORxXx, 99);
+        GamePlayerScore johnScore2 = new GamePlayerScore(game2, john, 1);
+        GamePlayerScore alexScore2 = new GamePlayerScore(game2, alex, 13);
+        GamePlayerScore alisaScore2 = new GamePlayerScore(game2, alisa, 22);
+        GamePlayerScore xXxNAGIBATORxXxScore2 = new GamePlayerScore(game2, xXxNAGIBATORxXx, 19);
 
 
-        List<Score> scores = Arrays.asList(johnScore, alexScore, alisaScore, xXxNAGIBATORxXxScore,
+        List<GamePlayerScore> scores = Arrays.asList(johnScore, alexScore, alisaScore, xXxNAGIBATORxXxScore,
                 johnScore2, alexScore2, alisaScore2, xXxNAGIBATORxXxScore2);
 
         playerRepository.saveAll(players);
@@ -129,8 +131,8 @@ class PlayerNotFoundException extends RuntimeException {
 }
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-class BadRequestException extends RuntimeException {
-    BadRequestException(String nickname) {
+class PlayerAlreadyExistException extends RuntimeException {
+    PlayerAlreadyExistException(String nickname) {
         super("Not unique nickname: " + nickname);
     }
 }

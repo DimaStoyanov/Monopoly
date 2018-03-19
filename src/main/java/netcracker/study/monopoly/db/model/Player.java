@@ -31,7 +31,7 @@ public class Player extends AbstractIdentifiableObject implements Serializable {
     private PlayerStatistic stat;
 
     @OneToMany(mappedBy = "player", cascade = CascadeType.REFRESH)
-    private Set<Score> scores;
+    private Set<GamePlayerScore> scores;
 
     @ManyToOne
     @JoinColumn

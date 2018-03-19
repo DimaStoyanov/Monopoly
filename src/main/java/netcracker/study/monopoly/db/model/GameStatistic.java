@@ -31,7 +31,7 @@ public class GameStatistic extends AbstractIdentifiableObject implements Seriali
 
 
     @OneToMany(mappedBy = "game")
-    private Set<Score> scores;
+    private Set<GamePlayerScore> scores;
 
     @PrePersist
     private void update() {

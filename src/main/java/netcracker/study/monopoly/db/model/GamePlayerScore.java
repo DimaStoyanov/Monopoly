@@ -14,7 +14,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @ToString(of = "score")
 @Getter
-public class Score extends AbstractIdentifiableObject implements Serializable {
+public class GamePlayerScore extends AbstractIdentifiableObject implements Serializable {
 
     @ManyToOne(optional = false)
     @JoinColumn
