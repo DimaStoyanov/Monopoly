@@ -10,6 +10,7 @@ public class Street implements Cell{
     String Name;
     Own own;
     boolean toBuy;
+    int position;
 
     @Override
     public void action(Gamer gamer) {
