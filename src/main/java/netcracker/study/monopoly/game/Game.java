@@ -7,8 +7,8 @@ public class Game {
 
     List<Gamer> gamers = new ArrayList<>();
 
-    public void start(int i){
-        for (int j = 0; j < i; j++) {
+    public void start(int gamersCount) {
+        for (int j = 0; j < gamersCount; j++) {
             gamers.add(new Gamer());
             gamers.get(j).setPosition(0);
         }

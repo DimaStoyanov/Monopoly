@@ -5,7 +5,7 @@ import netcracker.study.monopoly.game.resources.Own;
 
 public class Street implements Cell{
 
-    int value;
+    int cost;
     Gamer owner;
     String Name;
     Own own;
@@ -14,7 +14,7 @@ public class Street implements Cell{
 
     @Override
     public void action(Gamer gamer) {
-        if(owner.equals(null)){
+        if (owner == null) {
             if (toBuy){
                 buy(gamer);
             }
@@ -25,11 +25,11 @@ public class Street implements Cell{
 
     public void buy(Gamer gamer){
         owner = gamer;
-        gamer.buy(value);
+        gamer.buy(cost);
     }
 
     public void pay(Gamer gamer){
         owner = gamer;
-        gamer.pay(value);
+        gamer.pay(cost);
     }
 }

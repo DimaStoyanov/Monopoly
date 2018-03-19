@@ -4,21 +4,21 @@ import netcracker.study.monopoly.game.Gamer;
 
 public class Start implements Cell {
 
-    int money;
+    int salary;
     int position;
     String name;
 
     @Override
     public void action(Gamer gamer) {
-        gamer.sell(money);
+        gamer.sell(salary);
     }
 
-    public int getMoney() {
-        return money;
+    public int getSalary() {
+        return salary;
     }
 
-    public void setMoney(int money) {
-        this.money = money;
+    public void setSalary(int salary) {
+        this.salary = salary;
     }
 
     public int getPosition() {
