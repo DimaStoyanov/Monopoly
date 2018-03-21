@@ -1,18 +1,18 @@
 package netcracker.study.monopoly.game.cells;
 
+import lombok.Getter;
+import lombok.Setter;
 import netcracker.study.monopoly.game.Gamer;
 
-import java.util.ArrayList;
-import java.util.List;
-
+@Getter
+@Setter
 public class Flight implements Cell {
 
-    List<Integer> flights = new ArrayList<>();
-    int money;
 
+    int money;
+    int position;
 
     @Override
     public void action(Gamer gamer) {
-
     }
 }
