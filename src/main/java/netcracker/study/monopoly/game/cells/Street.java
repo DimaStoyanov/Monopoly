@@ -1,12 +1,14 @@
 package netcracker.study.monopoly.game.cells;
 
+import lombok.Getter;
 import netcracker.study.monopoly.game.Gamer;
 
+@Getter
 public class Street implements Cell{
 
     int cost;
     Gamer owner;
-    String Name;
+    String name;
     boolean toBuy;
     int position;
 

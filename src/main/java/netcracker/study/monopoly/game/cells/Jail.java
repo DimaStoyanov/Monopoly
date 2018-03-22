@@ -14,11 +14,14 @@ public class Jail implements Cell {
 
     @Getter
     @Setter
+    String name;
+
+    @Getter
+    @Setter
     int position;
 
     @Override
     public void action(Gamer gamer) {
     }
-
 
 }

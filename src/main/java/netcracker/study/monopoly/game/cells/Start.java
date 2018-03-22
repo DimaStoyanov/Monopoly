@@ -9,9 +9,9 @@ import netcracker.study.monopoly.game.Gamer;
 @Setter
 public class Start implements Cell {
 
-    int salary;
-    int position;
-    String name;
+    int salary = 200;
+    int position = 0;
+    String name = "Старт";
 
     @Override
     public void action(Gamer gamer) {

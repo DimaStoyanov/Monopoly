@@ -12,6 +12,8 @@ public class Flight implements Cell {
     int money;
     int position;
 
+    String name;
+
     @Override
     public void action(Gamer gamer) {
     }
