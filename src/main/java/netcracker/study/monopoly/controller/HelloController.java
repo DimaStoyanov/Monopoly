@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -33,14 +32,14 @@ public class HelloController {
         if (playerRepository.findByNickname(nickname).isPresent()) {
             throw new PlayerAlreadyExistException(nickname);
         }
-        Player player = new Player(nickname, new Date());
+        Player player = new Player(nickname);
         playerRepository.save(player);
 
 
         PlayerState playerState = new PlayerState(200, 0, player);
         List<CellState> cellStates = Collections.singletonList(new CellState(3));
         List<PlayerState> playerStates = Collections.singletonList(playerState);
-        Game game = new Game(playerStates, player, cellStates, new Date());
+        Game game = new Game(playerStates, player, cellStates);
         gameRepository.save(game);
         return "OK";
     }
@@ -51,7 +50,7 @@ public class HelloController {
                 new PlayerNotFoundException(nickname));
         List<PlayerState> playerStates = Collections.singletonList(new PlayerState(200, 0, player));
         List<CellState> cellStates = Collections.singletonList(new CellState(1));
-        Game game = new Game(playerStates, player, cellStates, new Date());
+        Game game = new Game(playerStates, player, cellStates);
         gameRepository.save(game);
         return "OK";
     }

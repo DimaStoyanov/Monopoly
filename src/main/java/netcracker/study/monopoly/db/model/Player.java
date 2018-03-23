@@ -16,7 +16,6 @@ import java.util.List;
 public class Player extends AbstractIdentifiableObject implements Serializable {
 
     @Temporal(TemporalType.DATE)
-    @NonNull
     @Column(updatable = false)
     private Date createdAt;
 
@@ -34,10 +33,11 @@ public class Player extends AbstractIdentifiableObject implements Serializable {
     @JsonIgnore
     private List<Player> friends;
 
-    public Player(String nickname, Date createdAt) {
+    public Player(String nickname) {
         this.nickname = nickname;
-        this.createdAt = createdAt;
+        this.createdAt = new Date();
         stat = new PlayerStatistics();
+        createdAt = new Date();
     }
 
     public void addFriend(Player player) {
