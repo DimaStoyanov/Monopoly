@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class JSONRead {
+public class JSONGameRead {
 
     Gson gson = new Gson();
 
@@ -26,18 +26,18 @@ public class JSONRead {
     File cellFolder = new File("src/main/resources/game/streets");
     File[] cellFiles = cellFolder.listFiles();
 
-    public JSONRead(int gamersCount) {
+    public JSONGameRead(int gamersCount) {
         setGamers(gamersCount);
     }
 
-    public JSONRead() {
+    public JSONGameRead() {
         setStreets();
     }
 
     public static void main(String[] args) {
-        JSONRead jsonRead = new JSONRead(4);
+        JSONGameRead jsonGameRead = new JSONGameRead(4);
         Map<Integer, Street> cells;
-        cells = jsonRead.getStreets();
+        cells = jsonGameRead.getStreets();
 
         for (int i = 1; i < cells.size(); i++) {
             System.out.println(cells.get(i).getName());

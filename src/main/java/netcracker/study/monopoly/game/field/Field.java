@@ -3,7 +3,7 @@ package netcracker.study.monopoly.game.field;
 import netcracker.study.monopoly.game.cells.Cell;
 import netcracker.study.monopoly.game.cells.Start;
 import netcracker.study.monopoly.game.cells.Street;
-import netcracker.study.monopoly.util.JSONRead;
+import netcracker.study.monopoly.util.JSONGameRead;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +26,9 @@ public class Field {
     }
 
     public void setCells() {
-        JSONRead jsonRead = new JSONRead();
-        jsonRead.setStreets();
-        Map<Integer, Street> streets = jsonRead.getStreets();
+        JSONGameRead jsonGameRead = new JSONGameRead();
+        jsonGameRead.setStreets();
+        Map<Integer, Street> streets = jsonGameRead.getStreets();
         cells.add(start);
         for (int i = 0; i < streets.size(); i++) {
             cells.add(streets.get(i + 1));
