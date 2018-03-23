@@ -26,6 +26,7 @@ public class HelloController {
         this.gameRepository = gameRepository;
     }
 
+
     @RequestMapping(value = "/insert")
     @ResponseStatus(HttpStatus.CREATED)
     public String insert(@RequestParam(name = "nickname", defaultValue = "Anonymous") String nickname) {

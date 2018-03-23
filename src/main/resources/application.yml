@@ -22,13 +22,13 @@ server:
 security:
   oauth2:
     client:
-      clientId: 169804934687-gt2t00vhrepaubn87vtjqdor8imio6pl.apps.googleusercontent.com
-      clientSecret: p4QjvzUFKvouet5LkX7JwZ1o
-      accessTokenUri: https://www.googleapis.com/oauth2/v3/token
-      userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
-      tokenName: oauth_token
+      clientId: 6421813
+      clientSecret: MQkAtw8xDuaRYoEjTzAA
+      accessTokenUri: https://oauth.vk.com/access_token
+      userAuthorizationUri: https://oauth.vk.com/authorize
+      tokenName: code
       authenticationScheme: query
-      clientAuthenticationScheme: query
-      scope: profile email
+      clientAuthenticationScheme: form
+      grant-type: authorization_code
     resource:
-      userInfoUri: https://www.googleapis.com/plus/v1/people/me
+      userInfoUri: https://api.vk.com/method/users.get
