@@ -11,6 +11,7 @@ public class Gamer {
     int first;
     int second;
     Random random = new Random();
+    int order;
 
     public int getPosition() {
         return position;
@@ -18,6 +19,30 @@ public class Gamer {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getMoney() {
+        return money;
+    }
+
+    public void setMoney(int money) {
+        this.money = money;
     }
 
     int position;

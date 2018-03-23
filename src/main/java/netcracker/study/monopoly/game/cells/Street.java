@@ -11,6 +11,7 @@ public class Street implements Cell{
     String name;
     boolean toBuy;
     int position;
+    int level = 0;
 
     @Override
     public String action(Gamer gamer) {
