@@ -1,7 +1,7 @@
-package netcracker.study.monopoly.game.field;
+package netcracker.study.monopoly.game;
 
-import netcracker.study.monopoly.game.Gamer;
 import netcracker.study.monopoly.game.cells.Cell;
+import netcracker.study.monopoly.game.field.Field;
 import netcracker.study.monopoly.util.JSONGameRead;
 
 import java.util.ArrayList;

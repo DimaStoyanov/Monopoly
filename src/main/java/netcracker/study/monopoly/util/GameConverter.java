@@ -5,8 +5,8 @@ import netcracker.study.monopoly.db.model.Game;
 import netcracker.study.monopoly.db.model.Player;
 import netcracker.study.monopoly.db.model.PlayerState;
 import netcracker.study.monopoly.game.Gamer;
+import netcracker.study.monopoly.game.PlayGame;
 import netcracker.study.monopoly.game.cells.Street;
-import netcracker.study.monopoly.game.field.PlayGame;
 
 import java.util.ArrayList;
 import java.util.Date;
