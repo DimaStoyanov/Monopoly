@@ -14,7 +14,13 @@ public class Start implements Cell {
     String name = "Старт";
 
     @Override
-    public void action(Gamer gamer) {
+    public String action(Gamer gamer) {
         gamer.sell(salary);
+        return "Зарплата начислена";
+    }
+
+    @Override
+    public String show() {
+        return null;
     }
 }

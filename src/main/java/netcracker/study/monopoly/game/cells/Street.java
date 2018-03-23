@@ -13,13 +13,22 @@ public class Street implements Cell{
     int position;
 
     @Override
-    public void action(Gamer gamer) {
+    public String action(Gamer gamer) {
         if (owner == null) {
-            if (toBuy){
-                buy(gamer);
-            }
+            buy(gamer);
+            return "Вы приобрели " + name;
         }else {
             pay(gamer);
+            return "Вы оплатили за проживание на " + name;
+        }
+    }
+
+    @Override
+    public String show() {
+        if (owner == null) {
+            return "Вы можете приобрести " + name;
+        } else {
+            return "Вы должны оплатить за проживание на " + name;
         }
     }
 

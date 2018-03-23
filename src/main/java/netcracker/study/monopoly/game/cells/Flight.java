@@ -15,6 +15,12 @@ public class Flight implements Cell {
     String name;
 
     @Override
-    public void action(Gamer gamer) {
+    public String action(Gamer gamer) {
+        return null;
+    }
+
+    @Override
+    public String show() {
+        return null;
     }
 }

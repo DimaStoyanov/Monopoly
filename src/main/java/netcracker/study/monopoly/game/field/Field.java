@@ -27,7 +27,8 @@ public class Field {
 
     public void setCells() {
         JSONRead jsonRead = new JSONRead();
-        Map<Integer, Street> streets = jsonRead.getCells();
+        jsonRead.setStreets();
+        Map<Integer, Street> streets = jsonRead.getStreets();
         cells.add(start);
         for (int i = 0; i < streets.size(); i++) {
             cells.add(streets.get(i + 1));

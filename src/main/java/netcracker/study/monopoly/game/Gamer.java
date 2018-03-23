@@ -1,10 +1,16 @@
 package netcracker.study.monopoly.game;
 
+import java.util.Random;
+
 public class Gamer {
 
     String name;
     int money;
     boolean canGo;
+
+    int first;
+    int second;
+    Random random = new Random();
 
     public int getPosition() {
         return position;
@@ -25,6 +31,9 @@ public class Gamer {
     }
 
     public void go(){
+        first = random.nextInt(5) + 1;
+        second = random.nextInt(5) + 1;
+        position = position + first + second;
     }
 
     public void action(){

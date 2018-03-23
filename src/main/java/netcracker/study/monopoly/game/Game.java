@@ -1,39 +1,38 @@
 package netcracker.study.monopoly.game;
 
-import com.google.gson.Gson;
+import netcracker.study.monopoly.game.field.Field;
+import netcracker.study.monopoly.util.JSONRead;
 
-import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Game {
-    Gson gson = new Gson();
 
-    List<Gamer> gamers = new ArrayList<>();
-//    List<Cell>
+    JSONRead jsonRead;
+    List<Gamer> gamers;
+    Field field;
 
-    BufferedReader br;
-
-    File myFolder = new File("src/main/java/netcracker/study/monopoly/game/game/gamers");
-    File[] files = myFolder.listFiles();
-
-    public static void main(String[] args) throws FileNotFoundException {
-        File file = new File("src/main/java/netcracker/study/monopoly/game/game/gamers/gamer1.json");
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+    public static void main(String[] args) {
         Game game = new Game();
-        Gamer gamer = game.gson.fromJson(br, Gamer.class);
-        System.out.println(gamer.money);
+        game.start(100);
+        for (int i = 0; i < 100; i++) {
+            game.go(i);
+            game.action(i);
+        }
     }
 
     public void start(int gamersCount) {
-        for (int j = 0; j < gamersCount; j++) {
-            try {
-                br = new BufferedReader(new InputStreamReader(new FileInputStream(files[j])));
-                gamers.add(gson.fromJson(br, Gamer.class));
-                gamers.get(j).setPosition(0);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+        jsonRead = new JSONRead(gamersCount);
+        gamers = jsonRead.getGamers();
+        field = new Field();
+        field.setCells();
+    }
+
+    public void go(int gamerNum) {
+        gamers.get(gamerNum).go();
+        System.out.println(field.getCells().get(gamers.get(gamerNum).getPosition()).show());
+    }
+
+    public void action(int gamerNum) {
+        System.out.println(field.getCells().get(gamers.get(gamerNum).getPosition()).action(gamers.get(gamerNum)));
     }
 }

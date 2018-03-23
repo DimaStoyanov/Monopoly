@@ -15,21 +15,29 @@ public class JSONRead {
     Gson gson = new Gson();
 
     List<Gamer> gamers = new ArrayList<>();
-    Map<Integer, Street> cells = new HashMap<>();
+    Map<Integer, Street> streets = new HashMap<>();
     Street street;
 
     BufferedReader br;
 
-    File gamerFolder = new File("/src/main/resources/game/gamers");
+    File gamerFolder = new File("src/main/resources/game/gamers");
     File[] gamerFiles = gamerFolder.listFiles();
 
     File cellFolder = new File("src/main/resources/game/streets");
     File[] cellFiles = cellFolder.listFiles();
 
+    public JSONRead(int gamersCount) {
+        setGamers(gamersCount);
+    }
+
+    public JSONRead() {
+        setStreets();
+    }
+
     public static void main(String[] args) {
-        JSONRead jsonRead = new JSONRead();
+        JSONRead jsonRead = new JSONRead(4);
         Map<Integer, Street> cells;
-        cells = jsonRead.getCells();
+        cells = jsonRead.getStreets();
 
         for (int i = 1; i < cells.size(); i++) {
             System.out.println(cells.get(i).getName());
@@ -37,29 +45,35 @@ public class JSONRead {
 
     }
 
-    public List<Gamer> getGamers(int gamersCount) {
+    public List<Gamer> getGamers() {
+        return gamers;
+    }
+
+    public void setGamers(int gamersCount) {
         for (int j = 0; j < gamersCount; j++) {
             try {
-                br = new BufferedReader(new InputStreamReader(new FileInputStream(gamerFiles[j])));
+                br = new BufferedReader(new InputStreamReader(new FileInputStream(gamerFiles[0])));
                 gamers.add(gson.fromJson(br, Gamer.class));
                 gamers.get(j).setPosition(0);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
         }
-        return gamers;
     }
 
-    public Map<Integer, Street> getCells() {
+    public void setStreets() {
         for (int j = 0; j < cellFiles.length; j++) {
             try {
                 br = new BufferedReader(new InputStreamReader(new FileInputStream(cellFiles[j])));
                 street = gson.fromJson(br, Street.class);
-                cells.put(street.getPosition(), street);
+                streets.put(street.getPosition(), street);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
         }
-        return cells;
+    }
+
+    public Map<Integer, Street> getStreets() {
+        return streets;
     }
 }

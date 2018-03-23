@@ -21,7 +21,13 @@ public class Jail implements Cell {
     int position;
 
     @Override
-    public void action(Gamer gamer) {
+    public String action(Gamer gamer) {
+        return null;
+    }
+
+    @Override
+    public String show() {
+        return null;
     }
 
 }
