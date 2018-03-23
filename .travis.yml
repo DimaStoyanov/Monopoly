@@ -16,7 +16,7 @@ cache:
 services:
  - postgresql
 before_script:
- - psql -c 'create database users;' -U postgres
+ - psql -c 'create database test_users;' -U postgres
 deploy:
  provider: heroku
  api-key:

@@ -1,18 +1,16 @@
 package netcracker.study.monopoly.controller;
 
-import netcracker.study.monopoly.db.model.GamePlayerScore;
-import netcracker.study.monopoly.db.model.GameStatistic;
+import netcracker.study.monopoly.db.model.CellState;
+import netcracker.study.monopoly.db.model.Game;
 import netcracker.study.monopoly.db.model.Player;
+import netcracker.study.monopoly.db.model.PlayerState;
 import netcracker.study.monopoly.db.repository.GameRepository;
 import netcracker.study.monopoly.db.repository.PlayerRepository;
-import netcracker.study.monopoly.db.repository.ScoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -21,39 +19,55 @@ public class HelloController {
 
     private final PlayerRepository playerRepository;
     private final GameRepository gameRepository;
-    private final ScoreRepository scoreRepository;
 
     @Autowired
     public HelloController(PlayerRepository playerRepository,
-                           GameRepository gameRepository, ScoreRepository scoreRepository) {
+                           GameRepository gameRepository) {
         this.playerRepository = playerRepository;
         this.gameRepository = gameRepository;
-        this.scoreRepository = scoreRepository;
     }
 
     @RequestMapping(value = "/insert")
     @ResponseStatus(HttpStatus.CREATED)
-    public String insert(@RequestParam(name = "nickname", defaultValue = "Anonymous") String nickname,
-                         @RequestParam(name = "score", defaultValue = "100") int score,
-                         @RequestParam(name = "duration", defaultValue = "10") int duration) {
+    public String insert(@RequestParam(name = "nickname", defaultValue = "Anonymous") String nickname) {
         if (playerRepository.findByNickname(nickname).isPresent()) {
             throw new PlayerAlreadyExistException(nickname);
         }
         Player player = new Player(nickname, new Date());
-        GameStatistic game = new GameStatistic(duration, new Date(), player);
         playerRepository.save(player);
+
+
+        PlayerState playerState = new PlayerState(200, 0, player);
+        List<CellState> cellStates = Collections.singletonList(new CellState(3));
+        List<PlayerState> playerStates = Collections.singletonList(playerState);
+        Game game = new Game(playerStates, player, cellStates, new Date());
         gameRepository.save(game);
-        scoreRepository.save(new GamePlayerScore(game, player, score));
         return "OK";
     }
 
-    @RequestMapping(value = "/cleanup")
-    public String clean() {
-        scoreRepository.deleteAll();
-        gameRepository.deleteAll();
-        playerRepository.deleteAll();
+    @RequestMapping("/add_game")
+    public String addGame(@RequestParam(name = "nickname", defaultValue = "Anonymous") String nickname) {
+        Player player = playerRepository.findByNickname(nickname).orElseThrow(() ->
+                new PlayerNotFoundException(nickname));
+        List<PlayerState> playerStates = Collections.singletonList(new PlayerState(200, 0, player));
+        List<CellState> cellStates = Collections.singletonList(new CellState(1));
+        Game game = new Game(playerStates, player, cellStates, new Date());
+        gameRepository.save(game);
         return "OK";
     }
+
+    @RequestMapping("/finish_games")
+    public String finishGames(@RequestParam(name = "nickname", defaultValue = "Anonymous") String nickname) {
+        Player player = playerRepository.findByNickname(nickname).orElseThrow(() ->
+                new PlayerNotFoundException(nickname));
+
+        gameRepository.findByPlayer(player).forEach(g -> {
+            if (!g.isFinished()) g.finish(player, 10);
+        });
+        playerRepository.save(player);
+        return "OK";
+    }
+
 
     @RequestMapping(value = "/read/{nickname}")
     public Player read(@PathVariable String nickname) {
@@ -66,6 +80,18 @@ public class HelloController {
         return playerRepository.findAll();
     }
 
+    @RequestMapping("/read_games")
+    public Iterable<Game> readGames() {
+        return gameRepository.findAll();
+    }
+
+    @RequestMapping("/read_games/{nickname}")
+    public Iterable<Game> readPlayerGames(@PathVariable String nickname) {
+        Player player = playerRepository.findByNickname(nickname).orElseThrow(() ->
+                new PlayerNotFoundException(nickname));
+        return gameRepository.findByPlayer(player);
+    }
+
     @RequestMapping(value = "/update")
     public String updateScore(@RequestParam(name = "nickname") String nickname,
                               @RequestParam(name = "score") Integer score) {
@@ -76,50 +102,41 @@ public class HelloController {
         return "OK";
     }
 
-
-    @RequestMapping(value = "/stuff")
-    public Player stuff() {
-        prepossess();
-        return playerRepository.findByNickname("john").orElseThrow(() -> new PlayerNotFoundException("john"));
-
+    @RequestMapping("/add_friend")
+    public String addFriend(@RequestParam(name = "from") String from,
+                            @RequestParam(name = "to") String to) {
+        if (from.equals(to)) return "You can't be friend of yourself";
+        Player playerFrom = playerRepository.findByNickname(from).orElseThrow(() ->
+                new PlayerNotFoundException(from));
+        Player playerTo = playerRepository.findByNickname(to).orElseThrow(() ->
+                new PlayerNotFoundException(to));
+        playerFrom.addFriend(playerTo);
+        playerRepository.save(playerFrom);
+        return "OK";
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void prepossess() {
-        Date date = new Date();
-
-        Player john = new Player("john", date);
-        Player alex = new Player("alex", new Date());
-        Player alisa = new Player("alisa", date);
-        Player xXxNAGIBATORxXx = new Player("xXxNAGIBATORxXx", date);
-
-        List<Player> players = Arrays.asList(john, alex, alisa, xXxNAGIBATORxXx);
-
-        GameStatistic game = new GameStatistic(35, new Date(), john);
-        GameStatistic game2 = new GameStatistic(5, date, alisa);
-
-
-        List<GameStatistic> games = Arrays.asList(game, game2);
-
-        GamePlayerScore johnScore = new GamePlayerScore(game, john, 100);
-        GamePlayerScore alexScore = new GamePlayerScore(game, alex, 78);
-        GamePlayerScore alisaScore = new GamePlayerScore(game, alisa, 53);
-        GamePlayerScore xXxNAGIBATORxXxScore = new GamePlayerScore(game, xXxNAGIBATORxXx, 99);
-        GamePlayerScore johnScore2 = new GamePlayerScore(game2, john, 1);
-        GamePlayerScore alexScore2 = new GamePlayerScore(game2, alex, 13);
-        GamePlayerScore alisaScore2 = new GamePlayerScore(game2, alisa, 22);
-        GamePlayerScore xXxNAGIBATORxXxScore2 = new GamePlayerScore(game2, xXxNAGIBATORxXx, 19);
-
-
-        List<GamePlayerScore> scores = Arrays.asList(johnScore, alexScore, alisaScore, xXxNAGIBATORxXxScore,
-                johnScore2, alexScore2, alisaScore2, xXxNAGIBATORxXxScore2);
-
-        playerRepository.saveAll(players);
-        gameRepository.saveAll(games);
-        scoreRepository.saveAll(scores);
-
-
+    @RequestMapping("/read_friends")
+    public Iterable<Player> readFriends(@RequestParam(name = "nickname", defaultValue = "Anonymous") String nickname) {
+        Player player = playerRepository.findByNickname(nickname).orElseThrow(() ->
+                new PlayerNotFoundException(nickname));
+        return player.getFriends();
     }
+
+    @RequestMapping("/remove_friend")
+    public String removeFriend(@RequestParam(name = "from") String from,
+                               @RequestParam(name = "to") String to) {
+        Player playerFrom = playerRepository.findByNickname(from).orElseThrow(() ->
+                new PlayerNotFoundException(from));
+        Player playerTo = playerRepository.findByNickname(to).orElseThrow(() ->
+                new PlayerNotFoundException(from));
+
+        boolean deleted = playerFrom.removeFriend(playerTo);
+        playerRepository.save(playerFrom);
+
+        return deleted ? "OK" : "Can't find your friend " + to;
+    }
+
+
 }
 
 

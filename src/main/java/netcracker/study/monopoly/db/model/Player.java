@@ -1,16 +1,18 @@
 package netcracker.study.monopoly.db.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Entity
-@ToString
+@ToString(exclude = "friends")
 @NoArgsConstructor
 @Getter
+@Table(name = "players")
 public class Player extends AbstractIdentifiableObject implements Serializable {
 
     @Temporal(TemporalType.DATE)
@@ -23,24 +25,29 @@ public class Player extends AbstractIdentifiableObject implements Serializable {
     @Column(unique = true)
     private String nickname;
 
-    @OneToMany(mappedBy = "winner", cascade = CascadeType.REFRESH)
-    private Set<GameStatistic> gamesWon;
-
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH}, optional = false)
+    @OneToOne(cascade = {CascadeType.PERSIST}, optional = false)
     @JoinColumn
-    private PlayerStatistic stat;
+    private PlayerStatistics stat;
 
-    @OneToMany(mappedBy = "player", cascade = CascadeType.REFRESH)
-    private Set<GamePlayerScore> scores;
-
-    @ManyToOne
-    @JoinColumn
-    private Game currentGame;
+    @ManyToMany
+    @JoinTable
+    @JsonIgnore
+    private List<Player> friends;
 
     public Player(String nickname, Date createdAt) {
         this.nickname = nickname;
         this.createdAt = createdAt;
-        stat = new PlayerStatistic(0, 0, 0, this);
+        stat = new PlayerStatistics();
     }
+
+    public void addFriend(Player player) {
+        friends.add(player);
+        player.getFriends().add(this);
+    }
+
+    public boolean removeFriend(Player player) {
+        return friends.remove(player) && player.getFriends().remove(this);
+    }
+
 
 }

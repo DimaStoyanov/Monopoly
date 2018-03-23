@@ -25,14 +25,18 @@ public class MonopolyApplication extends AbstractHandlerExceptionResolver {
         SpringApplication.run(MonopolyApplication.class, args);
 
         String token = System.getenv("ROLLBAR_ACCESS_TOKEN");
-        rollbar = Rollbar.init(withAccessToken(token)
-                .handleUncaughtErrors(true)
-                .build());
+        if (token != null) {
+            rollbar = Rollbar.init(withAccessToken(token)
+                    .handleUncaughtErrors(true)
+                    .build());
+        }
     }
 
     @Override
     protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        rollbar.debug(ex);
+        if (rollbar != null) {
+            rollbar.debug(ex);
+        }
         return null;
     }
 

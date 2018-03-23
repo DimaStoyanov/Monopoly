@@ -1,28 +1,25 @@
 package netcracker.study.monopoly;
 
-import netcracker.study.monopoly.db.model.GamePlayerScore;
-import netcracker.study.monopoly.db.model.GameStatistic;
+import netcracker.study.monopoly.db.model.CellState;
+import netcracker.study.monopoly.db.model.Game;
 import netcracker.study.monopoly.db.model.Player;
+import netcracker.study.monopoly.db.model.PlayerState;
 import netcracker.study.monopoly.db.repository.GameRepository;
 import netcracker.study.monopoly.db.repository.PlayerRepository;
-import netcracker.study.monopoly.db.repository.ScoreRepository;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @RunWith(SpringRunner.class)
@@ -34,113 +31,41 @@ public class MonopolyApplicationTests {
     @Autowired
     private PlayerRepository playerRepository;
     @Autowired
-    private ScoreRepository scoreRepository;
-    @Autowired
     private WebApplicationContext webApplicationContext;
     private MockMvc mockMvc;
     private final Random random = new Random();
 
 
-    @Before
-    public void init() {
+    @Test
+    public void insert() {
         mockMvc = webAppContextSetup(webApplicationContext).build();
-    }
 
-    @Test
-    @Transactional
-    public void insertAndReadViaRest() throws Exception {
-        Random random = new Random();
-        String nickname = "u" + random.nextLong();
-        int score = 42;
-        String url = String.format("/insert?nickname=%s&score=%s", nickname, score);
+        Player john = new Player("john", new Date());
+        Player ivan = new Player("ivan", new Date());
+        Player alisa = new Player("alisa", new Date());
+        Player bot = new Player("bot", new Date());
+        List<Player> players = Arrays.asList(john, ivan, alisa, bot);
 
-        mockMvc.perform(get(url))
-                .andExpect(status().isCreated())
-                .andExpect(content().string("OK"));
+        List<CellState> cellStates = Arrays.asList(new CellState(0), new CellState(1),
+                new CellState(2), new CellState(3));
 
-        mockMvc.perform(get("/read/" + nickname))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nickname", is(nickname)))
-                .andExpect(jsonPath("$.stat.totalScore", is(score)))
-                .andExpect(jsonPath("$.stat.totalGames", is(1)))
-                .andExpect(jsonPath("$.stat.totalWins", is(1)));
+        List<PlayerState> playerStates = Arrays.asList(new PlayerState(200, 0, john),
+                new PlayerState(200, 1, ivan),
+                new PlayerState(200, 2, alisa),
+                new PlayerState(200, 3, bot));
 
-    }
+        List<Game> games = Arrays.asList(new Game(playerStates, john, cellStates, new Date()),
+                new Game(playerStates, alisa, cellStates, new Date()));
 
-    @Test
-    @Transactional
-    public void insertAndReadDB() {
-        String nickname = "u" + random.nextLong();
-        Player player = new Player(nickname, new Date());
-        GameStatistic game = new GameStatistic(10, new Date(), player);
-        GamePlayerScore score = new GamePlayerScore(game, player, 100);
 
-        playerRepository.save(player);
-        gameRepository.save(game);
-        scoreRepository.save(score);
+        playerRepository.saveAll(players);
+        gameRepository.saveAll(games);
 
-        Player playerFromDB = playerRepository.findByNickname(nickname).orElse(null);
-        assert playerFromDB != null;
-        Assert.assertEquals(player, playerFromDB);
-        Assert.assertTrue(playerFromDB.getStat().getTotalScore() == 100);
-        Assert.assertTrue(playerFromDB.getStat().getTotalGames() == 1);
-        Assert.assertTrue(playerFromDB.getStat().getTotalWins() == 1);
-        Assert.assertEquals(game, gameRepository.findById(game.getId()).orElse(null));
-        Assert.assertEquals(score, scoreRepository.findById(score.getId()).orElse(null));
+
+        Assert.assertTrue(playerRepository.count() == 4);
+        Assert.assertTrue(gameRepository.count() == 2);
     }
 
 
-    @Test
-    @Transactional
-    public void duplicateInsertViaRest() throws Exception {
-        String nickname = "u" + random.nextLong();
-        String request = String.format("/insert?nickname=%s", nickname);
-
-
-        mockMvc.perform(get(request))
-                .andExpect(status().isCreated());
-
-        mockMvc.perform(get(request))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @Transactional
-    public void findNotExistPlayerViaRest() throws Exception {
-        String nickname = "u" + random.nextLong();
-        String request = String.format("/read/%s", nickname);
-
-        mockMvc.perform(get(request))
-                .andExpect(status().isNotFound());
-    }
-
-
-    @Test
-    @Transactional
-    public void updateViaRest() throws Exception {
-        String nickname = "u" + random.nextLong();
-        int defaultScore = 100;
-        int newScore = 42;
-        String insertRequest = String.format("/insert?nickname=%s", nickname);
-        String updateRequest = String.format("/update?nickname=%s&score=%s", nickname, newScore);
-        String readRequest = String.format("/read/%s", nickname);
-
-        mockMvc.perform(get(insertRequest))
-                .andExpect(status().isCreated());
-
-        mockMvc.perform(get(readRequest))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.stat.totalScore", is(defaultScore)));
-
-        mockMvc.perform(get(updateRequest))
-                .andExpect(status().isOk());
-
-        mockMvc.perform(get(readRequest))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nickname", is(nickname)))
-                .andExpect(jsonPath("$.stat.totalScore", is(defaultScore + newScore)));
-
-    }
 }
-
 
