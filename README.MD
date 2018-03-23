@@ -6,11 +6,11 @@
 [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/DimaStoyanov/Monopoly/blob/master/LICENSE)
 
 ### Database
-<img alt="ER Diagram" height="300px" src="https://pp.userapi.com/c830608/v830608828/b328e/KTel_xlzIjg.jpg">  
-
-### JSONB
-<img alt="ER Diagram" height="180px" src="https://pp.userapi.com/c824502/v824502828/e109e/7tGZ7V4hZuI.jpg">  
+<img alt="ER Diagram" height="300px" src="https://sun9-4.userapi.com/c834204/v834204523/f48d0/ajY7LB814ZA.jpg"> 
+<img alt="Another ER Diagram" height="300px" src="https://sun9-9.userapi.com/c834204/v834204523/f48c7/g4Nmh2-sGy4.jpg">
+<img alt="DTO methods" height="300px" src="https://sun9-6.userapi.com/c834204/v834204523/f48bf/83vTgzZ3Qq8.jpg">
 
 
 ### Game logic UML
-<img alt="UML" height="300px" src="https://sun9-7.userapi.com/c840624/v840624241/647ab/oIPV8S-nN-E.jpg">
+<img alt="Cells UML" height="300px" src="https://pp.userapi.com/c846418/v846418523/8682/DPXCEQpg5yo.jpg">
+<img alt="other classes UML" height="300px" src="https://pp.userapi.com/c846418/v846418523/8689/-hZ0m7CTfA8.jpg">

@@ -1,34 +1,84 @@
 package netcracker.study.monopoly.db.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import netcracker.study.monopoly.db.model.json.GameState;
-import netcracker.study.monopoly.util.JSONBUserType;
-import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import lombok.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Set;
+import java.util.Date;
+import java.util.List;
 
-@TypeDef(name = "jsonb", typeClass = JSONBUserType.class,
-        parameters = @Parameter(name = JSONBUserType.CLASS,
-                value = "netcracker.study.monopoly.db.model.json.GameState"))
+
 @Entity
 @Getter
-@ToString(exclude = "players")
+@ToString(exclude = {"turnOf", "winner"})
+@NoArgsConstructor
+@Table(name = "games")
 public class Game extends AbstractIdentifiableObject implements Serializable {
 
-    @OneToMany(cascade = CascadeType.REFRESH, mappedBy = "currentGame")
-    @JsonIgnore
-    private Set<Player> players;
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "game")
+    @NonNull
+    private List<PlayerState> playerStates;
 
-    @Type(type = "jsonb")
+    @ManyToOne(optional = false)
+    @NonNull
+    @JsonIgnore
     @Setter
-    private GameState state;
+    private Player turnOf;
+
+    @OneToMany(cascade = CascadeType.PERSIST)
+    @JoinColumn
+    @NonNull
+    private List<CellState> field;
+
+    private boolean finished = false;
+
+    private int durationMinutes;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @NonNull
+    @Column(updatable = false)
+    private Date startedAt;
+
+    @ManyToOne
+    @NonNull
+    @JoinColumn
+    @JsonIgnore
+    private Player winner;
+
+    public Game(List<PlayerState> playerStates, Player turnOf, List<CellState> field, Date startedAt) {
+        this.playerStates = playerStates;
+        this.turnOf = turnOf;
+        this.field = field;
+        this.startedAt = startedAt;
+        playerStates.forEach(p -> p.setGame(this));
+    }
+
+    /**
+     * Need to call when game is finished.
+     * Set finished to true, set winner and duration of game
+     * Also update statistics of players
+     *
+     * @param winner          - {@link Player}, that won this game
+     * @param durationMinutes - how many minutes was the game
+     * @throws IllegalStateException - repeated calls of this function
+     */
+    public void finish(Player winner, int durationMinutes) {
+        if (finished) {
+            throw new IllegalStateException("Game already finished");
+        }
+
+        finished = true;
+        this.winner = winner;
+        this.durationMinutes = durationMinutes;
+
+        winner.getStat().incrementTotalWins();
+        playerStates.forEach(p -> {
+            p.getPlayer().getStat().incrementTotalGames();
+            p.getPlayer().getStat().addTotalScore(p.getScore());
+        });
+    }
+
+
+
 }

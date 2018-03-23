@@ -1,5 +1,4 @@
 ymaps.ready(init);
-var myMap, myRectangle, myRectangle2, myRectangle3, myRectangle4, myRectangle5;
 
 function init() {
     myMap = new ymaps.Map('map', {
@@ -9,88 +8,39 @@ function init() {
         searchControlProvider: 'yandex#search'
     });
 
-    myRectangle = new ymaps.Rectangle([
-        // Задаем координаты диагональных углов прямоугольника.
-        [55.70, 37.55],
-        [55.72, 37.53]
-    ], null, {
-        // Опции.
-        // Цвет и прозрачность заливки.
-        fillColor: '#7df9ff33',
-        // Дополнительная прозрачность заливки..
-        // Итоговая прозрачность будет не #33(0.2), а 0.1(0.2*0.5).
-        fillOpacity: 0.8,
-        // Цвет обводки.
-        strokeColor: '#0000FF',
-        fillMethod: 'stretch',
-        fillImageHref: 'https://pp.userapi.com/c846419/v846419978/37d9/gVOIsb6FV1A.jpg',
-        // Прозрачность обводки.
-        strokeOpacity: 0.5,
-        // Ширина линии.
-        strokeWidth: 2,
-        // Радиус скругления углов.
-        // Данная опция принимается только прямоугольником.
-        borderRadius: 6
-    });
+    var buildRectangle = function (coords, strokeColor, imgHref) {
+        return new ymaps.Rectangle(coords, null, {
+            // Опции.
+            // Цвет и прозрачность заливки.
+            fillColor: '#7df9ff33',
+            // Дополнительная прозрачность заливки..
+            // Итоговая прозрачность будет не #33(0.2), а 0.1(0.2*0.5).
+            fillOpacity: 0.8,
+            // Цвет обводки.
+            strokeColor: strokeColor,
+            fillMethod: 'stretch',
+            fillImageHref: imgHref,
+            // Прозрачность обводки.
+            strokeOpacity: 0.5,
+            // Ширина линии.
+            strokeWidth: 2,
+            // Радиус скругления углов.
+            // Данная опция принимается только прямоугольником.
+            borderRadius: 6
+        });
 
-    myRectangle2 = new ymaps.Rectangle([
-        [55.66, 37.60],
-        [55.68, 37.62]
-    ], null, {
-        fillColor: '#7df9ff33',
-        fillOpacity: 0.8,
-        strokeColor: '#0000FF',
-        fillMethod: 'stretch',
-        fillImageHref: 'https://pp.userapi.com/c846419/v846419978/37f0/PXkX-6KioZs.jpg',
-        strokeOpacity: 0.5,
-        strokeWidth: 2,
-        borderRadius: 6
-    });
+    };
 
-
-    myRectangle3 = new ymaps.Rectangle([
-        [55.65, 37.55],
-        [55.67, 37.53]
-    ], null, {
-        fillColor: '#7df9ff33',
-        fillOpacity: 0.8,
-        strokeColor: '#0000FF',
-        fillMethod: 'stretch',
-        fillImageHref: 'https://pp.userapi.com/c846419/v846419978/37d2/mQO76o1afHw.jpg',
-        strokeOpacity: 0.5,
-        strokeWidth: 2,
-        borderRadius: 6
-    });
-
-    myRectangle4 = new ymaps.Rectangle([
-        [55.60, 37.59],
-        [55.62, 37.57]
-    ], null, {
-        fillColor: '#7df9ff33',
-        fillOpacity: 0.8,
-        strokeColor: '#0000FF',
-        fillMethod: 'stretch',
-        fillImageHref: 'https://pp.userapi.com/c846419/v846419978/37cb/WLLZYFaEjcg.jpg',
-        strokeOpacity: 0.5,
-        strokeWidth: 2,
-        borderRadius: 6
-    });
-
-    myRectangle5 = new ymaps.Rectangle([
-        [55.62, 37.66],
-        [55.60, 37.69]
-    ], null, {
-        fillColor: '#7df9ff33',
-        fillOpacity: 0.8,
-        strokeColor: '#FF0000',
-        fillMethod: 'stretch',
-        fillImageHref: 'https://pp.userapi.com/c846419/v846419978/37b0/uNV-aWK8C7s.jpg',
-        // 'https://pp.userapi.com/c834303/v834303410/dcfdd/tQAOSeI41oc.jpg',
-        strokeOpacity: 0.5,
-        strokeWidth: 4,
-        borderRadius: 6
-    });
-
+    var myRectangle = buildRectangle([[55.70, 37.55], [55.72, 37.53]], '#0000FF',
+        'https://pp.userapi.com/c846419/v846419978/37d9/gVOIsb6FV1A.jpg'),
+        myRectangle2 = buildRectangle([[55.66, 37.60], [55.68, 37.62]], '#0000FF',
+            'https://pp.userapi.com/c846419/v846419978/37f0/PXkX-6KioZs.jpg'),
+        myRectangle3 = buildRectangle([[55.65, 37.55], [55.67, 37.53]], '#0000FF',
+            'https://pp.userapi.com/c846419/v846419978/37d2/mQO76o1afHw.jpg'),
+        myRectangle4 = buildRectangle([[55.60, 37.59], [55.62, 37.57]], '#0000FF',
+            'https://pp.userapi.com/c846419/v846419978/37cb/WLLZYFaEjcg.jpg'),
+        myRectangle5 = buildRectangle([[55.62, 37.66], [55.60, 37.69]], '#FF0000',
+            'https://pp.userapi.com/c846419/v846419978/37b0/uNV-aWK8C7s.jpg');
 
     myRectangle5.events.add('click', function (e) {
         // Если меню метки уже отображено, то убираем его.
@@ -141,186 +91,75 @@ function init() {
         }
     });
 
+    var buildCircle = function (coords, imgHref, name, hintContent, strokeColor) {
+        // Создаем круг.
+        return new ymaps.Circle([
+            coords,
+            // Радиус круга в метрах.
+            300
+        ], {
+            // Описываем свойства круга.
+            // Содержимое балуна.
+            balloonContent: '<img height="100px" src=' + imgHref + '>\<' +
+            'br><div align="center">' + name + '</div>',
+            // Содержимое хинта.
+            hintContent: hintContent
+        }, {
+            // Задаем опции круга.
+            // Включаем возможность перетаскивания круга.
+            // draggable: true,
+            // Цвет заливки.
+            // Последний байт (77) определяет прозрачность.
+            // Прозрачность заливки также можно задать используя опцию "fillOpacity".
+            fillOpacity: 0.3,
+
+            fillColor: "#DB7377",
+            // Цвет обводки.
+            strokeColor: strokeColor,
+            // Прозрачность обводки.
+            strokeOpacity: 0.5,
+            // Ширина обводки в пикселях.
+            strokeWidth: 5
+
+        });
+    };
+
 
     // Создаем круг.
-    var myCircle = new ymaps.Circle([
-        // Координаты центра круга.
-        // [55.67, 37.62],
-        // [55.70, 37.55],
-        [55.71, 37.53],
+    var myCircle = buildCircle([55.71, 37.53], "https://pp.userapi.com/c841133/v841133895/1a3d4/TxeNVM5X_RA.jpg",
+        "Dmitriy Stoyanov", "Player1", "#391066"),
+        myCircle2 = buildCircle([55.61, 37.69], "https://pp.userapi.com/c636620/v636620219/75c85/bzeG7tSUYdw.jpg",
+            "Konstantin Risov", "Player2", "#5FA000");
 
-        // Радиус круга в метрах.
-        300
-    ], {
-        // Описываем свойства круга.
-        // Содержимое балуна.
-        balloonContent: '<img height="100px" src="https://pp.userapi.com/c841133/v841133895/1a3d4/TxeNVM5X_RA.jpg">\<' +
-        'br><div align="center">Dmitriy Stoyanov</div>',
-        // Содержимое хинта.
-        hintContent: "Player1"
-    }, {
-        // Задаем опции круга.
-        // Включаем возможность перетаскивания круга.
-        // draggable: true,
-        // Цвет заливки.
-        // Последний байт (77) определяет прозрачность.
-        // Прозрачность заливки также можно задать используя опцию "fillOpacity".
-        iconImageHref: 'https://pp.userapi.com/c841133/v841133895/1a3d4/TxeNVM5X_RA.jpg',
-        fillOpacity: 0.3,
-
-        fillColor: "#DB709377",
-        // Цвет обводки.
-        strokeColor: "#391066",
-        // Прозрачность обводки.
-        strokeOpacity: 0.5,
-        // Ширина обводки в пикселях.
-        strokeWidth: 5
-
-    });
-
-    var myCircle2 = new ymaps.Circle([
-        // Координаты центра круга.
-        // [55.67, 37.62],
-        // [55.70, 37.55],
-        // [55.71, 37.55],
-        [55.61, 37.69],
-
-        // Радиус круга в метрах.
-        300
-    ], {
-        // Описываем свойства круга.
-        // Содержимое балуна.
-        balloonContent: '<img height="100px" src="https://pp.userapi.com/c636620/v636620219/75c85/bzeG7tSUYdw.jpg">\<' +
-        'br><div align="center">Konstantin Risov</div>',
-        // Содержимое хинта.
-        hintContent: "Player2"
-    }, {
-        // Задаем опции круга.
-        // Включаем возможность перетаскивания круга.
-        // draggable: true,
-        // Цвет заливки.
-        // Последний байт (77) определяет прозрачность.
-        // Прозрачность заливки также можно задать используя опцию "fillOpacity".
-        // iconImageHref: 'https://pp.userapi.com/c841133/v841133895/1a3d4/TxeNVM5X_RA.jpg',
-        fillOpacity: 0.3,
-
-        fillColor: "#DB709377",
-        // Цвет обводки.
-        strokeColor: "#5FA000",
-        // Прозрачность обводки.
-        strokeOpacity: 0.5,
-        // Ширина обводки в пикселях.
-        strokeWidth: 5
-
-    });
 
     var balloonLayout = ymaps.templateLayoutFactory.createClass("", {}
     );
 
-    var multiRoute = new ymaps.multiRouter.MultiRoute({
-        referencePoints: [
-            [55.60, 37.66],
-            [55.61, 37.59]
-        ]
-    }, {
-        wayPointFinishIconImageSize: [1, 1],
-        pinVisble: false,
-        balloonLayout: balloonLayout,
-        // balloonPanelMaxMapArea: 0
-        pinIconFillColor: "#000088",
-        pinActiveIconFillColor: "#B3B3B3",
-        wayPointVisible: false,
+    var buildRoute = function (coords, routeColor) {
+        return new ymaps.multiRouter.MultiRoute({
+            referencePoints: coords
+        }, {
+            wayPointFinishIconImageSize: [1, 1],
+            pinVisble: false,
+            balloonLayout: balloonLayout,
+            // balloonPanelMaxMapArea: 0
+            pinIconFillColor: "#000088",
+            pinActiveIconFillColor: "#B3B3B3",
+            wayPointVisible: false,
 
-        routeStrokeWidth: 0,
-        routeStrokeColor: "#000000",
-        routeActiveStrokeWidth: 3,
-        routeActiveStrokeColor: "#214212"
+            routeStrokeWidth: 0,
+            routeStrokeColor: "#000000",
+            routeActiveStrokeWidth: 3,
+            routeActiveStrokeColor: routeColor
 
-    });
+        });
+    };
 
-    var multiRoute2 = new ymaps.multiRouter.MultiRoute({
-        referencePoints: [
-            [55.62, 37.69],
-            [55.666, 37.622]
-
-        ]
-    }, {
-        wayPointFinishIconImageSize: [1, 1],
-        pinVisble: false,
-        balloonLayout: balloonLayout,
-        // balloonPanelMaxMapArea: 0
-        pinIconFillColor: "#000088",
-        pinActiveIconFillColor: "#B3B3B3",
-        wayPointVisible: false,
-
-        routeStrokeWidth: 0,
-        routeStrokeColor: "#000000",
-        routeActiveStrokeWidth: 3,
-        routeActiveStrokeColor: "#0AAF3F"
-
-    });
-
-    var multiRoute3 = new ymaps.multiRouter.MultiRoute({
-        referencePoints: [
-            [55.68, 37.60],
-            [55.70, 37.551]
-
-        ]
-    }, {
-        wayPointFinishIconImageSize: [1, 1],
-        pinVisble: false,
-        balloonLayout: balloonLayout,
-        // balloonPanelMaxMapArea: 0
-        pinIconFillColor: "#000088",
-        pinActiveIconFillColor: "#B3B3B3",
-        wayPointVisible: false,
-
-        routeStrokeWidth: 0,
-        routeStrokeColor: "#000000",
-        routeActiveStrokeWidth: 3,
-        routeActiveStrokeColor: "#133E92"
-
-    });
-
-    var multiRoute5 = new ymaps.multiRouter.MultiRoute({
-        referencePoints: [
-            [55.62, 37.58],
-            [55.65, 37.55]
-        ]
-    }, {
-        wayPointFinishIconImageSize: [1, 1],
-        pinVisble: false,
-        balloonLayout: balloonLayout,
-        // balloonPanelMaxMapArea: 0
-        pinIconFillColor: "#000088",
-        pinActiveIconFillColor: "#B3B3B3",
-        wayPointVisible: false,
-
-        routeStrokeWidth: 0,
-        routeStrokeColor: "#000000",
-        routeActiveStrokeWidth: 3,
-        routeActiveStrokeColor: "#E61200"
-
-    });
-
-    var multiRoute4 = new ymaps.multiRouter.MultiRoute({
-        referencePoints: [
-            [55.699, 37.535],
-            [55.67, 37.54]
-
-        ]
-    }, {
-        balloonLayout: balloonLayout,
-        pinIconFillColor: "#000088",
-        pinActiveIconFillColor: "#B3B3B3",
-        wayPointVisible: false,
-
-        routeStrokeWidth: 0,
-        // routeStrokeColor: "#000000",
-        routeActiveStrokeWidth: 3,
-        routeActiveStrokeColor: "#E63E92"
-
-    });
+    var multiRoute = buildRoute([[55.60, 37.66], [55.61, 37.59]], '#214212'),
+        multiRoute2 = buildRoute([[55.62, 37.69], [55.666, 37.622]], '#0AAF3F'),
+        multiRoute3 = buildRoute([[55.68, 37.60], [55.70, 37.551]], '#133E92'),
+        multiRoute4 = buildRoute([[55.699, 37.535], [55.67, 37.54]], '#E63E92'),
+        multiRoute5 = buildRoute([[55.62, 37.58], [55.65, 37.55]], '#E61200');
 
     myMap.geoObjects
         .add(myRectangle)
