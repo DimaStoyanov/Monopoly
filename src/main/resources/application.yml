@@ -22,13 +22,10 @@ server:
 security:
   oauth2:
     client:
-      clientId: 6421813
-      clientSecret: MQkAtw8xDuaRYoEjTzAA
-      accessTokenUri: https://oauth.vk.com/access_token
-      userAuthorizationUri: https://oauth.vk.com/authorize
-      tokenName: code
-      authenticationScheme: query
-      clientAuthenticationScheme: form
-      grant-type: authorization_code
+       clientId: e7a663e9ac916682020c
+       clientSecret: 493e6dc4a0b8ad04db5716f2d4c0d1245c1ac130
+       accessTokenUri: https://github.com/login/oauth/access_token
+       userAuthorizationUri: https://github.com/login/oauth/authorize
+       clientAuthenticationScheme: form
     resource:
-      userInfoUri: https://api.vk.com/method/users.get
+       userInfoUri: https://api.github.com/user
