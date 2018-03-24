@@ -4,13 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Getter
 @ToString(exclude = {"player", "game"})
 @NoArgsConstructor
 @Table(name = "players_state")
-public class PlayerState extends AbstractIdentifiableObject {
+public class PlayerState extends AbstractIdentifiableObject implements Serializable {
 
     @Setter
     private int position = 0;

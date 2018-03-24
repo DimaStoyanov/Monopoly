@@ -10,13 +10,14 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity
 @Getter
 @ToString(exclude = "owner")
 @NoArgsConstructor
 @Table(name = "cells_state")
-public class CellState extends AbstractIdentifiableObject {
+public class CellState extends AbstractIdentifiableObject implements Serializable {
 
     @Setter
     private int level = 0;

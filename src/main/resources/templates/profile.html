@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:dt="http://www.thymeleaf.org/dandelion/datatables"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Monopoly profile</title>
+</head>
+<body>
+
+<p th:text="'Player: ' +  ${player}"></p>
+<p th:if="${name}" th:text="'Name: ' + ${name}"></p>
+<p th:if="${city}" th:text="'City: ' +  ${city}"></p>
+<img th:if="${avatar_url}" height="150" th:src="${avatar_url}">
+
+<h2> Friends: </h2>
+<table border="1" dt:table="true">
+    <tbody>
+    <tr th:each="friend : ${friends}">
+        <td><img height="80" th:src="${friend[0]}"></td>
+        <td th:text="${friend[1]}"></td>
+        <td th:text="${friend[2]? 'Online' : 'Offline'}"></td>
+        <td>
+            <button> Invite</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

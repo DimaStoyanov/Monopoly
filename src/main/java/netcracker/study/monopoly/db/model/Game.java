@@ -36,21 +36,20 @@ public class Game extends AbstractIdentifiableObject implements Serializable {
     private int durationMinutes;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @NonNull
     @Column(updatable = false)
     private Date startedAt;
 
     @ManyToOne
-    @NonNull
     @JoinColumn
     @JsonIgnore
     private Player winner;
 
-    public Game(List<PlayerState> playerStates, Player turnOf, List<CellState> field, Date startedAt) {
+    public Game(List<PlayerState> playerStates, Player turnOf, List<CellState> field) {
         this.playerStates = playerStates;
         this.turnOf = turnOf;
         this.field = field;
-        this.startedAt = startedAt;
+        this.startedAt = new Date();
+        startedAt = new Date();
         playerStates.forEach(p -> p.setGame(this));
     }
 

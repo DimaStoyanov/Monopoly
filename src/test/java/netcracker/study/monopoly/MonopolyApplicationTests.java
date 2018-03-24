@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -36,14 +35,15 @@ public class MonopolyApplicationTests {
     private final Random random = new Random();
 
 
+
     @Test
     public void insert() {
         mockMvc = webAppContextSetup(webApplicationContext).build();
 
-        Player john = new Player("john", new Date());
-        Player ivan = new Player("ivan", new Date());
-        Player alisa = new Player("alisa", new Date());
-        Player bot = new Player("bot", new Date());
+        Player john = new Player("john");
+        Player ivan = new Player("ivan");
+        Player alisa = new Player("alisa");
+        Player bot = new Player("bot");
         List<Player> players = Arrays.asList(john, ivan, alisa, bot);
 
         List<CellState> cellStates = Arrays.asList(new CellState(0), new CellState(1),
@@ -54,8 +54,8 @@ public class MonopolyApplicationTests {
                 new PlayerState(200, 2, alisa),
                 new PlayerState(200, 3, bot));
 
-        List<Game> games = Arrays.asList(new Game(playerStates, john, cellStates, new Date()),
-                new Game(playerStates, alisa, cellStates, new Date()));
+        List<Game> games = Arrays.asList(new Game(playerStates, john, cellStates),
+                new Game(playerStates, alisa, cellStates));
 
 
         playerRepository.saveAll(players);
