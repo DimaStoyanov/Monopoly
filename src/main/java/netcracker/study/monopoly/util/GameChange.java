@@ -4,6 +4,7 @@ import netcracker.study.monopoly.game.Gamer;
 import netcracker.study.monopoly.game.cells.Cell;
 import netcracker.study.monopoly.game.cells.Street;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameChange {
@@ -11,6 +12,12 @@ public class GameChange {
     private List<Gamer> gamersChange;
     private List<Cell> cellsChange;
     private List<Street> streetChange;
+
+    public GameChange() {
+        gamersChange = new ArrayList<>();
+        cellsChange = new ArrayList<>();
+        streetChange = new ArrayList<>();
+    }
 
     public boolean addGamerChange(Gamer gamer) {
         try {
