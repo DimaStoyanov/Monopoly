@@ -33,7 +33,6 @@ public class ProfileController {
 
     @RequestMapping("/")
     public String profile(Principal principal, Model model) {
-        System.out.println("here");
         OAuth2Authentication oauth = (OAuth2Authentication) principal;
         Map details = (Map) oauth.getUserAuthentication().getDetails();
         String nickname = (String) details.get("login");
