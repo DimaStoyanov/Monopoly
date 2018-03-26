@@ -25,6 +25,11 @@ public class Player extends AbstractIdentifiableObject implements Serializable {
     @Column(unique = true)
     private String nickname;
 
+    @Setter
+    @NonNull
+    @Column(unique = true)
+    private String sessionId;
+
     @OneToOne(cascade = {CascadeType.PERSIST}, optional = false)
     @JoinColumn
     private PlayerStatistics stat;
@@ -39,10 +44,11 @@ public class Player extends AbstractIdentifiableObject implements Serializable {
     @Setter
     private String avatarUrl = "https://avatars3.githubusercontent.com/u/4161866?s=200&v=4";
 
-    public Player(String nickname) {
+    public Player(String nickname, String sessionId) {
         this.nickname = nickname;
         this.createdAt = new Date();
         stat = new PlayerStatistics();
+        this.sessionId = sessionId;
         createdAt = new Date();
     }
 

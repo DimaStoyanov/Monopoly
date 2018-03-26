@@ -41,10 +41,10 @@ public class MonopolyApplicationTests {
     @Before
     @Transactional
     public void insert() {
-        Player john = new Player("john");
-        Player ivan = new Player("ivan");
-        Player alisa = new Player("alisa");
-        Player bot = new Player("bot");
+        Player john = new Player("john", "1");
+        Player ivan = new Player("ivan", "2");
+        Player alisa = new Player("alisa", "3");
+        Player bot = new Player("bot", "4");
         List<Player> players = Arrays.asList(john, ivan, alisa, bot);
 
         List<StreetState> street = Arrays.asList(new StreetState(2), new StreetState(1),
