@@ -2,7 +2,6 @@ package netcracker.study.monopoly.controller;
 
 
 import lombok.SneakyThrows;
-import netcracker.study.monopoly.PlayerTracker;
 import netcracker.study.monopoly.db.model.Player;
 import netcracker.study.monopoly.db.repository.GameRepository;
 import netcracker.study.monopoly.db.repository.PlayerRepository;
@@ -48,6 +47,7 @@ public class ProfileController {
 
 
         List<List<? extends Serializable>> friends = player.getFriends().stream()
+                // Online players should be first
                 .sorted((o1, o2) -> playerTracker.isOnline(o1.getNickname()) ? -1 : 1)
                 .map(p -> Arrays.asList(p.getAvatarUrl(), p.getNickname(),
                         playerTracker.isOnline(p.getNickname())))

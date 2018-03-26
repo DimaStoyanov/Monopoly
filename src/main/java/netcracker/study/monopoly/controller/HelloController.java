@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 @RestController
 public class HelloController {
@@ -35,7 +34,6 @@ public class HelloController {
         if (playerRepository.findByNickname(nickname).isPresent()) {
             throw new PlayerAlreadyExistException(nickname);
         }
-        String sessionId = "id" + new Random().nextLong();
         Player player = new Player(nickname);
         playerRepository.save(player);
 

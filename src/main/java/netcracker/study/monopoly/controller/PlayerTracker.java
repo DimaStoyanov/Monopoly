@@ -1,4 +1,4 @@
-package netcracker.study.monopoly;
+package netcracker.study.monopoly.controller;
 
 import net.jodah.expiringmap.ExpiringMap;
 import netcracker.study.monopoly.db.model.Player;
@@ -23,6 +23,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 
+/**
+ * This filter insert into database new players and update profile if session is new
+ * Also keep track of all active users (that have requests last 30 seconds)
+ */
 @Component
 public class PlayerTracker extends GenericFilterBean {
     private final PlayerRepository playerRepository;

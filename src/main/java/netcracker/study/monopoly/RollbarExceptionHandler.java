@@ -1,6 +1,7 @@
 package netcracker.study.monopoly;
 
 import com.rollbar.notifier.Rollbar;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
@@ -11,9 +12,13 @@ import javax.servlet.http.HttpServletResponse;
 import static com.rollbar.notifier.config.ConfigBuilder.withAccessToken;
 
 
-// TODO - not work
 @Component
-public class RollbarExceptionHandler extends AbstractHandlerExceptionResolver {
+public class RollbarExceptionHandler extends AbstractHandlerExceptionResolver implements Ordered {
+
+    @Override
+    public int getOrder() {
+        return Integer.MIN_VALUE;
+    }
 
     private Rollbar rollbar;
 

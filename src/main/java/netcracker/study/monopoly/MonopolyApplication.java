@@ -1,5 +1,6 @@
 package netcracker.study.monopoly;
 
+import netcracker.study.monopoly.controller.PlayerTracker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
