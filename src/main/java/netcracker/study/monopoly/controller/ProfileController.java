@@ -38,7 +38,6 @@ public class ProfileController {
 
     @RequestMapping("/")
     public String profile(Principal principal, HttpSession session, Model model) {
-        session.setMaxInactiveInterval(10);
 
         OAuth2Authentication oauth = (OAuth2Authentication) principal;
         Map details = (Map) oauth.getUserAuthentication().getDetails();
@@ -54,6 +53,10 @@ public class ProfileController {
                 .filter(u -> !sessionRegistry.getAllSessions(u, false).isEmpty())
                 .map(Object::toString)
                 .collect(Collectors.toSet());
+
+        sessionRegistry.getAllPrincipals().stream()
+                .map(p -> (Principal) p)
+                .forEach(p -> System.out.println(p.getName()));
 
         List<List<? extends Serializable>> friends = player.getFriends().stream()
                 .sorted((o1, o2) -> active.contains(o1.getNickname()) ? -1 : 1)
