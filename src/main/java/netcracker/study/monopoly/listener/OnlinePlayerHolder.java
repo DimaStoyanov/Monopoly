@@ -1,6 +1,6 @@
 package netcracker.study.monopoly.listener;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
@@ -8,11 +8,11 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Service
+@Component
 public class OnlinePlayerHolder implements HttpSessionListener {
 
 
-    private Set<String> activeSessionIds = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private static Set<String> activeSessionIds = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     @Override
     public void sessionCreated(HttpSessionEvent se) {
