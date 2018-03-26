@@ -36,7 +36,7 @@ public class HelloController {
             throw new PlayerAlreadyExistException(nickname);
         }
         String sessionId = "id" + new Random().nextLong();
-        Player player = new Player(nickname, sessionId);
+        Player player = new Player(nickname);
         playerRepository.save(player);
 
 
