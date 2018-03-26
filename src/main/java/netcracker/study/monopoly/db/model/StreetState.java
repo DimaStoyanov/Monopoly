@@ -16,8 +16,8 @@ import java.io.Serializable;
 @Getter
 @ToString(exclude = "owner")
 @NoArgsConstructor
-@Table(name = "cells_state")
-public class CellState extends AbstractIdentifiableObject implements Serializable {
+@Table(name = "streets_state")
+public class StreetState extends AbstractIdentifiableObject implements Serializable {
 
     @Setter
     private int level = 0;
@@ -30,7 +30,7 @@ public class CellState extends AbstractIdentifiableObject implements Serializabl
 
     private int position;
 
-    public CellState(int position) {
+    public StreetState(int position) {
         this.position = position;
     }
 }
