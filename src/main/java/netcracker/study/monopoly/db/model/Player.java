@@ -32,7 +32,7 @@ public class Player extends AbstractIdentifiableObject implements Serializable {
     @ManyToMany
     @JoinTable
     @JsonIgnore
-    @OrderBy("online desc, nickname asc")
+    @OrderBy("nickname")
     private Set<Player> friends = new HashSet<>();
 
 

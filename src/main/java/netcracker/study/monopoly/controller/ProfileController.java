@@ -24,17 +24,16 @@ import java.util.stream.Collectors;
 public class ProfileController {
 
     private final PlayerRepository playerRepository;
-
     private final GameRepository gameRepository;
+    private final SessionRegistry sessionRegistry;
+
 
     @Autowired
-    public ProfileController(PlayerRepository playerRepository, GameRepository gameRepository) {
+    public ProfileController(PlayerRepository playerRepository, GameRepository gameRepository, SessionRegistry sessionRegistry) {
         this.playerRepository = playerRepository;
         this.gameRepository = gameRepository;
+        this.sessionRegistry = sessionRegistry;
     }
-
-    @Autowired
-    private SessionRegistry sessionRegistry;
 
 
     @RequestMapping("/")
@@ -57,6 +56,7 @@ public class ProfileController {
                 .collect(Collectors.toSet());
 
         List<List<? extends Serializable>> friends = player.getFriends().stream()
+                .sorted((o1, o2) -> active.contains(o1.getNickname()) ? -1 : 1)
                 .map(p -> Arrays.asList(p.getAvatarUrl(), p.getNickname(), active.contains(p.getNickname())))
                 .collect(Collectors.toList());
 
