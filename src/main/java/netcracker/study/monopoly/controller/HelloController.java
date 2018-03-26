@@ -1,15 +1,16 @@
 package netcracker.study.monopoly.controller;
 
-import netcracker.study.monopoly.db.model.CellState;
 import netcracker.study.monopoly.db.model.Game;
 import netcracker.study.monopoly.db.model.Player;
 import netcracker.study.monopoly.db.model.PlayerState;
+import netcracker.study.monopoly.db.model.StreetState;
 import netcracker.study.monopoly.db.repository.GameRepository;
 import netcracker.study.monopoly.db.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,10 +38,10 @@ public class HelloController {
         playerRepository.save(player);
 
 
-        PlayerState playerState = new PlayerState(200, 0, player);
-        List<CellState> cellStates = Collections.singletonList(new CellState(3));
-        List<PlayerState> playerStates = Collections.singletonList(playerState);
-        Game game = new Game(playerStates, player, cellStates);
+        PlayerState playerState = new PlayerState(200, 1, player);
+        List<StreetState> street = Arrays.asList(new StreetState(3), new StreetState(2));
+        List<PlayerState> playerStates = Arrays.asList(playerState, new PlayerState(200, 0, player));
+        Game game = new Game(playerStates, player, street);
         gameRepository.save(game);
         return "OK";
     }
@@ -50,8 +51,8 @@ public class HelloController {
         Player player = playerRepository.findByNickname(nickname).orElseThrow(() ->
                 new PlayerNotFoundException(nickname));
         List<PlayerState> playerStates = Collections.singletonList(new PlayerState(200, 0, player));
-        List<CellState> cellStates = Collections.singletonList(new CellState(1));
-        Game game = new Game(playerStates, player, cellStates);
+        List<StreetState> street = Collections.singletonList(new StreetState(1));
+        Game game = new Game(playerStates, player, street);
         gameRepository.save(game);
         return "OK";
     }
