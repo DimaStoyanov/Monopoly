@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.Arrays;
@@ -37,7 +36,7 @@ public class ProfileController {
 
 
     @RequestMapping("/")
-    public String profile(Principal principal, HttpSession session, Model model) {
+    public String profile(Principal principal, Model model) {
 
         OAuth2Authentication oauth = (OAuth2Authentication) principal;
         Map details = (Map) oauth.getUserAuthentication().getDetails();
@@ -54,9 +53,6 @@ public class ProfileController {
                 .map(Object::toString)
                 .collect(Collectors.toSet());
 
-        sessionRegistry.getAllPrincipals().stream()
-                .map(p -> (Principal) p)
-                .forEach(p -> System.out.println(p.getName()));
 
         List<List<? extends Serializable>> friends = player.getFriends().stream()
                 .sorted((o1, o2) -> active.contains(o1.getNickname()) ? -1 : 1)
