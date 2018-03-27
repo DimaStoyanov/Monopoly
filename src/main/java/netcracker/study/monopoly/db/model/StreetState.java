@@ -17,7 +17,7 @@ import java.io.Serializable;
 @ToString(exclude = "owner")
 @NoArgsConstructor
 @Table(name = "streets_state")
-public class StreetState extends AbstractIdentifiableObject implements Serializable, Cloneable {
+public class StreetState extends AbstractIdentifiableObject implements Serializable {
 
     @Setter
     private int level = 0;
@@ -40,12 +40,5 @@ public class StreetState extends AbstractIdentifiableObject implements Serializa
         this.position = position;
         this.cost = cost;
         this.name = name;
-    }
-
-    @Override
-    public StreetState clone() throws CloneNotSupportedException {
-        StreetState street = (StreetState) super.clone();
-        street.setName(name);
-        return street;
     }
 }

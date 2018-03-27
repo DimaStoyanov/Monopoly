@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Creates {@link Game} with specified list of {@link Player}
@@ -52,23 +53,23 @@ public final class GameCreatorHelper {
 
     @SneakyThrows
     private static List<StreetState> getStreets() {
-        List<StreetState> streetStates = new ArrayList<>();
-        for (StreetState state : streets) {
-            streetStates.add(state.clone());
-        }
-        return streetStates;
+        return GameCreatorHelper.streets.stream()
+                .map(s -> new StreetState(s.getPosition(), s.getCost(), s.getName()))
+                .collect(Collectors.toList());
+    }
+
+    private static List<PlayerState> getGamers(List<Player> players) {
+        return players.stream()
+                .map(p -> new PlayerState(playerStartMoney, players.indexOf(p), p))
+                .collect(Collectors.toList());
     }
 
     @SneakyThrows
     public static Game createGame(List<Player> players) {
-        List<PlayerState> playerStates = new ArrayList<>();
-        int order = 0;
-        for (Player p : players) {
-            playerStates.add(new PlayerState(playerStartMoney, order, p));
-            order++;
-        }
+        List<PlayerState> playerStates = getGamers(players);
         return new Game(playerStates, players.get(0), getStreets());
     }
+
 
     private static class PlayerConfig {
         @Getter
