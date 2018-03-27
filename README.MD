@@ -6,9 +6,7 @@
 [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/DimaStoyanov/Monopoly/blob/master/LICENSE)
 
 ### Database
-<img alt="ER Diagram" height="300px" src="https://sun9-4.userapi.com/c834204/v834204523/f48d0/ajY7LB814ZA.jpg"> 
-<img alt="Another ER Diagram" height="300px" src="https://sun9-9.userapi.com/c834204/v834204523/f48c7/g4Nmh2-sGy4.jpg">
-<img alt="DTO methods" height="300px" src="https://sun9-6.userapi.com/c834204/v834204523/f48bf/83vTgzZ3Qq8.jpg">
+<img alt="ER Diagram" height="300px" src="https://sun9-3.userapi.com/c830609/v830609157/b45c0/mWhtmBW0uc0.jpg"> 
 
 
 ### Game logic UML

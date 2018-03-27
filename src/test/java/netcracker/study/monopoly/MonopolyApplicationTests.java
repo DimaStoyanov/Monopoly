@@ -13,16 +13,12 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
-
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -34,8 +30,6 @@ public class MonopolyApplicationTests {
     private PlayerRepository playerRepository;
     @Autowired
     private WebApplicationContext webApplicationContext;
-    private MockMvc mockMvc;
-    private final Random random = new Random();
 
 
     @Before
@@ -47,8 +41,9 @@ public class MonopolyApplicationTests {
         Player bot = new Player("bot");
         List<Player> players = Arrays.asList(john, ivan, alisa, bot);
 
-        List<StreetState> street = Arrays.asList(new StreetState(2), new StreetState(1),
-                new StreetState(0), new StreetState(3));
+        List<StreetState> street = Arrays.asList(new StreetState(2, 200, ""),
+                new StreetState(1, 200, ""),
+                new StreetState(0, 200, ""), new StreetState(3, 200, ""));
 
         List<PlayerState> playerStates = Arrays.asList(new PlayerState(200, 0, john),
                 new PlayerState(200, 2, alisa),
@@ -61,13 +56,11 @@ public class MonopolyApplicationTests {
 
         playerRepository.saveAll(players);
         gameRepository.saveAll(games);
-
     }
 
     @Test
     @Transactional
     public void checkCount() {
-        mockMvc = webAppContextSetup(webApplicationContext).build();
         Assert.assertTrue(playerRepository.count() == 4);
         Assert.assertTrue(gameRepository.count() == 2);
 

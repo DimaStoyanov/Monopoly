@@ -1,89 +1,65 @@
 package netcracker.study.monopoly.game;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Random;
 
 public class Gamer {
-
-    String name;
-    int money;
-    boolean canGo;
-
-    int first;
-    int second;
-    Random random = new Random();
+    @Getter
     int order;
-
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getMoney() {
-        return money;
-    }
-
-    public void setMoney(int money) {
-        this.money = money;
-    }
-
+    @Getter
+    @Setter
     int position;
+    @Getter
+    private String name;
+    @Getter
+    @Setter
+    private int money;
+    @Getter
+    @Setter
+    private boolean canGo;
+    private int first;
+    private int second;
+    private Random random = new Random();
 
-    public boolean isCanGo() {
-        return canGo;
+
+    public Gamer(String name, int order) {
+        this.name = name;
+        this.order = order;
+        position = 0;
     }
 
-    public void setCanGo(boolean canGo) {
-        this.canGo = canGo;
-    }
 
-    public void go(){
+    public void go() {
         first = random.nextInt(5) + 1;
         second = random.nextInt(5) + 1;
         position = position + first + second;
     }
 
-    public void action(){
+    public void action() {
 
     }
 
-    public void sell(int i){
-        money+=i;
+    public void sell(int i) {
+        money += i;
     }
 
-    public void buy(int i){
-        if(money > i){
-            money-=i;
+    public void buy(int i) {
+        if (money > i) {
+            money -= i;
         } else {
             System.out.println("You can't buy this street");
         }
     }
 
-    public void jailAction(boolean b){
+    public void jailAction(boolean b) {
         canGo = b;
     }
 
-    public void pay(int i){
-        if(money > i){
-            money-=i;
+    public void pay(int i) {
+        if (money > i) {
+            money -= i;
         } else {
             System.out.println("You can't pay");
         }

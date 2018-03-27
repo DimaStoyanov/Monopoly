@@ -15,12 +15,12 @@ import static com.rollbar.notifier.config.ConfigBuilder.withAccessToken;
 @Component
 public class RollbarExceptionHandler extends AbstractHandlerExceptionResolver implements Ordered {
 
+    private Rollbar rollbar;
+
     @Override
     public int getOrder() {
         return Integer.MIN_VALUE;
     }
-
-    private Rollbar rollbar;
 
     RollbarExceptionHandler() {
         String token = System.getenv("ROLLBAR_ACCESS_TOKEN");

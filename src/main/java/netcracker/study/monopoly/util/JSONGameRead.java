@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// No longer need
 public class JSONGameRead {
 
     Gson gson = new Gson();

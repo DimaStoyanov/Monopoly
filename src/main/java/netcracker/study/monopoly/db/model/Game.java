@@ -18,7 +18,7 @@ public class Game extends AbstractIdentifiableObject implements Serializable {
 
     @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "game")
     @NonNull
-    @OrderBy(value = "order")
+    @OrderBy("order")
     private List<PlayerState> playerStates;
 
     @ManyToOne(optional = false)
@@ -30,7 +30,7 @@ public class Game extends AbstractIdentifiableObject implements Serializable {
     @OneToMany(cascade = CascadeType.PERSIST)
     @JoinColumn
     @NonNull
-    @OrderBy(value = "position")
+    @OrderBy("position")
     private List<StreetState> field;
 
     private boolean finished = false;

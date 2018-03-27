@@ -17,7 +17,7 @@ import java.io.Serializable;
 @ToString(exclude = "owner")
 @NoArgsConstructor
 @Table(name = "streets_state")
-public class StreetState extends AbstractIdentifiableObject implements Serializable {
+public class StreetState extends AbstractIdentifiableObject implements Serializable, Cloneable {
 
     @Setter
     private int level = 0;
@@ -26,11 +26,26 @@ public class StreetState extends AbstractIdentifiableObject implements Serializa
     @ManyToOne
     @JoinColumn
     @JsonIgnore
-    private Player owner;
+    private PlayerState owner;
 
     private int position;
 
-    public StreetState(int position) {
+    @Setter
+    private int cost;
+
+    @Setter
+    private String name;
+
+    public StreetState(int position, int cost, String name) {
         this.position = position;
+        this.cost = cost;
+        this.name = name;
+    }
+
+    @Override
+    public StreetState clone() throws CloneNotSupportedException {
+        StreetState street = (StreetState) super.clone();
+        street.setName(name);
+        return street;
     }
 }

@@ -1,24 +1,27 @@
 package netcracker.study.monopoly.game.cells;
 
-import lombok.Getter;
+import lombok.Data;
 import netcracker.study.monopoly.game.Gamer;
 
-@Getter
-public class Street implements Cell{
+@Data
+public class Street implements Cell {
 
-    int cost;
-    Gamer owner;
-    String name;
-    boolean toBuy;
-    int position;
-    int level = 0;
+    private int cost;
+    private Gamer owner;
+    private String name;
+    // For what is it?
+    private boolean toBuy;
+    private int position;
+    private int level = 0;
+
+
 
     @Override
     public String action(Gamer gamer) {
         if (owner == null) {
             buy(gamer);
             return "Вы приобрели " + name;
-        }else {
+        } else {
             pay(gamer);
             return "Вы оплатили за проживание на " + name;
         }
@@ -33,12 +36,12 @@ public class Street implements Cell{
         }
     }
 
-    public void buy(Gamer gamer){
+    public void buy(Gamer gamer) {
         owner = gamer;
         gamer.buy(cost);
     }
 
-    public void pay(Gamer gamer){
+    public void pay(Gamer gamer) {
         owner = gamer;
         gamer.pay(cost);
     }
