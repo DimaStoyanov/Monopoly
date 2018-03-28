@@ -13,6 +13,7 @@ import java.util.Set;
 @ToString(exclude = "friends")
 @NoArgsConstructor
 @Getter
+@EqualsAndHashCode(exclude = {"friends", "createdAt"}, callSuper = true)
 @Table(name = "players")
 public class Player extends AbstractIdentifiableObject implements Serializable {
 

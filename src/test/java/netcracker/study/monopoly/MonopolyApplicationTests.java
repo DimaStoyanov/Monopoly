@@ -1,9 +1,9 @@
 package netcracker.study.monopoly;
 
+import netcracker.study.monopoly.db.model.CellState;
 import netcracker.study.monopoly.db.model.Game;
 import netcracker.study.monopoly.db.model.Player;
 import netcracker.study.monopoly.db.model.PlayerState;
-import netcracker.study.monopoly.db.model.StreetState;
 import netcracker.study.monopoly.db.repository.GameRepository;
 import netcracker.study.monopoly.db.repository.PlayerRepository;
 import org.junit.Assert;
@@ -19,6 +19,8 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static netcracker.study.monopoly.db.model.CellState.CellType.STREET;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -41,17 +43,17 @@ public class MonopolyApplicationTests {
         Player bot = new Player("bot");
         List<Player> players = Arrays.asList(john, ivan, alisa, bot);
 
-        List<StreetState> street = Arrays.asList(new StreetState(2, 200, ""),
-                new StreetState(1, 200, ""),
-                new StreetState(0, 200, ""), new StreetState(3, 200, ""));
+        List<CellState> street = Arrays.asList(new CellState(2, "", STREET),
+                new CellState(1, "", STREET),
+                new CellState(0, "", STREET), new CellState(3, "", STREET));
 
-        List<PlayerState> playerStates = Arrays.asList(new PlayerState(200, 0, john),
-                new PlayerState(200, 2, alisa),
-                new PlayerState(200, 1, ivan),
-                new PlayerState(200, 3, bot));
+        List<PlayerState> playerStates = Arrays.asList(new PlayerState(0, john),
+                new PlayerState(2, alisa),
+                new PlayerState(1, ivan),
+                new PlayerState(3, bot));
 
-        List<Game> games = Arrays.asList(new Game(playerStates, john, street),
-                new Game(playerStates, alisa, street));
+        List<Game> games = Arrays.asList(new Game(playerStates, street),
+                new Game(playerStates, street));
 
 
         playerRepository.saveAll(players);

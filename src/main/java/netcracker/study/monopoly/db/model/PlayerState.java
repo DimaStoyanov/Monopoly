@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Getter
 @ToString(exclude = {"player", "game"})
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = "game", callSuper = true)
 @Table(name = "players_state")
 public class PlayerState extends AbstractIdentifiableObject implements Serializable {
 
@@ -23,11 +24,12 @@ public class PlayerState extends AbstractIdentifiableObject implements Serializa
     private int score = 0;
 
     @Setter
-    private int money;
+    @NonNull
+    private Integer money;
 
-    @Setter
     @Column(name = "order_number")
-    private int order;
+    @NonNull
+    private Integer order;
 
     @ManyToOne
     @JoinColumn
@@ -42,8 +44,8 @@ public class PlayerState extends AbstractIdentifiableObject implements Serializa
     private Game game;
 
 
-    public PlayerState(int money, int order, Player player) {
-        this.money = money;
+    public PlayerState(Integer order, Player player) {
+        this.money = 2000;
         this.order = order;
         this.player = player;
     }

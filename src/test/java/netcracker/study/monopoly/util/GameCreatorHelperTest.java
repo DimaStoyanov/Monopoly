@@ -34,6 +34,8 @@ public class GameCreatorHelperTest {
     public void checkCreatedGame() {
         Assert.assertTrue(game.getPlayerStates().size() == 4);
         Assert.assertTrue(game.getField().size() == 22);
+        int initMoney = game.getPlayerStates().get(0).getMoney();
+        Assert.assertTrue(game.getPlayerStates().stream().allMatch(p -> p.getMoney() == initMoney));
         Assert.assertEquals(game.getPlayerStates().stream()
                 .map(PlayerState::getPlayer)
                 .collect(Collectors.toList()), players);

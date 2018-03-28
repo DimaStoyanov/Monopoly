@@ -31,3 +31,9 @@ security:
        clientAuthenticationScheme: form
     resource:
        userInfoUri: https://api.github.com/user
+
+DB_URL: jdbc:postgresql://localhost/users
+DB_USERNAME: postgres
+DB_PASSWORD: postgres
+GIT_CLIENT_ID: e7a663e9ac916682020c
+GIT_CLIENT_SECRET: e7a663e9ac916682020c

@@ -1,16 +1,20 @@
-package netcracker.study.monopoly.game;
+package netcracker.study.monopoly.controller.dto;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.Random;
 
+@EqualsAndHashCode(exclude = "random")
+@ToString
 public class Gamer {
     @Getter
     int order;
     @Getter
     @Setter
-    int position;
+    int position = 0;
     @Getter
     private String name;
     @Getter
@@ -18,16 +22,14 @@ public class Gamer {
     private int money;
     @Getter
     @Setter
-    private boolean canGo;
+    private boolean canGo = true;
     private int first;
     private int second;
     private Random random = new Random();
 
-
-    public Gamer(String name, int order) {
-        this.name = name;
+    public Gamer(int order, String name) {
         this.order = order;
-        position = 0;
+        this.name = name;
     }
 
 

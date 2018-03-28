@@ -1,5 +1,6 @@
 package netcracker.study.monopoly.db.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -10,6 +11,7 @@ import java.io.Serializable;
 @Entity
 @ToString
 @Getter
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "players_statistics")
 public class PlayerStatistics extends AbstractIdentifiableObject implements Serializable {
 

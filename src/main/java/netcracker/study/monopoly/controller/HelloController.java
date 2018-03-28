@@ -1,9 +1,9 @@
 package netcracker.study.monopoly.controller;
 
+import netcracker.study.monopoly.db.model.CellState;
 import netcracker.study.monopoly.db.model.Game;
 import netcracker.study.monopoly.db.model.Player;
 import netcracker.study.monopoly.db.model.PlayerState;
-import netcracker.study.monopoly.db.model.StreetState;
 import netcracker.study.monopoly.db.repository.GameRepository;
 import netcracker.study.monopoly.db.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
+
+import static netcracker.study.monopoly.db.model.CellState.CellType.STREET;
 
 @RestController
 public class HelloController {
@@ -37,11 +39,11 @@ public class HelloController {
         playerRepository.save(player);
 
 
-        PlayerState playerState = new PlayerState(200, 0, player);
-        List<StreetState> streetStates = Collections.singletonList(
-                new StreetState(3, 200, "noname"));
+        PlayerState playerState = new PlayerState(0, player);
+        List<CellState> streetStates = Collections.singletonList(
+                new CellState(3, "noname", STREET));
         List<PlayerState> playerStates = Collections.singletonList(playerState);
-        Game game = new Game(playerStates, player, streetStates);
+        Game game = new Game(playerStates, streetStates);
         gameRepository.save(game);
         return "OK";
     }
@@ -50,9 +52,9 @@ public class HelloController {
     public String addGame(@RequestParam(name = "nickname", defaultValue = "Anonymous") String nickname) {
         Player player = playerRepository.findByNickname(nickname).orElseThrow(() ->
                 new PlayerNotFoundException(nickname));
-        List<PlayerState> playerStates = Collections.singletonList(new PlayerState(200, 0, player));
-        List<StreetState> streetStates = Collections.singletonList(new StreetState(1, 200, ""));
-        Game game = new Game(playerStates, player, streetStates);
+        List<PlayerState> playerStates = Collections.singletonList(new PlayerState(0, player));
+        List<CellState> streetStates = Collections.singletonList(new CellState(1, "", STREET));
+        Game game = new Game(playerStates, streetStates);
         gameRepository.save(game);
         return "OK";
     }

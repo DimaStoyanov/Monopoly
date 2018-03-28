@@ -13,6 +13,7 @@ import java.util.List;
 @Getter
 @ToString(exclude = {"turnOf", "winner"})
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = "startedAt", callSuper = true)
 @Table(name = "games")
 public class Game extends AbstractIdentifiableObject implements Serializable {
 
@@ -25,13 +26,13 @@ public class Game extends AbstractIdentifiableObject implements Serializable {
     @NonNull
     @JsonIgnore
     @Setter
-    private Player turnOf;
+    private PlayerState turnOf;
 
     @OneToMany(cascade = CascadeType.PERSIST)
     @JoinColumn
     @NonNull
     @OrderBy("position")
-    private List<StreetState> field;
+    private List<CellState> field;
 
     private boolean finished = false;
 
@@ -46,9 +47,9 @@ public class Game extends AbstractIdentifiableObject implements Serializable {
     @JsonIgnore
     private Player winner;
 
-    public Game(List<PlayerState> playerStates, Player turnOf, List<StreetState> field) {
+    public Game(List<PlayerState> playerStates, List<CellState> field) {
         this.playerStates = playerStates;
-        this.turnOf = turnOf;
+        this.turnOf = playerStates.get(0);
         this.field = field;
         this.startedAt = new Date();
         startedAt = new Date();
@@ -64,6 +65,7 @@ public class Game extends AbstractIdentifiableObject implements Serializable {
      * @param durationMinutes - how many minutes was the game
      * @throws IllegalStateException - repeated calls of this function
      */
+    // вынести в GameManager
     public void finish(Player winner, int durationMinutes) {
         if (finished) {
             throw new IllegalStateException("Game already finished");
@@ -79,7 +81,6 @@ public class Game extends AbstractIdentifiableObject implements Serializable {
             p.getPlayer().getStat().addTotalScore(p.getScore());
         });
     }
-
 
 
 }
