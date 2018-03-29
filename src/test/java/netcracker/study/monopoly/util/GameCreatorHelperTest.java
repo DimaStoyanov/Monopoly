@@ -1,5 +1,6 @@
 package netcracker.study.monopoly.util;
 
+import netcracker.study.monopoly.db.GameCreator;
 import netcracker.study.monopoly.db.model.Game;
 import netcracker.study.monopoly.db.model.Player;
 import netcracker.study.monopoly.db.model.PlayerState;
@@ -27,13 +28,14 @@ public class GameCreatorHelperTest {
         players.add(new Player("egor"));
         players.add(new Player("liza"));
         players.add(new Player("alisa"));
-        game = GameCreatorHelper.createGame(players);
+        game = GameCreator.INSTANCE.createGame(players);
     }
+
 
     @Test
     public void checkCreatedGame() {
         Assert.assertTrue(game.getPlayerStates().size() == 4);
-        Assert.assertTrue(game.getField().size() == 22);
+        Assert.assertTrue(game.getField().size() == 23);
         int initMoney = game.getPlayerStates().get(0).getMoney();
         Assert.assertTrue(game.getPlayerStates().stream().allMatch(p -> p.getMoney() == initMoney));
         Assert.assertEquals(game.getPlayerStates().stream()

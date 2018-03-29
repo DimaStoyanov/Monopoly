@@ -1,6 +1,7 @@
 package netcracker.study.monopoly.db.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.SerializedName;
 import lombok.*;
 
 import javax.persistence.*;
@@ -41,7 +42,10 @@ public class CellState extends AbstractIdentifiableObject implements Serializabl
     }
 
     public enum CellType {
-        STREET, START, FLIGHT, JAIL
+        @SerializedName("STREET") STREET,
+        @SerializedName("START") START,
+        @SerializedName("FLIGHT") FLIGHT,
+        @SerializedName("JAIL") JAIL
     }
 }
 

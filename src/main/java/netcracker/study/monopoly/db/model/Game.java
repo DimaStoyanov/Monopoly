@@ -34,17 +34,22 @@ public class Game extends AbstractIdentifiableObject implements Serializable {
     @OrderBy("position")
     private List<CellState> field;
 
+    @Setter
     private boolean finished = false;
 
-    private int durationMinutes;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(updatable = false)
     private Date startedAt;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Setter
+    private Date finishedAt;
+
     @ManyToOne
     @JoinColumn
     @JsonIgnore
+    @Setter
     private Player winner;
 
     public Game(List<PlayerState> playerStates, List<CellState> field) {
@@ -55,32 +60,4 @@ public class Game extends AbstractIdentifiableObject implements Serializable {
         startedAt = new Date();
         playerStates.forEach(p -> p.setGame(this));
     }
-
-    /**
-     * Need to call when game is finished.
-     * Set finished to true, set winner and duration of game
-     * Also update statistics of players
-     *
-     * @param winner          - {@link Player}, that won this game
-     * @param durationMinutes - how many minutes was the game
-     * @throws IllegalStateException - repeated calls of this function
-     */
-    // вынести в GameManager
-    public void finish(Player winner, int durationMinutes) {
-        if (finished) {
-            throw new IllegalStateException("Game already finished");
-        }
-
-        finished = true;
-        this.winner = winner;
-        this.durationMinutes = durationMinutes;
-
-        winner.getStat().incrementTotalWins();
-        playerStates.forEach(p -> {
-            p.getPlayer().getStat().incrementTotalGames();
-            p.getPlayer().getStat().addTotalScore(p.getScore());
-        });
-    }
-
-
 }

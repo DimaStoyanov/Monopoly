@@ -65,8 +65,9 @@ public class MonopolyApplicationTests {
     public void checkCount() {
         Assert.assertTrue(playerRepository.count() == 4);
         Assert.assertTrue(gameRepository.count() == 2);
-
     }
+
+
 
     // This actually does not work only in test (hibernate is too lazy lol)
 //    @Test

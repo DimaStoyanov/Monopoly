@@ -59,18 +59,6 @@ public class HelloController {
         return "OK";
     }
 
-    @RequestMapping("/finish_games")
-    public String finishGames(@RequestParam(name = "nickname", defaultValue = "Anonymous") String nickname) {
-        Player player = playerRepository.findByNickname(nickname).orElseThrow(() ->
-                new PlayerNotFoundException(nickname));
-
-        gameRepository.findByPlayer(player).forEach(g -> {
-            if (!g.isFinished()) g.finish(player, 10);
-        });
-        playerRepository.save(player);
-        return "OK";
-    }
-
 
     @RequestMapping(value = "/read/{nickname}")
     public Player read(@PathVariable String nickname) {
