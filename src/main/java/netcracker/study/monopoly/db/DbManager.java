@@ -98,7 +98,7 @@ public class DbManager {
     }
 
     /**
-     * Update both player and cell in one transaction
+     * Update both player                                                                                                                                                                                                                                                                                                                                                                                                                                                and cell in one transaction
      */
     public void updatePlayerAndCell(PlayerState player, CellState cell) throws EntryNotFoundException {
         updatePlayer(player);

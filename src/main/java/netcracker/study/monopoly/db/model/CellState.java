@@ -11,7 +11,6 @@ import java.io.Serializable;
 @Getter
 @ToString(exclude = "owner")
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Table(name = "cells_state")
 public class CellState extends AbstractIdentifiableObject implements Serializable {
 

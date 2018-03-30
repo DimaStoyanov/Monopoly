@@ -1,6 +1,5 @@
 package netcracker.study.monopoly.db.model;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
@@ -12,7 +11,6 @@ import java.util.UUID;
 
 @MappedSuperclass
 @ToString
-@EqualsAndHashCode
 class AbstractIdentifiableObject {
     @Id
     @GeneratedValue(generator = "custom-uuid")

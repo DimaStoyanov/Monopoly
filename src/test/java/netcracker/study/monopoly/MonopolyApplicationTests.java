@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static netcracker.study.monopoly.db.model.CellState.CellType.STREET;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -32,7 +33,6 @@ public class MonopolyApplicationTests {
     private PlayerRepository playerRepository;
     @Autowired
     private WebApplicationContext webApplicationContext;
-
 
     @Before
     @Transactional
@@ -63,8 +63,8 @@ public class MonopolyApplicationTests {
     @Test
     @Transactional
     public void checkCount() {
-        Assert.assertTrue(playerRepository.count() == 4);
-        Assert.assertTrue(gameRepository.count() == 2);
+        assertTrue(playerRepository.count() == 4);
+        assertTrue(gameRepository.count() == 2);
     }
 
 

@@ -10,18 +10,17 @@ import java.io.Serializable;
 @Getter
 @ToString(exclude = {"player", "game"})
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = "game", callSuper = true)
 @Table(name = "players_state")
 public class PlayerState extends AbstractIdentifiableObject implements Serializable {
 
     @Setter
-    private int position = 0;
+    private Integer position = 0;
 
     @Setter
-    private boolean canGo = true;
+    private Boolean canGo = true;
 
     @Setter
-    private int score = 0;
+    private Integer score = 0;
 
     @Setter
     @NonNull

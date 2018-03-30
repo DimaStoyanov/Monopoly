@@ -13,7 +13,6 @@ import java.util.List;
 @Getter
 @ToString(exclude = {"turnOf", "winner"})
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = "startedAt", callSuper = true)
 @Table(name = "games")
 public class Game extends AbstractIdentifiableObject implements Serializable {
 

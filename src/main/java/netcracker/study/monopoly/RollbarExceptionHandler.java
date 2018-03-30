@@ -34,7 +34,7 @@ public class RollbarExceptionHandler extends AbstractHandlerExceptionResolver im
     @Override
     protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response,
                                               Object handler, Exception ex) {
-        System.out.println(ex.getMessage());
+        ex.printStackTrace();
         if (rollbar != null) {
             rollbar.debug(ex);
         }

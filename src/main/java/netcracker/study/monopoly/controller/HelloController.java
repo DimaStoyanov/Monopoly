@@ -1,5 +1,6 @@
 package netcracker.study.monopoly.controller;
 
+import io.swagger.annotations.Api;
 import netcracker.study.monopoly.db.model.CellState;
 import netcracker.study.monopoly.db.model.Game;
 import netcracker.study.monopoly.db.model.Player;
@@ -16,6 +17,7 @@ import java.util.List;
 import static netcracker.study.monopoly.db.model.CellState.CellType.STREET;
 
 @RestController
+@Api
 public class HelloController {
 
     private final PlayerRepository playerRepository;

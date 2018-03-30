@@ -10,19 +10,23 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @ComponentScan
 @EnableAutoConfiguration
 @EnableOAuth2Sso
+@EnableSwagger2
 public class MonopolyApplication extends WebSecurityConfigurerAdapter {
 
     private final PlayerTracker playerTracker;
+
 
     @Autowired
     public MonopolyApplication(PlayerTracker playerTracker) {
         this.playerTracker = playerTracker;
     }
+
 
     public static void main(String[] args) {
         SpringApplication.run(MonopolyApplication.class, args);

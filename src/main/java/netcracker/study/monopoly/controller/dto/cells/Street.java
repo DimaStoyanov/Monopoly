@@ -1,24 +1,15 @@
 package netcracker.study.monopoly.controller.dto.cells;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 import netcracker.study.monopoly.controller.dto.Gamer;
 
-@Getter
 @ToString
+@EqualsAndHashCode(callSuper = true)
 public class Street extends Cell {
-
-    @Setter
-    @NonNull
-    private Integer cost;
+    @Getter
     @Setter
     private Gamer owner;
-
-
-    public Street(Integer position, String name) {
-        this.name = name;
-        this.position = position;
-    }
 }

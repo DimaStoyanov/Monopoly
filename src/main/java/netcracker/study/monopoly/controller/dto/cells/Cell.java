@@ -1,16 +1,19 @@
 package netcracker.study.monopoly.controller.dto.cells;
 
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.ToString;
 
-@Getter
-@ToString
-public abstract class Cell {
-
+@Data
+@NoArgsConstructor
+abstract class Cell {
     @NonNull
     String name;
 
     @NonNull
     Integer position;
+
+    @NonNull
+    Integer cost;
+
 }

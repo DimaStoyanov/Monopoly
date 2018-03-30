@@ -1,5 +1,6 @@
 package netcracker.study.monopoly.controller;
 
+import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 import netcracker.study.monopoly.db.model.Player;
 import netcracker.study.monopoly.db.repository.PlayerRepository;
@@ -37,7 +38,7 @@ public class PlayerTracker extends GenericFilterBean {
     public PlayerTracker(PlayerRepository playerRepository) {
         this.playerRepository = playerRepository;
         activePlayers = ExpiringMap.builder()
-                .expirationPolicy(ExpiringMap.ExpirationPolicy.ACCESSED)
+                .expirationPolicy(ExpirationPolicy.ACCESSED)
                 .expiration(30, TimeUnit.SECONDS)
                 .build();
 

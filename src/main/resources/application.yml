@@ -29,3 +29,8 @@ security:
        clientAuthenticationScheme: form
     resource:
        userInfoUri: https://api.github.com/user
+    authorization:
+      realm: Monopoly in map
+DB_URL: jdbc:postgresql://localhost/users
+DB_USERNAME: postgres
+DB_PASSWORD: postgres
