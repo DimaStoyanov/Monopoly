@@ -1,5 +1,6 @@
 package netcracker.study.monopoly.db;
 
+import lombok.NonNull;
 import netcracker.study.monopoly.db.model.CellState;
 import netcracker.study.monopoly.db.model.Game;
 import netcracker.study.monopoly.db.model.Player;
@@ -55,10 +56,10 @@ public class DbManager {
     }
 
 
-    public CellState getCell(UUID gameId, UUID playerId) throws EntryNotFoundException {
-        return csr.findByGameIdAndPlayerId(gameId, playerId).orElseThrow(() ->
-                new EntryNotFoundException(format("Cell with game id = %s and " +
-                        "player id = %s not found", gameId, playerId)));
+    public CellState getCell(UUID gameId, @NonNull Integer position) throws EntryNotFoundException {
+        return csr.findByGameIdAndPosition(gameId, position).orElseThrow(() ->
+                new EntryNotFoundException(format("Cell with game id = %s 0" +
+                        "in position %s not found", gameId, position)));
     }
 
     public PlayerState getPlayer(UUID gameId, UUID playerId) throws EntryNotFoundException {

@@ -6,7 +6,7 @@
 [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/DimaStoyanov/Monopoly/blob/master/LICENSE)
 
 ### Database
-<img alt="ER Diagram" height="300px" src="https://sun9-3.userapi.com/c830609/v830609157/b45c0/mWhtmBW0uc0.jpg"> 
+<img alt="ER Diagram" height="300px" src="https://pp.userapi.com/c846122/v846122199/f9e2/9fF1NnrRPLE.jpg"> 
 
 
 ### Game logic UML

@@ -21,28 +21,28 @@ public enum GameCreator {
 
     INSTANCE();
 
-    private final String CELLS_PATH = "src/main/resources/game/field";
-    private final String PLAYER_CONFIG_PATH = "src/main/resources/game/gamers/gamer.json";
+    private final String cellsPath = "src/main/resources/game/field";
+    private final String playerConfigPath = "src/main/resources/game/gamers/gamer.json";
 
-    private final Collection<CellState> CELLS;
-    private final PlayerConfig PLAYER_CONFIG;
+    private final Collection<CellState> cells;
+    private final PlayerConfig playerConfig;
     private final Gson gson;
 
     GameCreator() {
         gson = new Gson();
-        CELLS = initCells();
-        PLAYER_CONFIG = initPlayerConfig();
+        cells = initCells();
+        playerConfig = initPlayerConfig();
     }
 
     @SneakyThrows
     private PlayerConfig initPlayerConfig() {
-        return gson.fromJson(new FileReader(new File(PLAYER_CONFIG_PATH)), PlayerConfig.class);
+        return gson.fromJson(new FileReader(new File(playerConfigPath)), PlayerConfig.class);
     }
 
     @SneakyThrows
     private Collection<CellState> initCells() {
         Map<Integer, CellState> cellsMap = new TreeMap<>();
-        File cellsDir = new File(CELLS_PATH);
+        File cellsDir = new File(cellsPath);
         putCells(cellsDir, cellsMap);
         return cellsMap.values();
     }
@@ -67,7 +67,7 @@ public enum GameCreator {
 
 
     private List<CellState> getCells() {
-        return CELLS.stream()
+        return cells.stream()
                 .map(s -> {
                     CellState state = new CellState(s.getPosition(), s.getName(), s.getType());
                     state.setCost(s.getCost());
@@ -80,7 +80,7 @@ public enum GameCreator {
         return players.stream()
                 .map(p -> {
                     PlayerState state = new PlayerState(players.indexOf(p), p);
-                    state.setMoney(PLAYER_CONFIG.getMoney());
+                    state.setMoney(playerConfig.getMoney());
                     return state;
                 })
                 .collect(Collectors.toList());
