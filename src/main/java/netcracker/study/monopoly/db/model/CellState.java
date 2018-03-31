@@ -26,7 +26,6 @@ public class CellState extends AbstractIdentifiableObject implements Serializabl
     @Setter
     private Integer cost;
 
-    @Setter
     @NonNull
     private String name;
 

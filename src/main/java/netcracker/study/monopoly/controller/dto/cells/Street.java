@@ -6,10 +6,11 @@ import lombok.Setter;
 import lombok.ToString;
 import netcracker.study.monopoly.controller.dto.Gamer;
 
-@ToString
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class Street extends Cell {
     @Getter
     @Setter
     private Gamer owner;
+
 }

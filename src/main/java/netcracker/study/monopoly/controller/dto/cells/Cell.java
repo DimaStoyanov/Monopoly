@@ -6,7 +6,7 @@ import lombok.NonNull;
 
 @Data
 @NoArgsConstructor
-abstract class Cell {
+public abstract class Cell {
     @NonNull
     String name;
 

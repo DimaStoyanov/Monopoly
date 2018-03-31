@@ -1,16 +1,19 @@
 package netcracker.study.monopoly.controller;
 
 import io.swagger.annotations.Api;
+import netcracker.study.monopoly.controller.dto.GameDto;
+import netcracker.study.monopoly.db.GameCreator;
 import netcracker.study.monopoly.db.model.CellState;
 import netcracker.study.monopoly.db.model.Game;
 import netcracker.study.monopoly.db.model.Player;
 import netcracker.study.monopoly.db.model.PlayerState;
 import netcracker.study.monopoly.db.repository.GameRepository;
 import netcracker.study.monopoly.db.repository.PlayerRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import netcracker.study.monopoly.util.DbDtoConverter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,12 +25,24 @@ public class HelloController {
 
     private final PlayerRepository playerRepository;
     private final GameRepository gameRepository;
+    private final DbDtoConverter converter;
 
-    @Autowired
+
     public HelloController(PlayerRepository playerRepository,
-                           GameRepository gameRepository) {
+                           GameRepository gameRepository, DbDtoConverter converter) {
         this.playerRepository = playerRepository;
         this.gameRepository = gameRepository;
+        this.converter = converter;
+    }
+
+
+    @RequestMapping("/dto")
+    public GameDto getDto() {
+        Game game = GameCreator.INSTANCE.createGame(Arrays.asList(
+                new Player("1"),
+                new Player("2")
+        ));
+        return converter.gameToDto(game);
     }
 
 

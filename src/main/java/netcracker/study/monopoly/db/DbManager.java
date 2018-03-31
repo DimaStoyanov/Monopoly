@@ -62,10 +62,10 @@ public class DbManager {
                         "in position %s not found", gameId, position)));
     }
 
-    public PlayerState getPlayer(UUID gameId, UUID playerId) throws EntryNotFoundException {
-        return psr.findByGameIdAndPlayerId(gameId, playerId).orElseThrow(() ->
-                new EntryNotFoundException(format("PlayerState with game id = %s and " +
-                        "player id = %s not found", gameId, playerId)));
+    public PlayerState getPlayer(UUID playerStateId) throws EntryNotFoundException {
+        return psr.findById(playerStateId).orElseThrow(() ->
+                new EntryNotFoundException(format("PlayerState with id = %s " +
+                        "not found", playerStateId)));
     }
 
     public UUID getTurnOf(UUID gameId) throws EntryNotFoundException {
@@ -73,10 +73,10 @@ public class DbManager {
         return game.getTurnOf().getPlayer().getId();
     }
 
-    public void setTurnOf(UUID gameId, UUID playerId) throws EntryNotFoundException {
-        PlayerState ps = psr.findByGameIdAndPlayerId(gameId, playerId).orElseThrow(() ->
-                new EntryNotFoundException(format("PlayerState with game id = %s and " +
-                        "player id = %s not found", gameId, playerId)));
+    public void setTurnOf(UUID playerStateId, UUID gameId) throws EntryNotFoundException {
+        PlayerState ps = psr.findById(playerStateId).orElseThrow(() ->
+                new EntryNotFoundException(format("PlayerState with id = %s " +
+                        "not found", playerStateId)));
         Game game = gr.findById(gameId).orElseThrow(() -> new EntryNotFoundException(gameId));
         game.setTurnOf(ps);
         gr.save(game);
@@ -106,13 +106,15 @@ public class DbManager {
     }
 
 
-    public void finishGame(UUID gameId, UUID winnerId) throws EntryNotFoundException {
+    public void finishGame(UUID gameId, UUID winnerStateId) throws EntryNotFoundException {
         Game game = gr.findById(gameId).orElseThrow(() -> new EntryNotFoundException(gameId));
         if (game.isFinished()) {
             throw new IllegalStateException(format("Game %s has already finished", game));
         }
 
-        game.setWinner(pr.findById(winnerId).orElseThrow(() -> new EntryNotFoundException(winnerId)));
+        game.setWinner(psr.findById(winnerStateId)
+                .orElseThrow(() -> new EntryNotFoundException(winnerStateId))
+                .getPlayer());
         game.setFinishedAt(new Date());
         game.getWinner().getStat().incrementTotalWins();
         game.getPlayerStates().forEach(p -> {
