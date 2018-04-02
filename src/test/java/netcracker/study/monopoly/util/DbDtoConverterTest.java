@@ -167,7 +167,7 @@ public class DbDtoConverterTest {
         assertEquals(cellState.getPosition(), streetPosition);
         assertEquals(cellState.getCost(), cost);
         assertEquals(cellState.getName(), cellName);
-        assertEquals(cellState.getType(), STREET);
+        assertEquals(cellState.getType(), streetDb.getType());
         assertEquals(cellState.getOwner(), ps);
 
     }

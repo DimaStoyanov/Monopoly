@@ -11,7 +11,7 @@ import netcracker.study.monopoly.db.repository.PlayerRepository;
 import netcracker.study.monopoly.db.repository.PlayerStateRepository;
 import netcracker.study.monopoly.exceptions.EntryNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -21,7 +21,7 @@ import java.util.UUID;
 import static java.lang.String.format;
 
 
-@Component
+@Service
 @Transactional
 public class DbManager {
 

@@ -1,5 +1,6 @@
 package netcracker.study.monopoly.controller.managers;
 
+import netcracker.study.monopoly.controller.dto.GameChange;
 import netcracker.study.monopoly.controller.dto.GameDto;
 import netcracker.study.monopoly.controller.dto.Gamer;
 import netcracker.study.monopoly.controller.dto.cells.Street;
@@ -18,11 +19,10 @@ import java.util.UUID;
 @Service
 public class GameManager {
 
-    private final static int FIELD_SIZE = 23;
-    DbManager dbManager;
-
-    final
-    DbDtoConverter converter;
+    private final DbManager dbManager;
+    private final DbDtoConverter converter;
+    private final Random random = new Random();
+    private int fieldSize = 23;
 
     @Autowired
     public GameManager(DbManager dbManager, DbDtoConverter converter) {
@@ -31,7 +31,9 @@ public class GameManager {
     }
 
     public GameDto create(List<UUID> gamerIds) throws EntryNotFoundException {
-        return converter.gameToDto(dbManager.createGame(gamerIds));
+        GameDto gameDto = converter.gameToDto(dbManager.createGame(gamerIds));
+        fieldSize = gameDto.getField().size();
+        return gameDto;
     }
 
     public GameDto getGame(UUID gameId) throws EntryNotFoundException {
@@ -56,23 +58,31 @@ public class GameManager {
         dbManager.updatePlayer(converter.gamerToDb(gamer, ps));
     }
 
-    public void streetStep(UUID gameId, UUID playerId) throws EntryNotFoundException {
+    public GameChange streetStep(UUID gameId, UUID playerId) throws EntryNotFoundException {
         PlayerState ps = dbManager.getPlayer(playerId);
         Gamer gamer = converter.playerToDto(ps);
-        Street street = converter.streetToDto(dbManager.getCell(gameId, gamer.getPosition()));
-        buy(gamer, street);
+        CellState cell = dbManager.getCell(gameId, gamer.getPosition());
+        Street street = converter.streetToDto(cell);
+        buy(ps, gamer, street, cell);
+
+        GameChange gameChange = new GameChange();
+        gameChange.setGamerChange(gamer);
+        gameChange.setStreetChange(street);
+        return gameChange;
     }
 
     private void pay(Gamer gamer, Street street) throws EntryNotFoundException {
         Gamer owner = street.getOwner();
         PlayerState ps = dbManager.getPlayer(owner.getId());
         int money = street.getCost();
+        // TODO: If not enough money - bankrupt?
         gamer.setMoney(gamer.getMoney() - money);
         owner.setMoney(owner.getMoney() + money);
         dbManager.updatePlayer(converter.gamerToDb(owner, ps));
     }
 
-    private boolean buy(Gamer gamer, Street street) {
+    private boolean buy(PlayerState ps, Gamer gamer, Street street, CellState cell)
+            throws EntryNotFoundException {
         if (street.getOwner() != null)
             return false;
         int cost = street.getCost();
@@ -80,6 +90,8 @@ public class GameManager {
             return false;
         gamer.setMoney(gamer.getMoney() - cost);
         street.setOwner(gamer);
+        dbManager.updateCell(converter.streetToDb(street, cell, ps));
+        dbManager.updatePlayer(converter.gamerToDb(gamer, ps));
         return true;
     }
 
@@ -93,9 +105,8 @@ public class GameManager {
     }
 
     private void go(Gamer gamer) {
-        Random random = new Random();
         int position = gamer.getPosition() + random.nextInt(6) + random.nextInt(6) + 2;
-        if (position > FIELD_SIZE) {
+        if (position > fieldSize) {
             startAction(gamer);
             gamer.setPosition(position - gamer.getPosition());
         } else
