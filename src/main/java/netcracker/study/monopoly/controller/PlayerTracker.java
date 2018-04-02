@@ -49,12 +49,12 @@ public class PlayerTracker extends GenericFilterBean {
         HttpServletRequest req = (HttpServletRequest) request;
         StandardSessionFacade session = (StandardSessionFacade) req.getSession(false);
         // "Infinity" session
-        session.setMaxInactiveInterval(0);
         OAuth2Authentication authentication = (OAuth2Authentication)
                 SecurityContextHolder.getContext().getAuthentication();
 
         String name = authentication.getName();
         if (!sessionsId.contains(session.getId())) {
+
 
             Map details = (Map) authentication.getUserAuthentication().getDetails();
 
@@ -62,6 +62,9 @@ public class PlayerTracker extends GenericFilterBean {
                     .orElseGet(() -> new Player(name));
             player.setAvatarUrl((String) details.get("avatar_url"));
             playerRepository.save(player);
+
+            session.setMaxInactiveInterval(0);
+            session.setAttribute("id", player.getId());
         }
 
         activePlayers.resetExpiration(name);

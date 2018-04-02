@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:dt="http://www.thymeleaf.org/dandelion/datatables"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" lang="en"
-      xsi:schemaLocation="http://www.thymeleaf.org/dandelion/datatables ">
+      xsi:schemaLocation="http://www.thymeleaf.org/dandelion/datatables
+http://www.thymeleaf.org/dandelion/datatables ">
 <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <head>
     <meta charset="UTF-8">
     <title>Monopoly profile</title>
@@ -24,17 +27,44 @@
     <tr th:each="friend : ${friends}">
         <td><img height="80" th:src="${friend[0]}"></td>
         <td th:text="${friend[1]}"></td>
-        <td onclick="onClick()" th:text="${friend[2]? 'Online' : 'Offline'}"></td>
+        <td th:text="${friend[2]? 'Online' : 'Offline'}"></td>
         <td>
-            <button>Invite</button>
+            <button onclick="onClick()">Invite</button>
         </td>
     </tr>
     </tbody>
 </table>
 
 <script>
+
+    var id = null;
+
+    $.get('/player', function (data) {
+        id = data;
+    });
+
     var onClick = function (e) {
-        alert("Not implemented")
+        alert("send");
+        stompClient.send('/app/invite', {}, JSON.stringify({
+            from: "Dima",
+            to: id,
+            roomId: 1
+
+        }));
+    };
+
+    var socket = new SockJS('/lobby');
+    var stompClient = Stomp.over(socket);
+
+
+    stompClient.connect({}, function () {
+        stompClient.subscribe('/topic/invite/' + id, onMessageReceived);
+    });
+
+    function onMessageReceived(payload) {
+        alert("Invited");
+        var msg = JSON.parse(payload.body);
+        alert("Player " + msg.from + " invite you to room " + msg.roomId)
     }
 </script>
 </body>

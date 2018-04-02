@@ -124,5 +124,27 @@ public class DbManager {
         game.setFinished(true);
     }
 
+    public boolean addFriend(UUID from, UUID to) throws EntryNotFoundException {
+        Player pFrom = pr.findById(from).orElseThrow(() -> new EntryNotFoundException(from));
+        Player pTo = pr.findById(to).orElseThrow(() -> new EntryNotFoundException(to));
+        if (pFrom.getFriends().contains(pTo)) {
+            return false;
+        }
+        pFrom.addFriend(pTo);
+        pr.save(pFrom);
+        return true;
+    }
+
+    public boolean removeFriend(UUID from, UUID to) throws EntryNotFoundException {
+        Player pFrom = pr.findById(from).orElseThrow(() -> new EntryNotFoundException(from));
+        Player pTo = pr.findById(to).orElseThrow(() -> new EntryNotFoundException(to));
+        if (pFrom.getFriends().contains(pTo)) {
+            pFrom.removeFriend(pTo);
+            pr.save(pFrom);
+            return true;
+        }
+        return false;
+    }
+
 
 }

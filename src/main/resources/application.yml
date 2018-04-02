@@ -17,7 +17,7 @@ logging:
     org:
       springframework: info
 server:
-  port: 8080
+  port: 8081
 
 security:
   oauth2:
@@ -31,9 +31,6 @@ security:
        userInfoUri: https://api.github.com/user
     authorization:
       realm: Monopoly in map
-#  TODO: use not depricated settings 
-  ignored:
-      /swagger-ui.html
 DB_URL: jdbc:postgresql://localhost/users
 DB_USERNAME: postgres
 DB_PASSWORD: postgres

@@ -36,7 +36,7 @@ public class HelloController {
     }
 
 
-    @RequestMapping("/dto")
+    @GetMapping("/dto")
     public GameDto getDto() {
         Game game = GameCreator.INSTANCE.createGame(Arrays.asList(
                 new Player("1"),
@@ -46,7 +46,7 @@ public class HelloController {
     }
 
 
-    @RequestMapping(value = "/insert")
+    @GetMapping(value = "/insert")
     @ResponseStatus(HttpStatus.CREATED)
     public String insert(@RequestParam(name = "nickname", defaultValue = "Anonymous") String nickname) {
         if (playerRepository.findByNickname(nickname).isPresent()) {
@@ -65,7 +65,14 @@ public class HelloController {
         return "OK";
     }
 
-    @RequestMapping("/add_game")
+    @PostMapping("/insert_player")
+    public Player insertPlayer(@RequestParam(name = "nickname") String nickname) {
+        Player player = new Player(nickname);
+        playerRepository.save(player);
+        return player;
+    }
+
+    @GetMapping("/add_game")
     public String addGame(@RequestParam(name = "nickname", defaultValue = "Anonymous") String nickname) {
         Player player = playerRepository.findByNickname(nickname).orElseThrow(() ->
                 new PlayerNotFoundException(nickname));
@@ -77,30 +84,30 @@ public class HelloController {
     }
 
 
-    @RequestMapping(value = "/read/{nickname}")
+    @GetMapping(value = "/read/{nickname}")
     public Player read(@PathVariable String nickname) {
         return playerRepository.findByNickname(nickname).orElseThrow(() ->
                 new PlayerNotFoundException(nickname));
     }
 
-    @RequestMapping("/read")
+    @GetMapping("/read")
     public Iterable<Player> readAll() {
         return playerRepository.findAll();
     }
 
-    @RequestMapping("/read_games")
+    @GetMapping("/read_games")
     public Iterable<Game> readGames() {
         return gameRepository.findAll();
     }
 
-    @RequestMapping("/read_games/{nickname}")
+    @GetMapping("/read_games/{nickname}")
     public Iterable<Game> readPlayerGames(@PathVariable String nickname) {
         Player player = playerRepository.findByNickname(nickname).orElseThrow(() ->
                 new PlayerNotFoundException(nickname));
         return gameRepository.findByPlayer(player);
     }
 
-    @RequestMapping(value = "/update")
+    @GetMapping(value = "/update")
     public String updateScore(@RequestParam(name = "nickname") String nickname,
                               @RequestParam(name = "score") Integer score) {
         Player player = playerRepository.findByNickname(nickname).
@@ -110,10 +117,9 @@ public class HelloController {
         return "OK";
     }
 
-    @RequestMapping("/add_friend")
+    @GetMapping("/add_friend")
     public String addFriend(@RequestParam(name = "from") String from,
                             @RequestParam(name = "to") String to) {
-        if (from.equals(to)) return "You can't be friend of yourself";
         Player playerFrom = playerRepository.findByNickname(from).orElseThrow(() ->
                 new PlayerNotFoundException(from));
         Player playerTo = playerRepository.findByNickname(to).orElseThrow(() ->
@@ -123,14 +129,14 @@ public class HelloController {
         return "OK";
     }
 
-    @RequestMapping("/read_friends")
+    @GetMapping("/read_friends")
     public Iterable<Player> readFriends(@RequestParam(name = "nickname", defaultValue = "Anonymous") String nickname) {
         Player player = playerRepository.findByNickname(nickname).orElseThrow(() ->
                 new PlayerNotFoundException(nickname));
         return player.getFriends();
     }
 
-    @RequestMapping("/remove_friend")
+    @GetMapping("/remove_friend")
     public String removeFriend(@RequestParam(name = "from") String from,
                                @RequestParam(name = "to") String to) {
         Player playerFrom = playerRepository.findByNickname(from).orElseThrow(() ->
