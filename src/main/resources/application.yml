@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:jdbc:postgresql://localhost/users}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
     hikari:
       connection-timeout: 30000
       maximum-pool-size: 10
@@ -17,7 +17,7 @@ logging:
     org:
       springframework: info
 server:
-  port: 8080
+  port: 8081
 
 security:
   oauth2:
@@ -31,9 +31,3 @@ security:
        userInfoUri: https://api.github.com/user
     authorization:
       realm: Monopoly in map
-#  TODO: use not depricated settings 
-  ignored:
-      /swagger-ui.html
-DB_URL: jdbc:postgresql://localhost/users
-DB_USERNAME: postgres
-DB_PASSWORD: postgres

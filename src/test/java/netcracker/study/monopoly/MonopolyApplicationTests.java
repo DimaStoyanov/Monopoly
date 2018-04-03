@@ -1,11 +1,11 @@
 package netcracker.study.monopoly;
 
-import netcracker.study.monopoly.db.model.CellState;
-import netcracker.study.monopoly.db.model.Game;
-import netcracker.study.monopoly.db.model.Player;
-import netcracker.study.monopoly.db.model.PlayerState;
-import netcracker.study.monopoly.db.repository.GameRepository;
-import netcracker.study.monopoly.db.repository.PlayerRepository;
+import netcracker.study.monopoly.models.entities.CellState;
+import netcracker.study.monopoly.models.entities.Game;
+import netcracker.study.monopoly.models.entities.Player;
+import netcracker.study.monopoly.models.entities.PlayerState;
+import netcracker.study.monopoly.models.repositories.GameRepository;
+import netcracker.study.monopoly.models.repositories.PlayerRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static netcracker.study.monopoly.db.model.CellState.CellType.STREET;
+import static netcracker.study.monopoly.models.entities.CellState.CellType.STREET;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)

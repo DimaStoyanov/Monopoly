@@ -1,6 +1,6 @@
 package netcracker.study.monopoly.config;
 
-import netcracker.study.monopoly.controller.PlayerTracker;
+import netcracker.study.monopoly.api.controllers.filters.PlayerTracker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.context.annotation.Configuration;
