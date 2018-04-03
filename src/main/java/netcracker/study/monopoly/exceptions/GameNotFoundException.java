@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.UUID;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class GameNotFoundException extends Throwable {
+public class GameNotFoundException extends RuntimeException {
     public GameNotFoundException(UUID gameId) {
         super(String.format("Game with id %s not found", gameId));
     }

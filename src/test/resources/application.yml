@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:jdbc:postgresql://localhost/users}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
     hikari:
       connection-timeout: 30000
       maximum-pool-size: 10
@@ -25,16 +25,10 @@ server:
 security:
   oauth2:
     client:
-       clientId: ${GIT_CLIENT_ID}
-       clientSecret: ${GIT_CLIENT_SECRET}
+       clientId: ${GIT_CLIENT_ID:e7a663e9ac916682020c}
+       clientSecret: ${GIT_CLIENT_SECRET:e7a663e9ac916682020c}
        accessTokenUri: https://github.com/login/oauth/access_token
        userAuthorizationUri: https://github.com/login/oauth/authorize
        clientAuthenticationScheme: form
     resource:
        userInfoUri: https://api.github.com/user
-
-DB_URL: jdbc:postgresql://localhost/users
-DB_USERNAME: postgres
-DB_PASSWORD: postgres
-GIT_CLIENT_ID: e7a663e9ac916682020c
-GIT_CLIENT_SECRET: e7a663e9ac916682020c
