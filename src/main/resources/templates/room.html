@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:dt="http://www.thymeleaf.org/dandelion/datatables"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      lang="en"
+      xsi:schemaLocation="http://www.thymeleaf.org/dandelion/datatables">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Room</title>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<table id="friends" border="1" dt:table="true">
+    <tbody>
+    <!--/*@thymesVar id="friends" type="java.util.List"*/-->
+    <tr th:each="friend : ${friends}">
+        <td><img height="80" th:src="${friend[0]}"></td>
+        <td th:text="${friend[1]}"></td>
+        <td th:text="${friend[2]? 'Online' : 'Offline'}"></td>
+        <td>
+            <button th:if="${friend[2]}" onclick="onFriendInviteClick()">Invite</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<button onclick="onInviteAllClick()">Invite all</button>
+<table id="inRoom">
+    <tr>
+        <td><!--/*@thymesVar id="avatar_url" type="java.lang.String"*/-->
+            <img height="80" th:src="${avatar_url}"></td>
+        <!--/*@thymesVar id="nickname" type="java.lang.String"*/-->
+        <td th:text="${nickname}"></td>
+    </tr>
+</table>
+
+<script>
+    function onFriendInviteClick() {
+        alert("Not implemented");
+    }
+
+
+    var socket = new SockJS('/lobby');
+    var stompClient = Stomp.over(socket);
+    var id = null;
+    $.get("/player/id", function (data) {
+        id = data;
+    });
+
+
+    stompClient.connect({}, function () {
+        stompClient.subscribe('/topic/invite/' + id, onMessageReceived);
+    });
+
+    function onMessageReceived(payload) {
+        alert("Invited");
+        var msg = JSON.parse(payload.body);
+        if (confirm("Player " + msg.from + " invite you. Join?")) {
+            $(location).attr('href', msg.url);
+        }
+    }
+
+    function onInviteAllClick() {
+        var nickname = null;
+        var url = $(location).attr('href');
+        alert(url);
+        $.get("/player/nickname", function (data) {
+            nickname = data;
+        });
+        $.get("/player/friends", function (data) {
+            data.forEach(function (item) {
+                stompClient.send('/app/invite', {}, JSON.stringify({
+                    from: nickname,
+                    to: item.id,
+                    url: url
+
+                }));
+            });
+        })
+    }
+
+
+</script>
+</body>
+</html>

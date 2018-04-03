@@ -5,9 +5,9 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @ToString(exclude = "friends")
@@ -34,7 +34,7 @@ public class Player extends AbstractIdentifiableObject implements Serializable {
     @JoinTable
     @JsonIgnore
     @OrderBy("nickname")
-    private Set<Player> friends = new HashSet<>();
+    private List<Player> friends = new ArrayList<>();
 
 
     @Setter

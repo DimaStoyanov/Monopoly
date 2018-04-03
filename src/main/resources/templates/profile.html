@@ -28,30 +28,37 @@ http://www.thymeleaf.org/dandelion/datatables ">
         <td><img height="80" th:src="${friend[0]}"></td>
         <td th:text="${friend[1]}"></td>
         <td th:text="${friend[2]? 'Online' : 'Offline'}"></td>
-        <td>
-            <button onclick="onClick()">Invite</button>
-        </td>
     </tr>
     </tbody>
 </table>
+<input id="friend_nickname" type="text" title="Nickname">
+<button onclick="onAddFriendClick()"> Add friend</button>
+
+
+<button onclick="onCreateRoomClick()">Create room</button>
 
 <script>
 
+    var friendNickname = document.getElementById("friend_nickname");
+
+    function onAddFriendClick() {
+        $.post('/player/add_friend?nickname=' + friendNickname.value, function (data) {
+            alert(data);
+        })
+    }
+
+    function onCreateRoomClick() {
+        $.post("/rooms/create", function (data) {
+            $(location).attr('href', '/rooms/' + data);
+        });
+    }
+
     var id = null;
 
-    $.get('/player', function (data) {
+    $.get('/player/id', function (data) {
         id = data;
     });
 
-    var onClick = function (e) {
-        alert("send");
-        stompClient.send('/app/invite', {}, JSON.stringify({
-            from: "Dima",
-            to: id,
-            roomId: 1
-
-        }));
-    };
 
     var socket = new SockJS('/lobby');
     var stompClient = Stomp.over(socket);
@@ -64,7 +71,9 @@ http://www.thymeleaf.org/dandelion/datatables ">
     function onMessageReceived(payload) {
         alert("Invited");
         var msg = JSON.parse(payload.body);
-        alert("Player " + msg.from + " invite you to room " + msg.roomId)
+        if (confirm("Player " + msg.from + " invite you. Join?")) {
+            $(location).attr('href', msg.url);
+        }
     }
 </script>
 </body>

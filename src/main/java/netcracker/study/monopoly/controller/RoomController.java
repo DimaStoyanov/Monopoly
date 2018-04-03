@@ -3,6 +3,9 @@ package netcracker.study.monopoly.controller;
 import lombok.extern.log4j.Log4j2;
 import netcracker.study.monopoly.controller.dto.InviteMsg;
 import netcracker.study.monopoly.controller.dto.RoomMsg;
+import netcracker.study.monopoly.db.model.Player;
+import netcracker.study.monopoly.db.repository.PlayerRepository;
+import netcracker.study.monopoly.exceptions.PlayerNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -15,7 +18,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 @Controller
 @Log4j2
@@ -23,10 +32,14 @@ public class RoomController {
 
     private final SimpMessagingTemplate template;
     private final AtomicLong lastRoomId;
+    private final PlayerRepository pr;
+    private final PlayerTracker playerTracker;
 
     @Autowired
-    public RoomController(SimpMessagingTemplate template) {
+    public RoomController(SimpMessagingTemplate template, PlayerRepository pr, PlayerTracker playerTracker) {
         this.template = template;
+        this.pr = pr;
+        this.playerTracker = playerTracker;
         lastRoomId = new AtomicLong();
     }
 
@@ -45,8 +58,20 @@ public class RoomController {
     }
 
     @GetMapping("/rooms/{roomId}")
-    public String loadRoom(Model model, @PathVariable String roomId) {
+    public String loadRoom(Model model, @PathVariable String roomId, HttpSession session)
+            throws PlayerNotFoundException {
+        Player player = pr.findById((UUID) session.getAttribute("id"))
+                .orElseThrow(PlayerNotFoundException::new);
         model.addAttribute("roomId", roomId);
+        model.addAttribute("nickname", player.getNickname());
+        model.addAttribute("avatar_url", player.getAvatarUrl());
+        List<List<? extends Serializable>> friends = player.getFriends()
+                .stream()
+                .sorted((o1, o2) -> playerTracker.isOnline(o1.getNickname()) ? -1 : 1)
+                .map(p -> Arrays.asList(p.getAvatarUrl(), p.getNickname(),
+                        playerTracker.isOnline(p.getNickname())))
+                .collect(Collectors.toList());
+        model.addAttribute("friends", friends);
         return "room";
     }
 

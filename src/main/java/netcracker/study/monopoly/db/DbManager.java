@@ -10,6 +10,7 @@ import netcracker.study.monopoly.db.repository.GameRepository;
 import netcracker.study.monopoly.db.repository.PlayerRepository;
 import netcracker.study.monopoly.db.repository.PlayerStateRepository;
 import netcracker.study.monopoly.exceptions.EntryNotFoundException;
+import netcracker.study.monopoly.exceptions.PlayerNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -124,9 +125,9 @@ public class DbManager {
         game.setFinished(true);
     }
 
-    public boolean addFriend(UUID from, UUID to) throws EntryNotFoundException {
-        Player pFrom = pr.findById(from).orElseThrow(() -> new EntryNotFoundException(from));
-        Player pTo = pr.findById(to).orElseThrow(() -> new EntryNotFoundException(to));
+    public boolean addFriend(String from, String to) throws PlayerNotFoundException {
+        Player pFrom = pr.findByNickname(from).orElseThrow(PlayerNotFoundException::new);
+        Player pTo = pr.findByNickname(to).orElseThrow(PlayerNotFoundException::new);
         if (pFrom.getFriends().contains(pTo)) {
             return false;
         }
