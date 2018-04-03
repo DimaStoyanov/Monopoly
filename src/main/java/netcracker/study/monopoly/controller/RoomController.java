@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -34,6 +32,8 @@ public class RoomController {
     private final AtomicLong lastRoomId;
     private final PlayerRepository pr;
     private final PlayerTracker playerTracker;
+    private final Map<Integer, List<UUID>> usersInRooms;
+
 
     @Autowired
     public RoomController(SimpMessagingTemplate template, PlayerRepository pr, PlayerTracker playerTracker) {
@@ -41,6 +41,7 @@ public class RoomController {
         this.pr = pr;
         this.playerTracker = playerTracker;
         lastRoomId = new AtomicLong();
+        usersInRooms = new HashMap<>();
     }
 
     @MessageMapping("/invite")

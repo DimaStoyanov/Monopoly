@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Room</title>
-    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 </head>
@@ -54,7 +54,6 @@
     });
 
     function onMessageReceived(payload) {
-        alert("Invited");
         var msg = JSON.parse(payload.body);
         if (confirm("Player " + msg.from + " invite you. Join?")) {
             $(location).attr('href', msg.url);
