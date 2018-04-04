@@ -28,6 +28,11 @@ http://www.thymeleaf.org/dandelion/datatables ">
         <td><img height="80" th:src="${friend[0]}"></td>
         <td th:text="${friend[1]}"></td>
         <td th:text="${friend[2]? 'Online' : 'Offline'}"></td>
+        <td>
+            <button onclick="onRemoveFriendClick(this)"
+                    th:id="'remove_' + ${friend[1]}">Remove
+            </button>
+        </td>
     </tr>
     </tbody>
 </table>
@@ -42,8 +47,23 @@ http://www.thymeleaf.org/dandelion/datatables ">
     var friendNickname = document.getElementById("friend_nickname");
 
     function onAddFriendClick() {
-        $.post('/player/add_friend?nickname=' + friendNickname.value, function (data) {
-            alert(data);
+        $.ajax({
+            url: '/player/add_friend?nickname=' + friendNickname.value,
+            type: 'PUT',
+            success: function (data) {
+                alert(data)
+            }
+        });
+    }
+
+    function onRemoveFriendClick(el) {
+        var nickname = el.id.substr(7);
+        $.ajax({
+            url: '/player/remove_friend?nickname=' + nickname,
+            type: 'PUT',
+            success: function (data) {
+                alert(data)
+            }
         })
     }
 

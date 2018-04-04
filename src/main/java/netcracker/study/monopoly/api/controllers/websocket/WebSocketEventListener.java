@@ -9,15 +9,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import javax.servlet.ServletContextEvent;
 import java.util.Map;
 
 @Component
 @Log4j2
 public class WebSocketEventListener {
 
+    private final SimpMessageSendingOperations messagingTemplate;
+
     @Autowired
-    SimpMessageSendingOperations messagingTemplate;
+    public WebSocketEventListener(SimpMessageSendingOperations messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
 
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectedEvent event) {

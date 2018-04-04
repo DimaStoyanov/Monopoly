@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -14,17 +13,23 @@ public class RoomMsg {
     @NonNull
     private Type type;
     @NonNull
-    private String playerName;
-    private Date date;
-    private List<UUID> players;
+    private String nickname;
+    @NonNull
+    private UUID idFrom;
 
-    public RoomMsg(Type type, String playerName) {
+    private Date sendAt;
+    private UUID gameId;
+    private String content;
+    private String avatarUrl;
+
+    public RoomMsg(Type type, String nickname, UUID idFrom) {
         this.type = type;
-        this.playerName = playerName;
-        date = new Date();
+        this.nickname = nickname;
+        this.idFrom = idFrom;
+        sendAt = new Date();
     }
 
     public enum Type {
-        JOIN, LEAVE, START
+        JOIN, LEAVE, START, CHAT
     }
 }

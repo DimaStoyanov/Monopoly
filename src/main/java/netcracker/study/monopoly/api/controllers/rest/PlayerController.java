@@ -35,6 +35,13 @@ public class PlayerController {
         return principal.getName();
     }
 
+    @GetMapping("/avatar_url")
+    public String getAvatarUrl(Principal principal) {
+        Player player = playerRepository.findByNickname(principal.getName())
+                .orElseThrow(PlayerNotFoundException::new);
+        return player.getAvatarUrl();
+    }
+
     @GetMapping("/friends")
     public List<Player> getFriends(HttpSession session) {
         Player player = playerRepository.findById((UUID) session.getAttribute("id"))
