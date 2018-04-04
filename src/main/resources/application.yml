@@ -10,6 +10,7 @@ spring:
     generate-ddl: true
     properties:
       hibernate:
+        ddl-auto: update
         temp:
           use_jdbc_metadata_defaults: false
 logging:

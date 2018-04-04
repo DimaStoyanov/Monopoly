@@ -1,12 +1,11 @@
-package netcracker.study.monopoly.api.dto.game;
+package netcracker.study.monopoly.api.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import netcracker.study.monopoly.api.dto.game.cells.Cell;
+import netcracker.study.monopoly.api.dto.cells.Cell;
 
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -17,6 +16,6 @@ public class GameDto {
     List<Gamer> players;
     @NonNull
     List<Cell> field;
-    @NonNull
-    UUID id;
+
+
 }
