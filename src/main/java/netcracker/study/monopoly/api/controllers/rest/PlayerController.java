@@ -1,6 +1,9 @@
 package netcracker.study.monopoly.api.controllers.rest;
 
 import lombok.extern.log4j.Log4j2;
+import netcracker.study.monopoly.api.controllers.filters.PlayerTracker;
+import netcracker.study.monopoly.api.dto.PlayerInfo;
+import netcracker.study.monopoly.converters.PlayerInfoConverter;
 import netcracker.study.monopoly.exceptions.PlayerNotFoundException;
 import netcracker.study.monopoly.models.entities.Player;
 import netcracker.study.monopoly.models.repositories.PlayerRepository;
@@ -19,10 +22,14 @@ import java.util.UUID;
 public class PlayerController {
 
     private final PlayerRepository playerRepository;
+    private final PlayerTracker playerTracker;
+    private final PlayerInfoConverter playerInfoConverter;
 
-
-    public PlayerController(PlayerRepository playerRepository) {
+    public PlayerController(PlayerRepository playerRepository, PlayerTracker playerTracker,
+                            PlayerInfoConverter playerInfoConverter) {
         this.playerRepository = playerRepository;
+        this.playerTracker = playerTracker;
+        this.playerInfoConverter = playerInfoConverter;
     }
 
     @GetMapping("/id")
@@ -43,10 +50,20 @@ public class PlayerController {
     }
 
     @GetMapping("/friends")
-    public List<Player> getFriends(HttpSession session) {
-        Player player = playerRepository.findById((UUID) session.getAttribute("id"))
+    public List<PlayerInfo> getFriends(HttpSession session) {
+        Player player = getPlayer(session);
+        return playerInfoConverter.toDtoAll(player.getFriends());
+    }
+
+    private Player getPlayer(HttpSession session) {
+        return playerRepository.findById((UUID) session.getAttribute("id"))
                 .orElseThrow(PlayerNotFoundException::new);
-        return player.getFriends();
+    }
+
+    @GetMapping("/info")
+    public PlayerInfo getInfo(HttpSession session) {
+        Player player = getPlayer(session);
+        return playerInfoConverter.toDto(player);
     }
 
     @PutMapping("/add_friend")

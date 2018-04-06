@@ -6,7 +6,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.util.Map;
@@ -22,11 +21,6 @@ public class WebSocketEventListener {
         this.messagingTemplate = messagingTemplate;
     }
 
-    @EventListener
-    public void handleWebSocketConnectListener(SessionConnectedEvent event) {
-        log.info("Received a new web socket connection " +
-                event.getSource());
-    }
 
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
@@ -35,6 +29,9 @@ public class WebSocketEventListener {
         Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
         Object msg = sessionAttributes.get("leaveMsg");
         String dest = (String) sessionAttributes.get("destination");
-        messagingTemplate.convertAndSend(dest, msg);
+        if (msg != null && dest != null) {
+            log.info(msg);
+            messagingTemplate.convertAndSend(dest, msg);
+        }
     }
 }

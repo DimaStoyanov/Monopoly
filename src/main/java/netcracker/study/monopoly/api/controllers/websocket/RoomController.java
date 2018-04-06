@@ -2,7 +2,10 @@ package netcracker.study.monopoly.api.controllers.websocket;
 
 import lombok.extern.log4j.Log4j2;
 import netcracker.study.monopoly.api.dto.InviteMsg;
+import netcracker.study.monopoly.api.dto.PlayerInfo;
 import netcracker.study.monopoly.api.dto.RoomMsg;
+import netcracker.study.monopoly.converters.PlayerInfoConverter;
+import netcracker.study.monopoly.models.entities.Player;
 import netcracker.study.monopoly.models.repositories.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -28,13 +31,15 @@ public class RoomController {
     private final SimpMessagingTemplate template;
     private final AtomicInteger lastRoomId;
     private final PlayerRepository playerRepository;
-    private final Map<Integer, List<UUID>> usersInRooms;
-
+    private final Map<Integer, Set<UUID>> usersInRooms;
+    private final PlayerInfoConverter playerInfoConverter;
 
     @Autowired
-    public RoomController(SimpMessagingTemplate template, PlayerRepository playerRepository) {
+    public RoomController(SimpMessagingTemplate template, PlayerRepository playerRepository,
+                          PlayerInfoConverter playerInfoConverter) {
         this.template = template;
         this.playerRepository = playerRepository;
+        this.playerInfoConverter = playerInfoConverter;
         lastRoomId = new AtomicInteger();
         usersInRooms = new HashMap<>();
     }
@@ -58,12 +63,20 @@ public class RoomController {
         return "room";
     }
 
+    @GetMapping("/rooms/{roomId}/participants")
+    public @ResponseBody
+    List<PlayerInfo> inRoom(@PathVariable Integer roomId) {
+        Set<UUID> uuids = usersInRooms.getOrDefault(roomId, new HashSet<>());
+        Collection<Player> players = (Collection<Player>) playerRepository.findAllById(uuids);
+        return playerInfoConverter.toDtoAll(players);
+    }
+
     @MessageMapping("/rooms/{roomId}")
     public void sendToRoom(@Payload RoomMsg msg, @DestinationVariable Integer roomId,
                            SimpMessageHeaderAccessor headerAccessor) {
         log.info(msg);
-        usersInRooms.computeIfAbsent(roomId, i -> new ArrayList<>());
-        List<UUID> uuids = usersInRooms.get(roomId);
+        usersInRooms.computeIfAbsent(roomId, i -> new HashSet<>());
+        Set<UUID> uuids = usersInRooms.get(roomId);
         switch (msg.getType()) {
             case JOIN:
                 Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
@@ -75,6 +88,10 @@ public class RoomController {
             case LEAVE:
                 uuids.remove(msg.getIdFrom());
                 break;
+            case KICK:
+                uuids.remove(msg.getKickedId());
+                break;
+
         }
         template.convertAndSend("/topic/rooms/" + roomId, msg);
     }

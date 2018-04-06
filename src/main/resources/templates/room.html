@@ -115,28 +115,16 @@
             color: #fff;
         }
 
-        #username-page {
-            text-align: center;
+        button.yellow {
+            background-color: gold;
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12);
+            color: #fff;
         }
 
-        .username-page-container {
-            background: #fff;
-            box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
-            border-radius: 2px;
-            width: 100%;
-            max-width: 500px;
-            display: inline-block;
-            margin-top: 42px;
-            vertical-align: middle;
-            position: relative;
-            padding: 35px 55px 35px;
-            min-height: 250px;
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            margin: 0 auto;
-            margin-top: -160px;
+        button.green {
+            background-color: limegreen;
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12);
+            color: #fff;
         }
 
         .username-page-container .username-submit {
@@ -148,16 +136,48 @@
             height: 100%;
         }
 
+        /* TODO remove absolute positions */
         .chat-container {
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
+            max-width: 900px;
+            left: 400px;
+            top: 50px;
+            width: 1000px;
+            position: absolute;
             background-color: #fff;
             box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
-            margin-top: 30px;
             height: calc(100% - 60px);
             max-height: 600px;
-            position: relative;
+            /*position: relative;*/
+        }
+
+        .friend-container {
+            left: 25px;
+            top: 200px;
+            width: 350px;
+            overflow: auto;
+            overflow-y: scroll;
+            position: absolute;
+            background-color: #fff;
+            box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
+            max-height: calc(50% - 60px);
+            height: fit-content;
+        }
+
+        .room-container {
+            left: 1325px;
+            top: 200px;
+            width: 300px;
+            position: absolute;
+            background-color: #fff;
+            box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
+            max-height: calc(50% - 60px);
+            height: fit-content;
+            /*position: relative;*/
+        }
+
+        .table-friends {
+            width: inherit;
+            margin: 5px;
         }
 
         #chat-page ul {
@@ -166,7 +186,7 @@
             margin: 0;
             overflow: auto;
             overflow-y: scroll;
-            padding: 0 20px 0px 20px;
+            padding: 0 20px 0 20px;
             height: calc(100% - 50px);
         }
 
@@ -203,6 +223,23 @@
         }
 
         #chat-page .chat-message i {
+            position: absolute;
+            width: 42px;
+            height: 42px;
+            overflow: hidden;
+            left: 10px;
+            display: inline-block;
+            vertical-align: middle;
+            font-size: 18px;
+            line-height: 42px;
+            color: #fff;
+            text-align: center;
+            border-radius: 50%;
+            font-style: normal;
+            text-transform: uppercase;
+        }
+
+        #chat-page .chat-message img {
             position: absolute;
             width: 42px;
             height: 42px;
@@ -274,13 +311,6 @@
                 height: calc(100% - 30px);
             }
 
-            .username-page-container {
-                width: auto;
-                margin-left: 15px;
-                margin-right: 15px;
-                padding: 25px;
-            }
-
             #chat-page ul {
                 height: calc(100% - 120px);
             }
@@ -308,12 +338,21 @@
     </style>
 </head>
 <body>
-<!--<button onclick="onInviteAllClick()">Invite all</button>-->
-<table id="inRoom">
-</table>
 
 
 <div id="chat-page">
+
+    <div class="friend-container">
+        <div class="chat-header">
+            <h2>Friends</h2>
+        </div>
+        <table id="friends" class="table-friends">
+        </table>
+        <div class="form-group" style="text-align: center;">
+            <input id="nickname" placeholder="Type nickname of friend" type="text">
+            <button onclick="onAddFriendClick()" class="primary"> Add friend</button>
+        </div>
+    </div>
     <div class="chat-container">
         <div class="chat-header">
             <h2>Room chat</h2>
@@ -337,11 +376,19 @@
             </div>
         </form>
     </div>
+    <div class="room-container">
+        <div class="chat-header">
+            <h2>In room</h2>
+        </div>
+        <table id="room" class="table-friends">
+        </table>
+        <div class="form-group" style="text-align: center;">
+            <button onclick="onLeaveClick()" class="accent">Leave</button>
+        </div>
+    </div>
 </div>
 <script>
     'use strict';
-    var chatPage = document.querySelector('#chat-page');
-    var usernameForm = document.querySelector('#usernameForm');
     var messageForm = document.querySelector('#messageForm');
     var messageInput = document.querySelector('#message');
     var messageArea = document.querySelector('#messageArea');
@@ -368,19 +415,119 @@
     roomId = $(location).attr('href');
     roomId = roomId.substr(roomId.lastIndexOf('/') + 1);
 
-    var colors = [
-        '#2196F3', '#32c787', '#00BCD4', '#ff5652',
-        '#ffc107', '#ff85af', '#FF9800', '#39bbb0'
-    ];
-
+    var tableInRoom = document.getElementById('room');
+    var friendNickname = document.getElementById('nickname');
 
     var socket = new SockJS('/lobby');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, onConnected, onError);
 
 
+    function onAddFriendClick() {
+        $.ajax({
+            url: '/player/add_friend?nickname=' + friendNickname.value,
+            type: 'PUT',
+            success: function (data) {
+                alert(data)
+            }
+        }).fail(function () {
+            alert("Player not found")
+        });
+    }
+
+    function onLeaveClick() {
+        $(location).attr('href', '/')
+    }
+
+    function getAndDrawFriends() {
+        $.get('/player/friends', function (friends) {
+            var table = document.getElementById('friends');
+            friends.forEach(function (item) {
+                var row = table.insertRow();
+
+                var img = new Image();
+                img.src = item.avatarUrl;
+                img.height = 80;
+                var avatarCell = row.insertCell();
+                avatarCell.appendChild(img);
+
+                var nicknameCell = row.insertCell();
+                nicknameCell.innerHTML = item.nickname;
+
+                var onlineStatCell = row.insertCell();
+                onlineStatCell.innerHTML = item.online ? "Online" : "Offline";
+
+                var inviteButton = document.createElement("BUTTON");
+                inviteButton.className = 'green';
+                inviteButton.innerHTML = "Invite";
+                inviteButton.addEventListener("click", function () {
+                    var url = $(location).attr('href');
+                    stompClient.send('/app/invite', {}, JSON.stringify({
+                        from: nickname,
+                        to: item.id,
+                        url: url
+                    }));
+                    alert("Invited");
+                });
+
+                var inviteCell = row.insertCell();
+                inviteCell.appendChild(inviteButton);
+            });
+
+        });
+
+    }
+
+    function addInRoom(item) {
+        var row = tableInRoom.insertRow();
+
+        var img = new Image();
+        img.src = item.avatarUrl;
+        img.height = 80;
+        var avatarCell = row.insertCell();
+        avatarCell.appendChild(img);
+
+        var nicknameCell = row.insertCell();
+        nicknameCell.innerHTML = item.nickname;
+
+        var kickCell = row.insertCell();
+        if (item.idFrom !== id) {
+            var kickButton = document.createElement("BUTTON");
+            kickButton.className = 'accent';
+            kickButton.innerHTML = "Kick";
+            kickButton.addEventListener("click", function () {
+                if (confirm("Kick " + item.nickname + "?")) {
+                    var msg = {
+                        nickname: nickname,
+                        type: 'KICK',
+                        idFrom: id,
+                        sendAt: new Date(),
+                        kickedId: item.idFrom
+                    };
+                    stompClient.send('/app/rooms/' + roomId, {}, JSON.stringify(msg))
+                }
+            });
+
+            kickCell.appendChild(kickButton);
+        }
+
+    }
+
+    getAndDrawFriends();
+
+    $.get('/rooms/' + roomId + '/participants', function (players) {
+        players.forEach(addInRoom)
+    });
+
+
     function onConnected() {
         stompClient.subscribe('/topic/rooms/' + roomId, onMessageReceived);
+        stompClient.subscribe('/topic/invite/' + id, function (payload) {
+            var msg = JSON.parse(payload.body);
+            if (confirm("Player " + msg.from + " invite you. Join?")) {
+                $(location).attr('href', msg.url);
+            }
+        });
 
         // Tell your username to the server
         stompClient.send("/app/rooms/" + roomId,
@@ -389,7 +536,8 @@
                 nickname: nickname,
                 type: 'JOIN',
                 sendAt: new Date(),
-                idFrom: id
+                idFrom: id,
+                avatarUrl: avatarUrl
             })
         );
 
@@ -397,8 +545,9 @@
     }
 
 
-    function onError(error) {
-        connectingElement.textContent = 'Could not connect to WebSocket server. Please refresh this page to try again!';
+    function onError() {
+        connectingElement.textContent = 'Could not connect to WebSocket server. ' +
+            'Please refresh this page to try again!';
         connectingElement.style.color = 'red';
     }
 
@@ -428,20 +577,39 @@
         if (message.type === 'JOIN') {
             messageElement.classList.add('event-message');
             message.content = message.nickname + ' joined!';
+            addInRoom(message)
+
         } else if (message.type === 'LEAVE') {
+            for (var i = 0, row; row = tableInRoom.rows[i]; i++) {
+                if (row.cells[1].innerHTML === message.nickname) {
+                    tableInRoom.deleteRow(i);
+                    break;
+                }
+            }
+
             messageElement.classList.add('event-message');
             message.content = message.nickname + ' left!';
+        } else if (message.type === 'KICK') {
+            if (message.kickedId === id) {
+                alert("You was kicked from room");
+                $(location).attr('href', '/');
+            }
+
+            for (i = 0, row; row = tableInRoom.rows[i]; i++) {
+                if (row.cells[1].innerHTML === message.nickname) {
+                    tableInRoom.deleteRow(i);
+                    break;
+                }
+            }
+
+            messageElement.classList.add('event-message');
+            message.content = message.nickname + ' was kicked!';
         } else {
             messageElement.classList.add('chat-message');
 
 
-            var avatarElement = document.createElement('i');
-            var avatarText = document.createTextNode(message.nickname[0]);
-            avatarElement.appendChild(avatarText);
-            avatarElement.style['background-color'] = getAvatarColor(message.nickname);
-            // TODO change default avatar to avatar with url
-            // avatarElement.src = message.avatarUrl;
-            // avatarElement.height = 40;
+            var avatarElement = document.createElement('img');
+            avatarElement.src = message.avatarUrl;
 
             messageElement.appendChild(avatarElement);
 
@@ -462,64 +630,8 @@
     }
 
 
-    function getAvatarColor(messageSender) {
-        var hash = 0;
-        for (var i = 0; i < messageSender.length; i++) {
-            hash = 31 * hash + messageSender.charCodeAt(i);
-        }
-        var index = Math.abs(hash % colors.length);
-        return colors[index];
-    }
-
     messageForm.addEventListener('submit', sendMessage, true)
 </script>
 
-<!-- TODO add invite-->
-<!--<script>-->
-<!--function onFriendInviteClick() {-->
-<!--alert("Not implemented");-->
-<!--}-->
-
-
-<!--var socket = new SockJS('/lobby');-->
-<!--var stompClient = Stomp.over(socket);-->
-<!--var id = null;-->
-<!--$.get("/player/id", function (data) {-->
-<!--id = data;-->
-<!--});-->
-
-
-<!--stompClient.connect({}, function () {-->
-<!--stompClient.subscribe('/topic/invite/' + id, onMessageReceived);-->
-<!--});-->
-
-<!--function onMessageReceived(payload) {-->
-<!--var msg = JSON.parse(payload.body);-->
-<!--if (confirm("Player " + msg.from + " invite you. Join?")) {-->
-<!--$(location).attr('href', msg.url);-->
-<!--}-->
-<!--}-->
-
-<!--function onInviteAllClick() {-->
-<!--var nickname = null;-->
-<!--var url = $(location).attr('href');-->
-<!--alert(url);-->
-<!--$.get("/player/nickname", function (data) {-->
-<!--nickname = data;-->
-<!--});-->
-<!--$.get("/player/friends", function (data) {-->
-<!--data.forEach(function (item) {-->
-<!--stompClient.send('/app/invite', {}, JSON.stringify({-->
-<!--from: nickname,-->
-<!--to: item.id,-->
-<!--url: url-->
-
-<!--}));-->
-<!--});-->
-<!--})-->
-<!--}-->
-
-
-<!--</script>-->
 </body>
 </html>

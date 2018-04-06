@@ -1,5 +1,6 @@
 package netcracker.study.monopoly.api.controllers.rest.admin;
 
+import netcracker.study.monopoly.exceptions.PlayerNotFoundException;
 import netcracker.study.monopoly.models.entities.Player;
 import netcracker.study.monopoly.models.repositories.PlayerRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,6 +41,25 @@ public class AdminController {
         playerRepository.save(new Player(nickname));
         return "Success";
     }
+
+    @GetMapping("/add-friend")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public String addFriend(@RequestParam(name = "from") String from,
+                            @RequestParam(name = "to") String to) {
+        Player playerFrom = playerRepository.findByNickname(from)
+                .orElseThrow(PlayerNotFoundException::new);
+        Player playerTo = playerRepository.findByNickname(to)
+                .orElseThrow(PlayerNotFoundException::new);
+
+        if (playerFrom.getFriends().contains(playerTo)) {
+            return "Already friends";
+        }
+
+        playerFrom.addFriend(playerTo);
+        playerRepository.save(playerFrom);
+        return "OK";
+    }
+
 
     @GetMapping("/upgrade")
     public String upgradeAuthorities() {

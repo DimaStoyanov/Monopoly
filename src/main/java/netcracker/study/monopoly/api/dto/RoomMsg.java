@@ -21,6 +21,7 @@ public class RoomMsg {
     private UUID gameId;
     private String content;
     private String avatarUrl;
+    private UUID kickedId;
 
     public RoomMsg(Type type, String nickname, UUID idFrom) {
         this.type = type;
@@ -30,6 +31,6 @@ public class RoomMsg {
     }
 
     public enum Type {
-        JOIN, LEAVE, START, CHAT
+        JOIN, LEAVE, START, CHAT, KICK
     }
 }
