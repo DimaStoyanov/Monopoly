@@ -136,49 +136,58 @@
             height: 100%;
         }
 
-        /* TODO remove absolute positions */
         .chat-container {
-            max-width: 900px;
-            left: 350px;
+            /*max-width: 900px;*/
+            left: calc(25%);
             top: 50px;
-            width: 800px;
+            width: calc(50% - 25px);
             position: absolute;
             background-color: #fff;
             box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
-            height: calc(100% - 60px);
-            max-height: 600px;
-            /*position: relative;*/
+            height: calc(80% - 60px);
+            /*max-height: 600px;*/
         }
 
         .friend-container {
             left: 25px;
-            top: 200px;
-            width: 300px;
-            overflow: auto;
-            overflow-y: scroll;
+            top: 50px;
+            width: calc(25% - 50px);
             position: absolute;
             background-color: #fff;
             box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
-            max-height: calc(50% - 60px);
-            height: fit-content;
+            height: 80%;
+            /*max-height: calc(80%);*/
+        }
+
+        .friend-list {
+            height: 80%;
+            overflow: auto;
         }
 
         .room-container {
-            left: 1175px;
-            top: 200px;
-            width: 300px;
+            left: calc(75%);
+            top: 50px;
+            width: calc(25% - 25px);
             position: absolute;
             background-color: #fff;
             box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
-            max-height: calc(50% - 60px);
-            height: fit-content;
+            max-height: calc(80%);
+            height: 80%;
             /*position: relative;*/
         }
 
-        .table-friends {
-            width: inherit;
+        .friend-list table {
+            width: 100%;
             margin: 5px;
         }
+
+        .friend-list tr {
+            width: inherit;
+        }
+
+
+
+
 
         #chat-page ul {
             list-style-type: none;
@@ -346,10 +355,11 @@
         <div class="chat-header">
             <h2>Friends</h2>
         </div>
-        <table id="friends" class="table-friends">
-        </table>
+        <div class="friend-list">
+            <table id="friends"></table>
+        </div>
         <div class="form-group" style="text-align: center;">
-            <input id="nickname" placeholder="Type nickname of friend" type="text">
+            <input id="nickname" placeholder="Nickname" type="text">
             <button onclick="onAddFriendClick()" class="primary"> Add friend</button>
         </div>
     </div>
@@ -377,8 +387,10 @@
         <div class="chat-header">
             <h2>In room</h2>
         </div>
-        <table id="room" class="table-friends">
-        </table>
+        <div class="friend-list">
+            <table id="room">
+            </table>
+        </div>
         <div class="form-group" style="text-align: center;">
             <button id="btn_start" class="primary">Start</button>
             <button onclick="onLeaveClick()" class="accent">Leave</button>
@@ -431,6 +443,7 @@
         }).fail(function () {
             alert("Player not found")
         });
+        friendNickname.value = ''
     }
 
     function onLeaveClick() {
@@ -440,12 +453,13 @@
     function getAndDrawFriends() {
         $.get('/player/friends', function (friends) {
             var table = document.getElementById('friends');
+            table.innerHTML = '';
             friends.forEach(function (item) {
                 var row = table.insertRow();
 
                 var img = new Image();
                 img.src = item.avatarUrl;
-                img.height = 80;
+                img.height = 60;
                 var avatarCell = row.insertCell();
                 avatarCell.appendChild(img);
 
@@ -455,52 +469,65 @@
                 var onlineStatCell = row.insertCell();
                 onlineStatCell.innerHTML = item.online ? "Online" : "Offline";
 
-                var inviteButton = document.createElement("BUTTON");
-                inviteButton.className = 'green';
-                inviteButton.innerHTML = "Invite";
-                inviteButton.addEventListener("click", function () {
-                    var url = $(location).attr('href');
-                    stompClient.send('/app/invite', {}, JSON.stringify({
-                        from: nickname,
-                        to: item.id,
-                        url: url
-                    }));
-                    alert("Invited");
-                });
-
                 var inviteCell = row.insertCell();
-                inviteCell.appendChild(inviteButton);
+                if (item.online) {
+                    var inviteButton = document.createElement("BUTTON");
+                    inviteButton.className = 'green';
+                    inviteButton.innerHTML = "Invite";
+                    inviteButton.addEventListener("click", function () {
+                        var url = $(location).attr('href');
+                        stompClient.send('/app/invite', {}, JSON.stringify({
+                            from: nickname,
+                            to: item.id,
+                            url: url
+                        }));
+                        alert("Invited");
+                    });
+
+                    inviteCell.appendChild(inviteButton);
+                }
+
             });
 
         });
 
     }
 
-    function addInRoom(item) {
+    function deleteFromRoomTableIfExist(item) {
+        for (var i = 0, row; row = tableInRoom.rows[i]; i++) {
+            if (row.cells[1].innerHTML === item.nickname) {
+                tableInRoom.deleteRow(i);
+                break;
+            }
+        }
+
+    }
+
+    function addInRoom(playerInfo) {
+        deleteFromRoomTableIfExist(playerInfo);
         var row = tableInRoom.insertRow();
 
         var img = new Image();
-        img.src = item.avatarUrl;
+        img.src = playerInfo.avatarUrl;
         img.height = 80;
         var avatarCell = row.insertCell();
         avatarCell.appendChild(img);
 
         var nicknameCell = row.insertCell();
-        nicknameCell.innerHTML = item.nickname;
+        nicknameCell.innerHTML = playerInfo.nickname;
 
         var kickCell = row.insertCell();
-        if (item.idFrom !== id) {
+        if (playerInfo.id !== id) {
             var kickButton = document.createElement("BUTTON");
             kickButton.className = 'accent';
             kickButton.innerHTML = "Kick";
             kickButton.addEventListener("click", function () {
-                if (confirm("Kick " + item.nickname + "?")) {
+                if (confirm("Kick " + playerInfo.nickname + "?")) {
                     var msg = {
-                        nickname: nickname,
+                        nickname: playerInfo.nickname,
                         type: 'KICK',
-                        idFrom: id,
-                        sendAt: new Date(),
-                        kickedId: item.idFrom
+                        playerId: playerInfo.id,
+                        sendAt: new Date()
                     };
                     stompClient.send('/app/rooms/' + roomId, {}, JSON.stringify(msg))
                 }
@@ -512,6 +539,7 @@
     }
 
     getAndDrawFriends();
+    setInterval(getAndDrawFriends, 10000);
 
     $.get('/rooms/' + roomId + '/participants', function (players) {
         players.forEach(addInRoom)
@@ -534,7 +562,7 @@
                 nickname: nickname,
                 type: 'JOIN',
                 sendAt: new Date(),
-                idFrom: id,
+                playerId: id,
                 avatarUrl: avatarUrl
             })
         );
@@ -556,7 +584,7 @@
             var chatMessage = {
                 nickname: nickname,
                 content: messageInput.value,
-                idFrom: id,
+                playerId: id,
                 type: 'CHAT',
                 avatarUrl: avatarUrl,
                 sendAt: new Date()
@@ -575,31 +603,24 @@
         if (message.type === 'JOIN') {
             messageElement.classList.add('event-message');
             message.content = message.nickname + ' joined!';
-            addInRoom(message)
+            var playerInfo = {
+                id: message.playerId,
+                nickname: message.nickname,
+                avatarUrl: message.avatarUrl
+            };
+            addInRoom(playerInfo)
 
         } else if (message.type === 'LEAVE') {
-            for (var i = 0, row; row = tableInRoom.rows[i]; i++) {
-                if (row.cells[1].innerHTML === message.nickname) {
-                    tableInRoom.deleteRow(i);
-                    break;
-                }
-            }
-
+            deleteFromRoomTableIfExist(message);
             messageElement.classList.add('event-message');
             message.content = message.nickname + ' left!';
         } else if (message.type === 'KICK') {
-            if (message.kickedId === id) {
+            if (message.playerId === id) {
                 alert("You was kicked from room");
                 $(location).attr('href', '/');
             }
 
-            for (i = 0, row; row = tableInRoom.rows[i]; i++) {
-                if (row.cells[1].innerHTML === message.nickname) {
-                    tableInRoom.deleteRow(i);
-                    break;
-                }
-            }
-
+            deleteFromRoomTableIfExist(message);
             messageElement.classList.add('event-message');
             message.content = message.nickname + ' was kicked!';
         } else {

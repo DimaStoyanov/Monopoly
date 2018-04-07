@@ -81,15 +81,15 @@ public class RoomController {
             case JOIN:
                 Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
                 sessionAttributes.put("destination", "/topic/rooms/" + roomId);
-                RoomMsg leaveMsg = new RoomMsg(LEAVE, msg.getNickname(), msg.getIdFrom());
+                RoomMsg leaveMsg = new RoomMsg(LEAVE, msg.getNickname(), msg.getPlayerId());
                 sessionAttributes.put("leaveMsg", leaveMsg);
-                uuids.add(msg.getIdFrom());
+                uuids.add(msg.getPlayerId());
                 break;
             case LEAVE:
-                uuids.remove(msg.getIdFrom());
+                uuids.remove(msg.getPlayerId());
                 break;
             case KICK:
-                uuids.remove(msg.getKickedId());
+                uuids.remove(msg.getPlayerId());
                 break;
 
         }

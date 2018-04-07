@@ -15,18 +15,17 @@ public class RoomMsg {
     @NonNull
     private String nickname;
     @NonNull
-    private UUID idFrom;
+    private UUID playerId;
 
     private Date sendAt;
     private UUID gameId;
     private String content;
     private String avatarUrl;
-    private UUID kickedId;
 
-    public RoomMsg(Type type, String nickname, UUID idFrom) {
+    public RoomMsg(Type type, String nickname, UUID playerId) {
         this.type = type;
         this.nickname = nickname;
-        this.idFrom = idFrom;
+        this.playerId = playerId;
         sendAt = new Date();
     }
 

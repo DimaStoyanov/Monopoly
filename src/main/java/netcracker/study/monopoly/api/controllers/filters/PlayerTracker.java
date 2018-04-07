@@ -1,5 +1,6 @@
 package netcracker.study.monopoly.api.controllers.filters;
 
+import lombok.extern.log4j.Log4j2;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 import netcracker.study.monopoly.models.entities.Player;
@@ -29,6 +30,7 @@ import java.util.concurrent.TimeUnit;
  * Also keep track of all active users (that have requests last 30 seconds)
  */
 @Component
+@Log4j2
 public class PlayerTracker extends GenericFilterBean {
     private final PlayerRepository playerRepository;
     private final Set<String> sessionsId = Collections.newSetFromMap(new ConcurrentHashMap<>());
@@ -62,7 +64,7 @@ public class PlayerTracker extends GenericFilterBean {
                     .orElseGet(() -> new Player(name));
             player.setAvatarUrl((String) details.get("avatar_url"));
             playerRepository.save(player);
-
+            log.info(String.format("Player %s logged in", player.getNickname()));
             session.setMaxInactiveInterval(0);
             session.setAttribute("id", player.getId());
         }
