@@ -24,10 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 import static java.lang.String.format;
 
@@ -55,7 +52,7 @@ public class GameManager {
     @Autowired
     private CellConverter cellConverter;
 
-    public GameDto create(List<UUID> playerIds) {
+    public GameDto create(Collection<UUID> playerIds) {
         log.trace("Creating game with ids: " + playerIds);
         List<Player> players = (List<Player>) playerRepository.findAllById(playerIds);
         if (players.size() != playerIds.size()) {

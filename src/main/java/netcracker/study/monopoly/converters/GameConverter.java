@@ -47,6 +47,7 @@ public class GameConverter {
                             return cellConverter.toStreet(c);
                     }
                 }).collect(Collectors.toList()));
+        gameDto.setId(game.getId());
         return gameDto;
     }
 }

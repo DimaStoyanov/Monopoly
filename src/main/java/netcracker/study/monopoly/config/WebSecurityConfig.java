@@ -1,6 +1,6 @@
 package netcracker.study.monopoly.config;
 
-import netcracker.study.monopoly.api.controllers.filters.PlayerTracker;
+import netcracker.study.monopoly.api.controllers.filters.RegistrationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.context.annotation.Configuration;
@@ -15,11 +15,11 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
-    private final PlayerTracker playerTracker;
+    private final RegistrationFilter playerTracker;
 
 
     @Autowired
-    public WebSecurityConfig(PlayerTracker playerTracker) {
+    public WebSecurityConfig(RegistrationFilter playerTracker) {
         this.playerTracker = playerTracker;
     }
 

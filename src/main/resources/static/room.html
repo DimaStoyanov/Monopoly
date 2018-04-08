@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- TODO scaling -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>Room</title>
+    <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+<body>
+
+
+<div id="chat-page">
+
+    <div class="friend-container">
+        <div class="chat-header">
+            <h2>Friends</h2>
+        </div>
+        <div class="friend-list">
+            <table id="friends"></table>
+        </div>
+        <div class="form-group" style="text-align: center;">
+            <input id="nickname" placeholder="Nickname" type="text">
+            <button onclick="onAddFriendClick()" class="primary"> Add friend</button>
+        </div>
+    </div>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>Room chat</h2>
+        </div>
+        <div class="connecting">
+            Connecting...
+        </div>
+        <ul id="messageArea">
+
+        </ul>
+        <form id="messageForm" name="messageForm" nameForm="messageForm">
+            <div class="form-group">
+                <div class="input-group clearfix">
+                    <input type="text" id="message" placeholder="Type a message..." autocomplete="off"
+                           class="form-control"/>
+                    <button type="submit" class="primary">Send</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="room-container">
+        <div class="chat-header">
+            <h2>In room</h2>
+        </div>
+        <div class="friend-list">
+            <table id="room">
+            </table>
+        </div>
+        <div class="form-group" style="text-align: center;">
+            <button id="btn_start" hidden="hidden" class="primary">Start</button>
+            <button onclick="onLeaveClick()" class="accent">Leave</button>
+        </div>
+    </div>
+</div>
+<script src="js/room.js"></script>
+
+</body>
+</html>

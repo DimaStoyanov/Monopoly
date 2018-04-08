@@ -9,6 +9,6 @@ import java.util.UUID;
 public class InviteMsg implements Serializable {
     private String from;
     private UUID to;
-    private String url;
+    private Long roomId;
 }
 

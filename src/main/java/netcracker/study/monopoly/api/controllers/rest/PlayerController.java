@@ -1,7 +1,6 @@
 package netcracker.study.monopoly.api.controllers.rest;
 
 import lombok.extern.log4j.Log4j2;
-import netcracker.study.monopoly.api.controllers.filters.PlayerTracker;
 import netcracker.study.monopoly.api.dto.PlayerInfo;
 import netcracker.study.monopoly.converters.PlayerInfoConverter;
 import netcracker.study.monopoly.exceptions.PlayerNotFoundException;
@@ -21,33 +20,18 @@ import java.util.UUID;
 @Log4j2
 public class PlayerController {
 
+    private static final String ROOM_ID_KEY = "roomId";
+    private static final String GAME_ID_KEY = "gameId";
+
     private final PlayerRepository playerRepository;
-    private final PlayerTracker playerTracker;
     private final PlayerInfoConverter playerInfoConverter;
 
-    public PlayerController(PlayerRepository playerRepository, PlayerTracker playerTracker,
+    public PlayerController(PlayerRepository playerRepository,
                             PlayerInfoConverter playerInfoConverter) {
         this.playerRepository = playerRepository;
-        this.playerTracker = playerTracker;
         this.playerInfoConverter = playerInfoConverter;
     }
 
-    @GetMapping("/id")
-    public UUID getId(HttpSession session) {
-        return (UUID) session.getAttribute("id");
-    }
-
-    @GetMapping("/nickname")
-    public String getNickname(Principal principal) {
-        return principal.getName();
-    }
-
-    @GetMapping("/avatar_url")
-    public String getAvatarUrl(Principal principal) {
-        Player player = playerRepository.findByNickname(principal.getName())
-                .orElseThrow(PlayerNotFoundException::new);
-        return player.getAvatarUrl();
-    }
 
     @GetMapping("/friends")
     public List<PlayerInfo> getFriends(HttpSession session) {
@@ -64,6 +48,30 @@ public class PlayerController {
     public PlayerInfo getInfo(HttpSession session) {
         Player player = getPlayer(session);
         return playerInfoConverter.toDto(player);
+    }
+
+    @GetMapping("/room")
+    public Long getRoomId(HttpSession session) {
+        return (Long) session.getAttribute(ROOM_ID_KEY);
+    }
+
+    @PutMapping("/room")
+    public void setRoomId(@RequestParam(name = ROOM_ID_KEY) Long roomId,
+                          HttpSession session, Principal principal) {
+        log.info(String.format("Player %s join in room %s", principal.getName(), roomId));
+        session.setAttribute(ROOM_ID_KEY, roomId);
+    }
+
+    @GetMapping("/game")
+    public UUID getGameId(HttpSession session) {
+        return (UUID) session.getAttribute(GAME_ID_KEY);
+    }
+
+    @PutMapping("/game")
+    public void setGameId(@RequestParam(name = GAME_ID_KEY) UUID gameId,
+                          HttpSession session, Principal principal) {
+        log.info(String.format("Player %s join in game %s", principal.getName(), gameId));
+        session.setAttribute(GAME_ID_KEY, gameId);
     }
 
     @PutMapping("/add_friend")

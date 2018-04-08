@@ -2,7 +2,7 @@ package netcracker.study.monopoly.api.controllers.rest;
 
 
 import lombok.SneakyThrows;
-import netcracker.study.monopoly.api.controllers.filters.PlayerTracker;
+import netcracker.study.monopoly.api.controllers.websocket.PlayersTracking;
 import netcracker.study.monopoly.models.entities.Game;
 import netcracker.study.monopoly.models.entities.Player;
 import netcracker.study.monopoly.models.repositories.GameRepository;
@@ -26,10 +26,11 @@ public class ProfileController {
 
     private final PlayerRepository playerRepository;
     private final GameRepository gameRepository;
-    private final PlayerTracker playerTracker;
+    private final PlayersTracking playerTracker;
 
     @Autowired
-    public ProfileController(PlayerRepository playerRepository, GameRepository gameRepository, PlayerTracker playerTracker) {
+    public ProfileController(PlayerRepository playerRepository, GameRepository gameRepository,
+                             PlayersTracking playerTracker) {
         this.playerRepository = playerRepository;
         this.gameRepository = gameRepository;
         this.playerTracker = playerTracker;
@@ -49,9 +50,10 @@ public class ProfileController {
 
         List<List<? extends Serializable>> friends = player.getFriends().stream()
                 // Online players should be first
-                .sorted((o1, o2) -> playerTracker.isOnline(o1.getNickname()) ? -1 : 1)
+                .sorted((o1, o2) -> playerTracker.getPlayerStatus(o2.getId())
+                        .equals("Offline") ? -1 : 1)
                 .map(p -> Arrays.asList(p.getAvatarUrl(), p.getNickname(),
-                        playerTracker.isOnline(p.getNickname())))
+                        playerTracker.getPlayerStatus(p.getId())))
                 .collect(Collectors.toList());
 
 

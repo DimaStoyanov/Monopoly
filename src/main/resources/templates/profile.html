@@ -12,22 +12,22 @@ http://www.thymeleaf.org/dandelion/datatables ">
 </head>
 <body>
 
-<!--/*@thymesVar id="player" type="java.lang.String"*/-->
+<!--/*@thymesVar id="player" status="java.lang.String"*/-->
 <p th:text="'Player: ' +  ${player}"></p>
 <p th:if="${name}" th:text="'Name: ' + ${name}"></p>
-<!--/*@thymesVar id="city" type="java.lang.String"*/-->
+<!--/*@thymesVar id="city" status="java.lang.String"*/-->
 <p id="city" th:if="${city}" th:text="'City: ' +  ${city}"></p>
-<!--/*@thymesVar id="avatar_url" type="java.lang.String"*/-->
+<!--/*@thymesVar id="avatar_url" status="java.lang.String"*/-->
 <img th:if="${avatar_url}" height="150" th:src="${avatar_url}">
 
 <h2> Friends: </h2>
 <table border="1" dt:table="true">
     <tbody>
-    <!--/*@thymesVar id="friends" type="java.util.List"*/-->
+    <!--/*@thymesVar id="friends" status="java.util.List"*/-->
     <tr th:each="friend : ${friends}">
         <td><img height="80" th:src="${friend[0]}"></td>
         <td th:text="${friend[1]}"></td>
-        <td th:text="${friend[2]? 'Online' : 'Offline'}"></td>
+        <td th:text="${friend[2]}"></td>
         <td>
             <button onclick="onRemoveFriendClick(this)"
                     th:id="'remove_' + ${friend[1]}">Remove
@@ -68,15 +68,21 @@ http://www.thymeleaf.org/dandelion/datatables ">
     }
 
     function onCreateRoomClick() {
-        $.post("/rooms/create", function (data) {
-            $(location).attr('href', '/rooms/' + data);
+        $.post("/rooms/create", function (roomId) {
+            $.ajax({
+                url: '/player/room?roomId=' + roomId,
+                type: 'PUT',
+                success: function () {
+                    $(location).attr('href', '/room.html');
+                }
+            })
         });
     }
 
     var id = null;
 
-    $.get('/player/id', function (data) {
-        id = data;
+    $.get('/player/info', function (data) {
+        id = data.id;
     });
 
 
@@ -85,6 +91,11 @@ http://www.thymeleaf.org/dandelion/datatables ">
 
 
     stompClient.connect({}, function () {
+        stompClient.send('/app/status', {}, JSON.stringify({
+            status: "ONLINE",
+            place: "SITE",
+            playerId: id
+        }));
         stompClient.subscribe('/topic/invite/' + id, onMessageReceived);
     });
 

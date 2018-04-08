@@ -50,8 +50,8 @@ function init() {
             // HTML-содержимое контекстного меню.
             var menuContent =
                 '<div id="menu">\
-            <div align="center"><input id="buysmth" type="submit" value="Buy"/></div>\
-            <div align="center"><input id="passsmth" type="submit" value="Pass"/></div>\
+            <div align="center"><input id="buysmth" status="submit" value="Buy"/></div>\
+            <div align="center"><input id="passsmth" status="submit" value="Pass"/></div>\
             </div>';
 
             // Размещаем контекстное меню на странице

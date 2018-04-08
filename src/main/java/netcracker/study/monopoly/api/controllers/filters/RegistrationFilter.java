@@ -1,12 +1,9 @@
 package netcracker.study.monopoly.api.controllers.filters;
 
 import lombok.extern.log4j.Log4j2;
-import net.jodah.expiringmap.ExpirationPolicy;
-import net.jodah.expiringmap.ExpiringMap;
 import netcracker.study.monopoly.models.entities.Player;
 import netcracker.study.monopoly.models.repositories.PlayerRepository;
 import org.apache.catalina.session.StandardSessionFacade;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Component;
@@ -22,7 +19,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -31,19 +27,12 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 @Log4j2
-public class PlayerTracker extends GenericFilterBean {
+public class RegistrationFilter extends GenericFilterBean {
     private final PlayerRepository playerRepository;
     private final Set<String> sessionsId = Collections.newSetFromMap(new ConcurrentHashMap<>());
-    private ExpiringMap<String, Boolean> activePlayers;
 
-    @Autowired
-    public PlayerTracker(PlayerRepository playerRepository) {
+    public RegistrationFilter(PlayerRepository playerRepository) {
         this.playerRepository = playerRepository;
-        activePlayers = ExpiringMap.builder()
-                .expirationPolicy(ExpirationPolicy.ACCESSED)
-                .expiration(30, TimeUnit.SECONDS)
-                .build();
-
     }
 
     @Override
@@ -69,13 +58,8 @@ public class PlayerTracker extends GenericFilterBean {
             session.setAttribute("id", player.getId());
         }
 
-        activePlayers.resetExpiration(name);
-        activePlayers.put(name, true);
         sessionsId.add(session.getId());
         chain.doFilter(request, response);
     }
 
-    public boolean isOnline(String name) {
-        return activePlayers.containsKey(name);
-    }
 }

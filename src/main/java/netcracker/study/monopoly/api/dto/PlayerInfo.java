@@ -18,5 +18,5 @@ public class PlayerInfo {
     @NonNull
     private String avatarUrl;
 
-    private boolean online;
+    private String status;
 }

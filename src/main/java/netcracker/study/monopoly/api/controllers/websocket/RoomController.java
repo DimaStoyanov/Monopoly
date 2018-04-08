@@ -1,10 +1,11 @@
 package netcracker.study.monopoly.api.controllers.websocket;
 
 import lombok.extern.log4j.Log4j2;
-import netcracker.study.monopoly.api.dto.InviteMsg;
 import netcracker.study.monopoly.api.dto.PlayerInfo;
 import netcracker.study.monopoly.api.dto.RoomMsg;
+import netcracker.study.monopoly.api.dto.game.GameDto;
 import netcracker.study.monopoly.converters.PlayerInfoConverter;
+import netcracker.study.monopoly.managers.GameManager;
 import netcracker.study.monopoly.models.entities.Player;
 import netcracker.study.monopoly.models.repositories.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,39 +29,32 @@ import static netcracker.study.monopoly.api.dto.RoomMsg.Type.LEAVE;
 @Log4j2
 public class RoomController {
 
+    public final static String LEAVE_MSG_KEY = "leaveRoomMsg";
+
     private final SimpMessagingTemplate template;
     private final AtomicInteger lastRoomId;
     private final PlayerRepository playerRepository;
     private final Map<Integer, Set<UUID>> usersInRooms;
     private final PlayerInfoConverter playerInfoConverter;
+    private final GameManager gameManager;
 
     @Autowired
     public RoomController(SimpMessagingTemplate template, PlayerRepository playerRepository,
-                          PlayerInfoConverter playerInfoConverter) {
+                          PlayerInfoConverter playerInfoConverter, GameManager gameManager) {
         this.template = template;
         this.playerRepository = playerRepository;
         this.playerInfoConverter = playerInfoConverter;
+        this.gameManager = gameManager;
         lastRoomId = new AtomicInteger();
         usersInRooms = new HashMap<>();
     }
 
-    @MessageMapping("/invite")
-    public void getInvite(@Payload InviteMsg msg) {
-        log.info(msg);
-        template.convertAndSend("/topic/invite/" + msg.getTo(), msg);
-    }
-
     @PostMapping("/rooms/create")
     public @ResponseBody
-    long createRoom() {
-        long roomId = lastRoomId.incrementAndGet();
+    Integer createRoom() {
+        int roomId = lastRoomId.incrementAndGet();
         log.info("Created room " + roomId);
         return roomId;
-    }
-
-    @GetMapping("/rooms/{roomId}")
-    public String loadRoom(@PathVariable String roomId) {
-        return "room";
     }
 
     @GetMapping("/rooms/{roomId}/participants")
@@ -71,27 +65,51 @@ public class RoomController {
         return playerInfoConverter.toDtoAll(players);
     }
 
+    @GetMapping("/rooms/{roomId}/host")
+    public @ResponseBody
+    UUID getHost(@PathVariable Integer roomId) {
+        Set<UUID> players = usersInRooms.get(roomId);
+        return players == null ? null : players.iterator().next();
+    }
+
+    @PostMapping("/rooms/{roomId}/start")
+    public @ResponseBody
+    UUID startGame(@PathVariable Integer roomId) {
+        log.info("Create game in room " + roomId);
+        Set<UUID> players = usersInRooms.get(roomId);
+//        if (players.size() < 2) {
+//            throw new NotEnoughPlayersException(players.size());
+//        }
+        GameDto gameDto = gameManager.create(players);
+        return gameDto.getId();
+    }
+
     @MessageMapping("/rooms/{roomId}")
     public void sendToRoom(@Payload RoomMsg msg, @DestinationVariable Integer roomId,
                            SimpMessageHeaderAccessor headerAccessor) {
         log.info(msg);
-        usersInRooms.computeIfAbsent(roomId, i -> new HashSet<>());
-        Set<UUID> uuids = usersInRooms.get(roomId);
+        usersInRooms.computeIfAbsent(roomId, i -> new LinkedHashSet<>());
+        Set<UUID> players = usersInRooms.get(roomId);
         switch (msg.getType()) {
             case JOIN:
                 Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
-                sessionAttributes.put("destination", "/topic/rooms/" + roomId);
                 RoomMsg leaveMsg = new RoomMsg(LEAVE, msg.getNickname(), msg.getPlayerId());
-                sessionAttributes.put("leaveMsg", leaveMsg);
-                uuids.add(msg.getPlayerId());
+                Runnable sendMsg = () -> this.sendToRoom(leaveMsg, roomId, headerAccessor);
+                sessionAttributes.put(LEAVE_MSG_KEY, sendMsg);
+                players.add(msg.getPlayerId());
                 break;
             case LEAVE:
-                uuids.remove(msg.getPlayerId());
+                players.remove(msg.getPlayerId());
                 break;
             case KICK:
-                uuids.remove(msg.getPlayerId());
+                players.remove(msg.getPlayerId());
                 break;
 
+
+        }
+
+        if (players.isEmpty()) {
+            usersInRooms.remove(roomId);
         }
         template.convertAndSend("/topic/rooms/" + roomId, msg);
     }

@@ -1,7 +1,6 @@
 package netcracker.study.monopoly.api.controllers.websocket;
 
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -16,22 +15,27 @@ public class WebSocketEventListener {
 
     private final SimpMessageSendingOperations messagingTemplate;
 
-    @Autowired
     public WebSocketEventListener(SimpMessageSendingOperations messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
     }
 
 
+
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-
+        log.debug("Disconnect socket " + event.getUser().getName());
         Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
-        Object msg = sessionAttributes.get("leaveMsg");
-        String dest = (String) sessionAttributes.get("destination");
-        if (msg != null && dest != null) {
-            log.info(msg);
-            messagingTemplate.convertAndSend(dest, msg);
+        Runnable sendStatusMsg = (Runnable)
+                sessionAttributes.get(PlayersTracking.STATUS_MSG_KEY);
+        Runnable sendRoomMsg = (Runnable) sessionAttributes.get(RoomController.LEAVE_MSG_KEY);
+
+
+        if (sendStatusMsg != null) {
+            sendStatusMsg.run();
+        }
+        if (sendRoomMsg != null) {
+            sendRoomMsg.run();
         }
     }
 }

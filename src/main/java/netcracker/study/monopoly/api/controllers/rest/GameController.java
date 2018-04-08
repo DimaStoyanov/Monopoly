@@ -3,9 +3,6 @@ package netcracker.study.monopoly.api.controllers.rest;
 import io.swagger.annotations.Api;
 import lombok.extern.log4j.Log4j2;
 import netcracker.study.monopoly.api.dto.game.GameDto;
-import netcracker.study.monopoly.exceptions.CellNotFoundException;
-import netcracker.study.monopoly.exceptions.GameNotFoundException;
-import netcracker.study.monopoly.exceptions.PlayerNotFoundException;
 import netcracker.study.monopoly.managers.GameManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,24 +27,15 @@ public class GameController {
     }
 
     @PostMapping("/create")
-    public GameDto createGame(@RequestBody List<UUID> playersId) throws PlayerNotFoundException {
+    public GameDto createGame(@RequestBody List<UUID> playersId) {
         log.info("Request create game with players id: " + playersId);
-        try {
-            return gameManager.create(playersId);
-        } catch (CellNotFoundException e) {
-            throw new PlayerNotFoundException();
-        }
+        return gameManager.create(playersId);
     }
 
     @PostMapping("/get-game")
-    public GameDto getGame(@RequestBody UUID gameId) throws GameNotFoundException {
+    public GameDto getGame(@RequestBody UUID gameId) {
         log.info("Request get game with id " + gameId);
-        try {
-            return gameManager.getGame(gameId);
-        } catch (CellNotFoundException e) {
-            log.debug(e);
-            throw new GameNotFoundException(gameId);
-        }
+        return gameManager.getGame(gameId);
     }
 
 
