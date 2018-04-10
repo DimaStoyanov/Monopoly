@@ -16,4 +16,13 @@ public abstract class Cell {
     @NonNull
     Integer cost;
 
+    @NonNull
+    String imgPath;
+
+    @NonNull
+    Double[][] cellCoordinates;
+
+    @NonNull
+    Double[][] routeCoordinates;
+
 }
