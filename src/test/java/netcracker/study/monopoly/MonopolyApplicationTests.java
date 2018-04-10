@@ -19,6 +19,8 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static netcracker.study.monopoly.models.entities.CellState.CellType.STREET;
 import static org.junit.Assert.assertEquals;
@@ -34,6 +36,10 @@ public class MonopolyApplicationTests {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
+    private List<Player> players;
+    private List<Game> games;
+
+
     @Before
     @Transactional
     public void insert() {
@@ -42,7 +48,7 @@ public class MonopolyApplicationTests {
         Player ivan = new Player("ivan");
         Player alisa = new Player("alisa");
         Player bot = new Player("bot");
-        List<Player> players = Arrays.asList(john, ivan, alisa, bot);
+        players = Arrays.asList(john, ivan, alisa, bot);
 
         List<CellState> street = Arrays.asList(new CellState(2, "", STREET),
                 new CellState(1, "", STREET),
@@ -53,7 +59,7 @@ public class MonopolyApplicationTests {
                 new PlayerState(1, ivan),
                 new PlayerState(3, bot));
 
-        List<Game> games = Arrays.asList(new Game(playerStates, street),
+        games = Arrays.asList(new Game(playerStates, street),
                 new Game(playerStates, street));
 
 
@@ -63,9 +69,13 @@ public class MonopolyApplicationTests {
 
     @Test
     @Transactional
-    public void checkCount() {
-        assertEquals(playerRepository.count(), 4);
-        assertEquals(gameRepository.count(), 2);
+    public void checkDb() {
+        List<Player> dbPlayers = players.stream()
+                .map(p -> playerRepository.findById(p.getId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        assertEquals(players, dbPlayers);
     }
 
 
