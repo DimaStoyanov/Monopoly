@@ -9,15 +9,14 @@ jdk:
  - oraclejdk8
 script:
    - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
-cache:
-  directories:
-    - '$HOME/.m2/repositories'
-    - '$HOME/.sonar/cache'
+#cache:
+#  directories:
+#    - '$HOME/.m2/repositories'
+#    - '$HOME/.sonar/cache'
 services:
  - postgresql
 before_script:
  - psql -c 'create database test_users;' -U postgres
- - psql -c 'truncate games, players cascade;' -U postgres
 deploy:
  provider: heroku
  api-key:
