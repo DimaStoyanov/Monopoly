@@ -26,7 +26,7 @@ function init() {
                     center[1] + Math.random() * 0.2];
                 var cell = buildRectangle([
                     startCoords,
-                    [startCoords[0] + 0.02, startCoords[1] + 0.02]
+                    [startCoords[0] + 0.01, startCoords[1] + 0.01]
                 ], item);
                 cells.push({
                     imgPath: item,
