@@ -22,7 +22,7 @@ public class GeneratorController {
         return Arrays
                 .stream(Objects.requireNonNull(file.listFiles()))
                 .map(f -> "game/images/" + f.getName())
-                .filter(f -> f.endsWith(".png"))
+                .filter(f -> f.endsWith(".jpg"))
                 .collect(Collectors.toList());
     }
 }
