@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static netcracker.study.monopoly.models.entities.CellState.CellType.STREET;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -63,10 +63,9 @@ public class MonopolyApplicationTests {
     @Test
     @Transactional
     public void checkCount() {
-        assertTrue(playerRepository.count() == 4);
-        assertTrue(gameRepository.count() == 2);
+        assertEquals(playerRepository.count(), 4);
+        assertEquals(gameRepository.count(), 2);
     }
-
 
 
     // This actually does not work only in test (hibernate is too lazy lol)
