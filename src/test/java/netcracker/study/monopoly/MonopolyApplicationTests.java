@@ -37,8 +37,6 @@ public class MonopolyApplicationTests {
     @Before
     @Transactional
     public void insert() {
-        playerRepository.deleteAll();
-        gameRepository.deleteAll();
 
         Player john = new Player("john");
         Player ivan = new Player("ivan");
