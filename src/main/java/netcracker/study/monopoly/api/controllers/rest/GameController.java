@@ -38,5 +38,30 @@ public class GameController {
         return gameManager.getGame(gameId);
     }
 
+    @PostMapping("/game/{gameID}/gamer/{gamerID}/firstStep")
+    public void firstStep(@RequestBody UUID gameID, @RequestBody UUID gamerID) {
+        log.info("Request gamer first step with id " + gamerID + " in the game this id " + gameID);
+        gameManager.firstStep(gameID, gamerID);
+    }
+
+    @PostMapping("/game/{gameID}/gamer/{gamerID}/firstStreet")
+    public void streetStep(@RequestBody UUID gameID, @RequestBody UUID gamerID) {
+        log.info("Request gamer buy street with id " + gamerID + " in the game this id " + gameID);
+        gameManager.streetStep(gameID, gamerID);
+    }
+
+    @PostMapping("/game/{gameID}/gamer/{gamerID}/flightStep/{position}")
+    public void flightStep(@RequestBody UUID gameID, @RequestBody UUID gamerID, @RequestBody Integer position) {
+        log.info("Request gamer flight id " + gamerID + " in the game this id " + gameID);
+        gameManager.flightStep(gameID, gamerID, position);
+    }
+
+    @PostMapping("/finish")
+    public void finish(@RequestBody UUID gameID, @RequestBody UUID gamerID) {
+        log.info("Request finish game with id " + gameID);
+        gameManager.finishGame(gameID, gamerID);
+    }
+
+
 
 }

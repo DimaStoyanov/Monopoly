@@ -95,7 +95,6 @@ public class GameManager {
                 }
                 break;
         }
-
         playerStateRepository.save(player);
     }
 
@@ -113,6 +112,18 @@ public class GameManager {
         Street street = cellConverter.toStreet(cell);
         gameChange.setStreetChange(street);
         return gameChange;
+    }
+
+    public void flightStep(UUID gameId, UUID playerId, Integer newPosition) {
+        PlayerState playerState = playerStateRepository.findById(playerId).orElseThrow(() ->
+                new PlayerNotFoundException(playerId));
+        Integer position = playerState.getPosition();
+        CellState cell = cellStateRepository.findByGameIdAndPosition(gameId, position)
+                .orElseThrow(() -> new CellNotFoundException(gameId, position));
+
+        flight(playerState, cell, newPosition);
+
+        firstStep(gameId, playerId);
     }
 
     private void payToOwner(PlayerState playerState, CellState street) {
@@ -136,6 +147,12 @@ public class GameManager {
         street.setOwner(playerState);
         playerStateRepository.save(playerState);
         cellStateRepository.save(street);
+        return true;
+    }
+
+    private boolean flight(PlayerState playerState, CellState cellState, Integer position) {
+        playerState.setPosition(position);
+        playerState.setMoney(playerState.getMoney() - cellState.getCost());
         return true;
     }
 
