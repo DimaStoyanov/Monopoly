@@ -10,7 +10,3 @@
 ### Database
 <img alt="ER Diagram" height="300px" src="https://pp.userapi.com/c846122/v846122199/f9e2/9fF1NnrRPLE.jpg"> 
 
-
-### Game logic UML
-<img alt="Cells UML" height="300px" src="https://pp.userapi.com/c846418/v846418523/8682/DPXCEQpg5yo.jpg">
-<img alt="other classes UML" height="300px" src="https://pp.userapi.com/c846418/v846418523/8689/-hZ0m7CTfA8.jpg">

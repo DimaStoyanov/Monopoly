@@ -9,6 +9,7 @@ import netcracker.study.monopoly.models.entities.CellState;
 import netcracker.study.monopoly.models.entities.Game;
 import netcracker.study.monopoly.models.entities.Player;
 import netcracker.study.monopoly.models.entities.PlayerState;
+import netcracker.study.monopoly.models.repositories.GameRepository;
 import netcracker.study.monopoly.models.repositories.PlayerRepository;
 import netcracker.study.monopoly.models.repositories.PlayerStateRepository;
 import org.junit.Test;
@@ -42,6 +43,8 @@ public class DbDtoConverterTest {
     PlayerRepository pr;
     @Autowired
     PlayerStateRepository psr;
+    @Autowired
+    GameRepository gr;
 
     @Test
     @Transactional
@@ -122,7 +125,9 @@ public class DbDtoConverterTest {
                 .map(n -> new Player("u" + n))
                 .collect(Collectors.toList());
 
+        pr.saveAll(players);
         Game dbGame = GameCreator.INSTANCE.createGame(players);
+        gr.save(dbGame);
         GameDto game = gameConverter.toDto(dbGame);
 
         assertTrue(game.getField().size() == dbGame.getField().size());

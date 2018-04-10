@@ -21,8 +21,9 @@ public enum GameCreator {
 
     INSTANCE();
 
-    private final String cellsPath = "src/main/resources/game/field";
-    private final String playerConfigPath = "src/main/resources/game/gamers/gamer.json";
+    private final String cellsPath = "src/main/resources/static/game/field";
+    private final String playerConfigPath =
+            "src/main/resources/static/game/gamers/gamer.json";
 
     private final Collection<CellState> cells;
     private final PlayerConfig playerConfig;

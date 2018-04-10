@@ -31,5 +31,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterAfter(playerTracker, FilterSecurityInterceptor.class)
                 .csrf().disable()
                 .sessionManagement().maximumSessions(1);
+
     }
 }

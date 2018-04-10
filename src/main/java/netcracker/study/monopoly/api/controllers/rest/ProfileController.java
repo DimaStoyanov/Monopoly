@@ -42,6 +42,7 @@ public class ProfileController {
     public String profile(Principal principal, Model model) {
         OAuth2Authentication oauth = (OAuth2Authentication) principal;
         Map details = (Map) oauth.getUserAuthentication().getDetails();
+
         String nickname = principal.getName();
 
         Player player = playerRepository.findByNickname(nickname).orElseThrow(() ->

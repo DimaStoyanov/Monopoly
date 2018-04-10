@@ -32,7 +32,7 @@ function init() {
     };
 
     var myRectangle = buildRectangle([[55.70, 37.55], [55.72, 37.53]], '#0000FF',
-        'https://pp.userapi.com/c846419/v846419978/37d9/gVOIsb6FV1A.jpg'),
+        'game/images/arbat.png'),
         myRectangle2 = buildRectangle([[55.66, 37.60], [55.68, 37.62]], '#0000FF',
             'https://pp.userapi.com/c846419/v846419978/37f0/PXkX-6KioZs.jpg'),
         myRectangle3 = buildRectangle([[55.65, 37.55], [55.67, 37.53]], '#0000FF',
