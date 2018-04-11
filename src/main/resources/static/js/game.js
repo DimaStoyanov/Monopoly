@@ -2,8 +2,8 @@ ymaps.ready(init);
 
 function init() {
     var myMap = new ymaps.Map('map', {
-        center: [55.674, 37.601],
-        zoom: 11
+        center: [55.675, 37.658],
+        zoom: 15
     }, {
         searchControlProvider: 'yandex#search'
     });
@@ -11,12 +11,16 @@ function init() {
     var cells = [];
 
     $.get('/player/game', function (gameId) {
+        if (!gameId) {
+            $(location).attr('href', '/');
+            return;
+        }
         $.get('/api/game/' + gameId, function (game) {
             game.field.forEach(function (item) {
                 var cell = buildRectangle(item.cellCoordinates, '#999966', item.imgPath);
                 myMap.geoObjects.add(cell);
                 cells.push(cell);
-                var route = buildRoute(item.routeCoordinates, '#99ff99');
+                var route = buildRoute(item.routeCoordinates, '#54d6f6');
                 myMap.geoObjects.add(route);
             })
         })
