@@ -66,11 +66,6 @@ function onMessageReceived(payload) {
     var messageElement = document.createElement('li');
 
 
-    alert(playersMap[message.idFrom]);
-    alert(Object.keys(playersMap));
-    alert(message.idFrom);
-    alert(typeof message.idFrom);
-
     var player = playersMap[message.idFrom];
 
     if (message.type === 'JOIN') {
@@ -147,9 +142,9 @@ function init() {
             connectSocket();
             game.players.forEach(function (item) {
                 playersMap[item.id] = item;
-                alert("Push");
-                alert(item.id);
-                alert(playersMap[item.id]);
+                if (item.name === selfInfo.nickname) {
+                    selfInfo.id = item.id
+                }
             });
             game.field.forEach(function (item) {
                 var cell = buildRectangle(item.cellCoordinates, '#999966', item.imgPath);
