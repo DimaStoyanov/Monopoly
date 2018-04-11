@@ -2,6 +2,7 @@ package netcracker.study.monopoly.converters;
 
 import netcracker.study.monopoly.api.dto.game.GameDto;
 import netcracker.study.monopoly.api.dto.game.Gamer;
+import netcracker.study.monopoly.api.dto.game.cells.Cell;
 import netcracker.study.monopoly.api.dto.game.cells.Flight;
 import netcracker.study.monopoly.api.dto.game.cells.Street;
 import netcracker.study.monopoly.models.GameCreator;
@@ -19,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -26,8 +28,8 @@ import java.util.stream.Stream;
 
 import static netcracker.study.monopoly.models.entities.CellState.CellType.FLIGHT;
 import static netcracker.study.monopoly.models.entities.CellState.CellType.STREET;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -72,7 +74,7 @@ public class DbDtoConverterTest {
     public void streetToDto() {
         Random random = new Random();
         int cost = random.nextInt();
-        int position = random.nextInt();
+        int position = random.nextInt() % 23;
         String name = "name";
         Player player = new Player(name);
         PlayerState ps = new PlayerState(0, player);
@@ -84,29 +86,37 @@ public class DbDtoConverterTest {
         street.setOwner(ps);
 
         Street dtoStreet = cellConverter.toStreet(street);
-        assertEquals(dtoStreet.getName(), street.getName());
-        assertEquals(dtoStreet.getCost(), street.getCost());
-        assertEquals(dtoStreet.getPosition(), street.getPosition());
-        assertEquals(dtoStreet.getOwner().getName(), ps.getPlayer().getNickname());
-        assertEquals(dtoStreet.getOwner().getCanGo(), ps.getCanGo());
-        assertEquals(dtoStreet.getOwner().getMoney(), ps.getMoney());
-        assertEquals(dtoStreet.getOwner().getPosition(), ps.getPosition());
-        assertEquals(dtoStreet.getOwner().getOrder(), ps.getOrder());
-        assertEquals(dtoStreet.getOwner().getId(), ps.getId());
+        assertEquals(street.getName(), dtoStreet.getName());
+        assertEquals(street.getCost(), dtoStreet.getCost());
+        assertEquals(street.getPosition(), dtoStreet.getPosition());
+        assertEquals(ps.getPlayer().getNickname(), dtoStreet.getOwner().getName());
+        assertEquals(ps.getCanGo(), dtoStreet.getOwner().getCanGo());
+        assertEquals(ps.getMoney(), dtoStreet.getOwner().getMoney());
+        assertEquals(ps.getPosition(), dtoStreet.getOwner().getPosition());
+        assertEquals(ps.getOrder(), dtoStreet.getOwner().getOrder());
+        assertEquals(ps.getId(), dtoStreet.getOwner().getId());
+        Cell initCell = GameCreator.INSTANCE.getInitCell(position);
+        assertEquals(initCell.getImgPath(), dtoStreet.getImgPath());
+        assertArrayEquals(initCell.getCellCoordinates(), dtoStreet.getCellCoordinates());
+        assertArrayEquals(initCell.getRouteCoordinates(), dtoStreet.getRouteCoordinates());
     }
 
     @Test
     public void flightToDto() {
         Random random = new Random();
-        int position = random.nextInt();
+        int position = random.nextInt() % 23;
         int cost = random.nextInt();
         CellState cell = new CellState(position, "flight", FLIGHT);
         cell.setCost(cost);
         Flight flight = cellConverter.toFlight(cell);
 
-        assertEquals(flight.getCost(), cell.getCost());
-        assertEquals(flight.getName(), cell.getName());
-        assertEquals(flight.getPosition(), cell.getPosition());
+        assertEquals(cell.getCost(), flight.getCost());
+        assertEquals(cell.getName(), flight.getName());
+        assertEquals(cell.getPosition(), flight.getPosition());
+        Cell initCell = GameCreator.INSTANCE.getInitCell(position);
+        assertEquals(initCell.getImgPath(), flight.getImgPath());
+        assertArrayEquals(initCell.getCellCoordinates(), flight.getCellCoordinates());
+        assertArrayEquals(initCell.getRouteCoordinates(), flight.getRouteCoordinates());
     }
 
     public void jailToDto() {
@@ -130,13 +140,21 @@ public class DbDtoConverterTest {
         gr.save(dbGame);
         GameDto game = gameConverter.toDto(dbGame);
 
-        assertTrue(game.getField().size() == dbGame.getField().size());
-        assertTrue(game.getPlayers().size() == dbGame.getPlayerStates().size());
-        assertEquals(game.getTurnOf().getId(), dbGame.getTurnOf().getId());
+        assertEquals(dbGame.getField().size(), game.getField().size());
+        assertEquals(dbGame.getPlayerStates().size(), game.getPlayers().size());
+        assertEquals(dbGame.getTurnOf().getId(), game.getTurnOf().getId());
         dbGame.getField().forEach(c ->
-                assertEquals(game.getField().get(c.getPosition()).getName(), c.getName()));
+                assertEquals(c.getName(), game.getField().get(c.getPosition()).getName()));
         dbGame.getPlayerStates().forEach(p ->
-                assertEquals(p.getId(), dbGame.getPlayerStates().get(p.getOrder()).getId()));
+                assertEquals(dbGame.getPlayerStates().get(p.getOrder()).getId(), p.getId()));
+        long correctCellsCount = game.getField().stream()
+                .filter(c -> {
+                    Cell initCell = GameCreator.INSTANCE.getInitCell(c.getPosition());
+                    return c.getImgPath().equals(initCell.getImgPath())
+                            && Arrays.deepEquals(c.getCellCoordinates(), initCell.getCellCoordinates())
+                            && Arrays.deepEquals(c.getRouteCoordinates(), initCell.getRouteCoordinates());
+                }).count();
+        assertEquals(game.getField().size(), correctCellsCount);
     }
 
 }

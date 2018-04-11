@@ -8,6 +8,20 @@ function init() {
         searchControlProvider: 'yandex#search'
     });
 
+    var cells = [];
+
+    $.get('/player/game', function (gameId) {
+        $.get('/api/game/' + gameId, function (game) {
+            game.field.forEach(function (item) {
+                var cell = buildRectangle(item.cellCoordinates, '#999966', item.imgPath);
+                myMap.geoObjects.add(cell);
+                cells.push(cell);
+                var route = buildRoute(item.routeCoordinates, '#99ff99');
+                myMap.geoObjects.add(route);
+            })
+        })
+    });
+
     var buildRectangle = function (coords, strokeColor, imgHref) {
         return new ymaps.Rectangle(coords, null, {
             // Опции.
@@ -50,8 +64,8 @@ function init() {
             // HTML-содержимое контекстного меню.
             var menuContent =
                 '<div id="menu">\
-            <div align="center"><input id="buysmth" status="submit" value="Buy"/></div>\
-            <div align="center"><input id="passsmth" status="submit" value="Pass"/></div>\
+            <div align="center"><input id="buysmth" value="Buy"/></div>\
+            <div align="center"><input id="passsmth" value="Pass"/></div>\
             </div>';
 
             // Размещаем контекстное меню на странице
@@ -112,7 +126,6 @@ function init() {
             // Последний байт (77) определяет прозрачность.
             // Прозрачность заливки также можно задать используя опцию "fillOpacity".
             fillOpacity: 0.3,
-
             fillColor: "#DB7377",
             // Цвет обводки.
             strokeColor: strokeColor,
@@ -161,19 +174,19 @@ function init() {
         multiRoute4 = buildRoute([[55.699, 37.535], [55.67, 37.54]], '#E63E92'),
         multiRoute5 = buildRoute([[55.62, 37.58], [55.65, 37.55]], '#E61200');
 
-    myMap.geoObjects
-        .add(myRectangle)
-        .add(myRectangle2)
-        .add(myRectangle3)
-        .add(myRectangle4)
-        .add(myRectangle5)
-        .add(myCircle)
-        .add(myCircle2)
-        .add(multiRoute)
-        .add(multiRoute2)
-        .add(multiRoute3)
-        .add(multiRoute4)
-        .add(multiRoute5);
+    // myMap.geoObjects
+    //     .add(myRectangle)
+    //     .add(myRectangle2)
+    //     .add(myRectangle3)
+    //     .add(myRectangle4)
+    //     .add(myRectangle5)
+    //     .add(myCircle)
+    //     .add(myCircle2)
+    //     .add(multiRoute)
+    //     .add(multiRoute2)
+    //     .add(multiRoute3)
+    //     .add(multiRoute4)
+    //     .add(multiRoute5);
 
 
 }

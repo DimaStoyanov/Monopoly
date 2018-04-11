@@ -127,9 +127,9 @@ button.green {
 
 .chat-container {
     /*max-width: 900px;*/
-    left: calc(25%);
+    left: 30%;
     top: 50px;
-    width: calc(50% - 25px);
+    width: calc(45% - 25px);
     position: absolute;
     background-color: #fff;
     box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
@@ -140,7 +140,7 @@ button.green {
 .friend-container {
     left: 25px;
     top: 50px;
-    width: calc(25% - 50px);
+    width: calc(30% - 50px);
     position: absolute;
     background-color: #fff;
     box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
@@ -149,7 +149,7 @@ button.green {
 }
 
 .friend-list {
-    height: 80%;
+    height: 75%;
     overflow: auto;
 }
 

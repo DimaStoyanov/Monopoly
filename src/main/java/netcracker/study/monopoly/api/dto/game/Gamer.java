@@ -2,10 +2,11 @@ package netcracker.study.monopoly.api.dto.game;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @Data
-public class Gamer {
+public class Gamer implements Serializable {
     private UUID id;
 
     private Integer order;

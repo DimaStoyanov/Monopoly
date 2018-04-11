@@ -1,0 +1,37 @@
+html, body {
+    width: 100%;
+    height: 95%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, serif;
+    font-size: 14px;
+}
+
+#map {
+    width: 100%;
+    height: 60%;
+}
+
+#menu {
+    position: absolute;
+    width: 12em;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding-bottom: 10px;
+    z-index: 2
+}
+
+#menu ul {
+    list-style-type: none;
+    padding: 20px;
+    margin: 0;
+}
+
+input {
+    width: 10em;
+}
+
+.header {
+    padding: 5px;
+}
