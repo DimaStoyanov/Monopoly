@@ -16,6 +16,12 @@ var cells = [];
 function connectSocket() {
     $.get('/player/info', function (data) {
             selfInfo = data;
+        game.players.forEach(function (item) {
+            if (item.name === selfInfo.nickname) {
+                selfInfo.id = item.id
+            }
+        });
+
             var socket = new SockJS('/lobby');
             stompClient = Stomp.over(socket);
             stompClient.connect({}, onConnected, onError);
@@ -61,7 +67,6 @@ function onError() {
 function onMessageReceived(payload) {
 
 
-    
     var message = JSON.parse(payload.body);
     var messageElement = document.createElement('li');
 
@@ -142,9 +147,6 @@ function init() {
             connectSocket();
             game.players.forEach(function (item) {
                 playersMap[item.id] = item;
-                if (item.name === selfInfo.nickname) {
-                    selfInfo.id = item.id
-                }
             });
             game.field.forEach(function (item) {
                 var cell = buildRectangle(item.cellCoordinates, '#999966', item.imgPath);
