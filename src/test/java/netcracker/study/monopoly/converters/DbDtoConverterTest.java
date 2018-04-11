@@ -74,7 +74,7 @@ public class DbDtoConverterTest {
     public void streetToDto() {
         Random random = new Random();
         int cost = random.nextInt();
-        int position = random.nextInt() % 23;
+        int position = random.nextInt(23);
         String name = "name";
         Player player = new Player(name);
         PlayerState ps = new PlayerState(0, player);
@@ -104,7 +104,7 @@ public class DbDtoConverterTest {
     @Test
     public void flightToDto() {
         Random random = new Random();
-        int position = random.nextInt() % 23;
+        int position = random.nextInt(23);
         int cost = random.nextInt();
         CellState cell = new CellState(position, "flight", FLIGHT);
         cell.setCost(cost);

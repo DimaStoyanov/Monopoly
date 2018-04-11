@@ -1,21 +1,143 @@
+'use strict';
+var messageForm = document.querySelector('#messageForm');
+var messageInput = document.querySelector('#message');
+var messageArea = document.querySelector('#messageArea');
+var connectingElement = document.querySelector('.connecting');
+
+
+var scoreTable = document.getElementById('score-table');
+
+var game = null;
+var playersMap = {};
+var selfInfo = null;
+var stompClient = null;
+var cells = [];
+
+
+$.get('/player/info', function (data) {
+        selfInfo = data;
+        var socket = new SockJS('/lobby');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, onConnected, onError);
+        messageForm.addEventListener('submit', sendMessage, true);
+    }
+);
+
+
+function onConnected() {
+    stompClient.subscribe('/topic/games/' + game.id, onMessageReceived);
+
+
+    // Tell your username to the server
+    stompClient.send("/app/gameId/" + roomId,
+        {},
+        JSON.stringify({
+            type: 'JOIN',
+            sendAt: new Date(),
+            idFrom: selfInfo.id,
+            avatarUrl: selfInfo.avatarUrl
+        })
+    );
+
+    stompClient.send('/app/status', {}, JSON.stringify({
+        place: "GAME",
+        status: "ONLINE",
+        playerId: selfInfo.id
+    }));
+
+
+    connectingElement.classList.add('hidden');
+
+}
+
+
+function onError() {
+    connectingElement.textContent = 'Could not connect to WebSocket server. ' +
+        'Please refresh this page to try again!';
+    connectingElement.style.color = 'red';
+}
+
+function onMessageReceived(payload) {
+    var message = JSON.parse(payload.body);
+    var messageElement = document.createElement('li');
+
+    var player = playersMap[message.idFrom];
+
+    if (message.type === 'JOIN') {
+        messageElement.classList.add('event-message');
+        message.content = player.name + ' joined!';
+
+    } else if (message.type === 'LEAVE') {
+        deleteFromRoomTableIfExist(message);
+        messageElement.classList.add('event-message');
+        message.content = player.name + ' left!';
+
+
+    } else if (message.type === 'STEP') {
+        messageElement.classList.add('event-message');
+    } else {
+        messageElement.classList.add('chat-message');
+
+
+        var avatarElement = document.createElement('img');
+        avatarElement.src = message.avatarUrl;
+
+        messageElement.appendChild(avatarElement);
+
+        var usernameElement = document.createElement('span');
+        var usernameText = document.createTextNode(player.name);
+        usernameElement.appendChild(usernameText);
+        messageElement.appendChild(usernameElement);
+    }
+
+    var textElement = document.createElement('p');
+    var messageText = document.createTextNode(message.content);
+    textElement.appendChild(messageText);
+
+    messageElement.appendChild(textElement);
+
+    messageArea.appendChild(messageElement);
+    messageArea.scrollTop = messageArea.scrollHeight;
+}
+
+function sendMessage(event) {
+    var messageContent = messageInput.value.trim();
+    if (messageContent && stompClient) {
+        var chatMessage = {
+            content: messageInput.value,
+            idFrom: selfInfo.id,
+            type: 'CHAT',
+            avatarUrl: selfInfo.avatarUrl,
+            sendAt: new Date()
+        };
+        stompClient.send("/app/games/" + game.id, {}, JSON.stringify(chatMessage));
+        messageInput.value = '';
+    }
+    event.preventDefault();
+}
+
+
 ymaps.ready(init);
 
 function init() {
     var myMap = new ymaps.Map('map', {
         center: [55.675, 37.658],
-        zoom: 15
+        zoom: 12
     }, {
         searchControlProvider: 'yandex#search'
     });
 
-    var cells = [];
 
     $.get('/player/game', function (gameId) {
         if (!gameId) {
             $(location).attr('href', '/');
             return;
         }
-        $.get('/api/game/' + gameId, function (game) {
+        $.get('/api/game/' + gameId, function (data) {
+            game = data;
+            game.players.forEach(function (item) {
+                playersMap[item.id] = item;
+            });
             game.field.forEach(function (item) {
                 var cell = buildRectangle(item.cellCoordinates, '#999966', item.imgPath);
                 myMap.geoObjects.add(cell);
@@ -171,26 +293,6 @@ function init() {
 
         });
     };
-
-    var multiRoute = buildRoute([[55.60, 37.66], [55.61, 37.59]], '#214212'),
-        multiRoute2 = buildRoute([[55.62, 37.69], [55.666, 37.622]], '#0AAF3F'),
-        multiRoute3 = buildRoute([[55.68, 37.60], [55.70, 37.551]], '#133E92'),
-        multiRoute4 = buildRoute([[55.699, 37.535], [55.67, 37.54]], '#E63E92'),
-        multiRoute5 = buildRoute([[55.62, 37.58], [55.65, 37.55]], '#E61200');
-
-    // myMap.geoObjects
-    //     .add(myRectangle)
-    //     .add(myRectangle2)
-    //     .add(myRectangle3)
-    //     .add(myRectangle4)
-    //     .add(myRectangle5)
-    //     .add(myCircle)
-    //     .add(myCircle2)
-    //     .add(multiRoute)
-    //     .add(multiRoute2)
-    //     .add(multiRoute3)
-    //     .add(multiRoute4)
-    //     .add(multiRoute5);
 
 
 }
