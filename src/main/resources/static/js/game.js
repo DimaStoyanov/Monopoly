@@ -59,6 +59,11 @@ function onError() {
 }
 
 function onMessageReceived(payload) {
+    alert(playersMap);
+    alert(message.idFrom);
+    alert(typeof message.idFrom);
+
+    
     var message = JSON.parse(payload.body);
     var messageElement = document.createElement('li');
 
