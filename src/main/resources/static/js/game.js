@@ -30,7 +30,7 @@ function onConnected() {
 
 
     // Tell your username to the server
-    stompClient.send("/app/gameId/" + game.id,
+    stompClient.send("/app/games/" + game.id,
         {},
         JSON.stringify({
             type: 'JOIN',
