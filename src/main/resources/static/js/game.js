@@ -13,15 +13,16 @@ var selfInfo = null;
 var stompClient = null;
 var cells = [];
 
-
-$.get('/player/info', function (data) {
-        selfInfo = data;
-        var socket = new SockJS('/lobby');
-        stompClient = Stomp.over(socket);
-        stompClient.connect({}, onConnected, onError);
-        messageForm.addEventListener('submit', sendMessage, true);
-    }
-);
+function connectSocket() {
+    $.get('/player/info', function (data) {
+            selfInfo = data;
+            var socket = new SockJS('/lobby');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, onConnected, onError);
+            messageForm.addEventListener('submit', sendMessage, true);
+        }
+    );
+}
 
 
 function onConnected() {
@@ -135,6 +136,7 @@ function init() {
         }
         $.get('/api/game/' + gameId, function (data) {
             game = data;
+            connectSocket();
             game.players.forEach(function (item) {
                 playersMap[item.id] = item;
             });
