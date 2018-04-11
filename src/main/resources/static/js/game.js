@@ -30,7 +30,7 @@ function onConnected() {
 
 
     // Tell your username to the server
-    stompClient.send("/app/gameId/" + roomId,
+    stompClient.send("/app/gameId/" + game.id,
         {},
         JSON.stringify({
             type: 'JOIN',
@@ -69,7 +69,6 @@ function onMessageReceived(payload) {
         message.content = player.name + ' joined!';
 
     } else if (message.type === 'LEAVE') {
-        deleteFromRoomTableIfExist(message);
         messageElement.classList.add('event-message');
         message.content = player.name + ' left!';
 
