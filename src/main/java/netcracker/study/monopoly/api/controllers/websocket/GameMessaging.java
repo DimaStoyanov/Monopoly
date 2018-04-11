@@ -21,7 +21,7 @@ public class GameMessaging {
         this.messagingTemplate = messagingTemplate;
     }
 
-    @MessageMapping("/game/{gameId}")
+    @MessageMapping("/games/{gameId}")
     public void processMsg(@Payload GameMsg msg, @DestinationVariable UUID gameId,
                            StompHeaderAccessor headerAccessor) {
         log.info(msg);
