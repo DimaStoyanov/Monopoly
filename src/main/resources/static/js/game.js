@@ -65,8 +65,9 @@ function onMessageReceived(payload) {
     var message = JSON.parse(payload.body);
     var messageElement = document.createElement('li');
 
-    alert(playersMap.keys());
+
     alert(playersMap[message.idFrom]);
+    alert(Object.keys(playersMap));
     alert(message.idFrom);
     alert(typeof message.idFrom);
 
