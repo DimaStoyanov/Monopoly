@@ -24,6 +24,7 @@ public class GameMessaging {
     @MessageMapping("/game/{gameId}")
     public void processMsg(@Payload GameMsg msg, @DestinationVariable UUID gameId,
                            StompHeaderAccessor headerAccessor) {
+        log.info(msg);
         messagingTemplate.convertAndSend("/topic/games/" + gameId, msg);
     }
 }
