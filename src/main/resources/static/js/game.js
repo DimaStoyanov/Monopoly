@@ -65,7 +65,8 @@ function onMessageReceived(payload) {
     var message = JSON.parse(payload.body);
     var messageElement = document.createElement('li');
 
-    alert(playersMap);
+    alert(playersMap.keys());
+    alert(playersMap[message.idFrom]);
     alert(message.idFrom);
     alert(typeof message.idFrom);
 
@@ -145,6 +146,9 @@ function init() {
             connectSocket();
             game.players.forEach(function (item) {
                 playersMap[item.id] = item;
+                alert("Push");
+                alert(item.id);
+                alert(playersMap[item.id]);
             });
             game.field.forEach(function (item) {
                 var cell = buildRectangle(item.cellCoordinates, '#999966', item.imgPath);
