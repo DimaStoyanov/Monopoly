@@ -143,7 +143,6 @@ function drawScoreTable() {
     })
 }
 
-drawScoreTable();
 setInterval(drawScoreTable, 10000);
 
 
@@ -166,6 +165,7 @@ function init() {
         $.get('/api/game/' + gameId, function (data) {
             game = data;
             connectSocket();
+            drawScoreTable();
             game.players.forEach(function (item) {
                 playersMap[item.id] = item;
             });
