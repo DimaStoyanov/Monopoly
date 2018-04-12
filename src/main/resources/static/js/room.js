@@ -164,7 +164,7 @@ function onConnected() {
         var msg = JSON.parse(payload.body);
         if (confirm("Player " + msg.from + " invite you. Join?")) {
             $.ajax({
-                url: '/player/room?id=' + msg.roomId,
+                url: '/player/room?roomId=' + msg.roomId,
                 type: 'PUT',
                 success: function () {
                     $(location).attr('href', '/room.html');
