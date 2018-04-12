@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import static netcracker.study.monopoly.api.controllers.websocket.WebSocketEventListener.LEAVE_MSG_KEY;
 
+
 @Controller
 @Log4j2
 public class GameMessaging {

@@ -145,7 +145,6 @@ function drawScoreTable() {
 
 setInterval(drawScoreTable, 10000);
 
-
 ymaps.ready(init);
 
 function init() {
@@ -166,6 +165,7 @@ function init() {
             game = data;
             connectSocket();
             drawScoreTable();
+          
             game.players.forEach(function (item) {
                 playersMap[item.id] = item;
             });
