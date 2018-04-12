@@ -63,6 +63,7 @@ public class DbDtoConverterTest {
         expected.setName(ps.getPlayer().getNickname());
         expected.setOrder(ps.getOrder());
         expected.setPosition(ps.getPosition());
+        expected.setAvatarUrl(ps.getPlayer().getAvatarUrl());
 
         Gamer actual = playerConverter.toDto(ps);
         assertEquals(expected, actual);
