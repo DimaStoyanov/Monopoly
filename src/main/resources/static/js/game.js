@@ -89,7 +89,7 @@ function onMessageReceived(payload) {
 
 
         var avatarElement = document.createElement('img');
-        avatarElement.src = message.avatarUrl;
+        avatarElement.src = player.avatarUrl;
 
         messageElement.appendChild(avatarElement);
 
@@ -116,7 +116,6 @@ function sendMessage(event) {
             content: messageInput.value,
             idFrom: selfInfo.id,
             type: 'CHAT',
-            avatarUrl: selfInfo.avatarUrl,
             sendAt: new Date()
         };
         stompClient.send("/app/games/" + game.id, {}, JSON.stringify(chatMessage));
@@ -124,6 +123,28 @@ function sendMessage(event) {
     }
     event.preventDefault();
 }
+
+function drawScoreTable() {
+    scoreTable.innerHTML = '';
+    game.players.forEach(function (player) {
+        var row = scoreTable.insertRow();
+
+        var avatarCell = row.insertCell();
+        var avatar = new Image();
+        avatar.src = player.avatarUrl;
+        avatar.height = 40;
+        avatarCell.appendChild(avatar);
+
+        var nameCell = row.insertCell();
+        nameCell.innerHTML = player.name;
+
+        var scoreCell = row.insertCell();
+        scoreCell.innerHTML = player.score;
+    })
+}
+
+drawScoreTable();
+setInterval(drawScoreTable, 10000);
 
 
 ymaps.ready(init);
@@ -207,7 +228,6 @@ function init() {
             // Размещаем контекстное меню на странице
             $('body').append(menuContent);
 
-            // alert(e.get('pagePixels'))
             // Задаем позицию меню.
             $('#menu').css({
                 left: e.get('pagePixels')[0],
