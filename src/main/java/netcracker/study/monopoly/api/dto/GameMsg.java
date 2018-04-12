@@ -22,7 +22,7 @@ public class GameMsg implements Serializable {
 
     private Type type;
 
-    enum Type {
+    public enum Type {
         JOIN, LEAVE, CHAT, CHANGE
     }
 }

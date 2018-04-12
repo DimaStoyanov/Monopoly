@@ -13,6 +13,8 @@ import java.util.Map;
 @Log4j2
 public class WebSocketEventListener {
 
+    static final String LEAVE_MSG_KEY = "leaveMsg";
+
     private final SimpMessageSendingOperations messagingTemplate;
 
     public WebSocketEventListener(SimpMessageSendingOperations messagingTemplate) {
@@ -26,16 +28,7 @@ public class WebSocketEventListener {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         log.debug("Disconnect socket " + event.getUser().getName());
         Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
-        Runnable sendStatusMsg = (Runnable)
-                sessionAttributes.get(PlayersTracking.STATUS_MSG_KEY);
-        Runnable sendRoomMsg = (Runnable) sessionAttributes.get(RoomController.LEAVE_MSG_KEY);
-
-
-        if (sendStatusMsg != null) {
-            sendStatusMsg.run();
-        }
-        if (sendRoomMsg != null) {
-            sendRoomMsg.run();
-        }
+        Runnable leaveMsg = (Runnable) sessionAttributes.get(LEAVE_MSG_KEY);
+        leaveMsg.run();
     }
 }

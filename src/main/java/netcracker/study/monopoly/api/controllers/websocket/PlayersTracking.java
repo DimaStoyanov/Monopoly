@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static netcracker.study.monopoly.api.controllers.websocket.WebSocketEventListener.LEAVE_MSG_KEY;
 import static netcracker.study.monopoly.api.dto.OnlineStatusMsg.Place.GAME;
 import static netcracker.study.monopoly.api.dto.OnlineStatusMsg.Place.ROOM;
 import static netcracker.study.monopoly.api.dto.OnlineStatusMsg.Status.OFFLINE;
@@ -22,7 +23,6 @@ import static netcracker.study.monopoly.api.dto.OnlineStatusMsg.Status.ONLINE;
 @Log4j2
 public class PlayersTracking {
 
-    public final static String STATUS_MSG_KEY = "statusOfflineMsg";
 
 
     private Set<UUID> inSitePlayers;
@@ -54,7 +54,7 @@ public class PlayersTracking {
             Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
             Runnable sendMsg = () -> this.getOnlineStatusMessage(
                     offlineMsg, headerAccessor);
-            sessionAttributes.put(STATUS_MSG_KEY, sendMsg);
+            sessionAttributes.put(LEAVE_MSG_KEY, sendMsg);
 
         } else {
 
