@@ -23,13 +23,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static netcracker.study.monopoly.api.controllers.websocket.WebSocketEventListener.LEAVE_MSG_KEY;
 import static netcracker.study.monopoly.api.dto.RoomMsg.Type.LEAVE;
 
 @Controller
 @Log4j2
 public class RoomController {
 
-    public final static String LEAVE_MSG_KEY = "leaveRoomMsg";
 
     private final SimpMessagingTemplate template;
     private final AtomicInteger lastRoomId;
