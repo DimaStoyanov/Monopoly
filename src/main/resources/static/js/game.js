@@ -324,11 +324,13 @@ function init() {
                 var circle = null;
                 if (useStart) {
                     startCoords[0] += cellLength / 3;
+                    startCoords[1] -= cellLength / 5;
                     circle = buildCircle(startCoords, player.avatarUrl, player.name, player.name,
                         playersColors[player.order]);
                     useStart = false;
                 } else {
                     endCoords[0] -= cellLength / 3;
+                    endCoords[1] += cellLength / 5;
                     circle = buildCircle(endCoords, player.avatarUrl, player.name, player.name,
                         playersColors[player.order]);
                     useStart = true;
