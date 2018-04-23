@@ -27,6 +27,7 @@ function connectSocket() {
         });
 
             var socket = new SockJS('/lobby');
+        socket.onclose = onClose();
             stompClient = Stomp.over(socket);
             stompClient.connect({}, onConnected, onError);
             messageForm.addEventListener('submit', sendMessage, true);
@@ -66,6 +67,10 @@ function onError() {
     connectingElement.textContent = 'Could not connect to WebSocket server. ' +
         'Please refresh this page to try again!';
     connectingElement.style.color = 'red';
+}
+
+function onClose() {
+    connectSocket();
 }
 
 function onMessageReceived(payload) {
@@ -266,7 +271,7 @@ function init() {
         }
     });
 
-    var buildCircle = function (coords, imgHref, name, hintContent, strokeColor) {
+    var buildCircle = function (coords, imgHref, name, strokeColor, score) {
         // Создаем круг.
         return new ymaps.Circle([
             coords,
@@ -276,9 +281,10 @@ function init() {
             // Описываем свойства круга.
             // Содержимое балуна.
             balloonContent: '<img height="100px" src=' + imgHref + '>\<' +
-            'br><div align="center">' + name + '</div>',
+            'br><div align="center">' + name + '</div>' +
+            '<br><div align="center">Score: ' + score + '</div>',
             // Содержимое хинта.
-            hintContent: hintContent
+            hintContent: name
         }, {
             // Задаем опции круга.
             // Включаем возможность перетаскивания круга.
@@ -307,11 +313,6 @@ function init() {
                 playerInCells[position] = [];
             }
             playerInCells[position].push(player);
-            // JUST FOR TEST
-            playerInCells[position].push(player);
-            playerInCells[position].push(player);
-            playerInCells[position].push(player);
-            // END JUST FOR TEST
         });
 
 
@@ -326,13 +327,13 @@ function init() {
                 var circle = null;
                 if (useStart) {
                     startCoords[0] += cellLength / 3;
-                    circle = buildCircle(startCoords, player.avatarUrl, player.name, player.name,
-                        playersColors[player.order]);
+                    circle = buildCircle(startCoords, player.avatarUrl, player.name,
+                        playersColors[player.order], player.score);
                     useStart = false;
                 } else {
                     endCoords[0] -= cellLength / 3;
-                    circle = buildCircle(endCoords, player.avatarUrl, player.name, player.name,
-                        playersColors[player.order]);
+                    circle = buildCircle(endCoords, player.avatarUrl, player.name,
+                        playersColors[player.order], player.score);
                     useStart = true;
                 }
                 myMap.geoObjects.add(circle);
@@ -340,13 +341,6 @@ function init() {
         }
     }
 
-
-
-    // Создаем круг.
-    var myCircle = buildCircle([55.71, 37.53], "https://pp.userapi.com/c841133/v841133895/1a3d4/TxeNVM5X_RA.jpg",
-        "Dmitriy Stoyanov", "Player1", "#391066"),
-        myCircle2 = buildCircle([55.61, 37.69], "https://pp.userapi.com/c636620/v636620219/75c85/bzeG7tSUYdw.jpg",
-            "Konstantin Risov", "Player2", "#5FA000");
 
 
     var balloonLayout = ymaps.templateLayoutFactory.createClass("", {}
