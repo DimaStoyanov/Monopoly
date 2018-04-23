@@ -2,9 +2,11 @@ package netcracker.study.monopoly.api.controllers.rest;
 
 import io.swagger.annotations.Api;
 import lombok.extern.log4j.Log4j2;
+import netcracker.study.monopoly.api.dto.game.GameChange;
 import netcracker.study.monopoly.api.dto.game.GameDto;
 import netcracker.study.monopoly.managers.GameManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -17,9 +19,12 @@ public class GameController {
 
     private final GameManager gameManager;
 
+    private final SimpMessagingTemplate messagingTemplate;
+
     @Autowired
-    public GameController(GameManager gameManager) {
+    public GameController(GameManager gameManager, SimpMessagingTemplate messagingTemplate) {
         this.gameManager = gameManager;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @GetMapping("/game/{gameId}")
@@ -31,7 +36,9 @@ public class GameController {
     @PostMapping("/game/{gameId}/gamer/{gamerId}/firstStep")
     public void firstStep(@PathVariable("gameId") UUID gameID, @PathVariable("gamerId") UUID gamerID) {
         log.info("Request gamer first step with id " + gamerID + " in the game this id " + gameID);
-        gameManager.firstStep(gameID, gamerID);
+        GameChange gameChange = gameManager.firstStep(gameID, gamerID);
+        messagingTemplate.convertAndSend("/topic/games/" + gameID, gameChange);
+
     }
 
     @PostMapping("/game/{gameID}/gamer/{gamerID}/firstStreet")

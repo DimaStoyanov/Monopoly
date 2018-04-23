@@ -52,6 +52,8 @@ public class GameManager {
     @Autowired
     private CellConverter cellConverter;
 
+    private GameCreator gameCreator = GameCreator.INSTANCE;
+
     public GameDto create(Collection<UUID> playerIds) {
         log.trace("Creating game with ids: " + playerIds);
         List<Player> players = (List<Player>) playerRepository.findAllById(playerIds);
@@ -59,7 +61,7 @@ public class GameManager {
             throw new PlayerNotFoundException();
         }
 
-        Game game = GameCreator.INSTANCE.createGame(players);
+        Game game = gameCreator.createGame(players);
         log.trace("Saving game " + game);
         gameRepository.save(game);
         return gameConverter.toDto(game);
@@ -73,7 +75,9 @@ public class GameManager {
         return gameConverter.toDto(game);
     }
 
-    public void firstStep(UUID gameId, UUID playerId) {
+    public GameChange firstStep(UUID gameId, UUID playerId) {
+        GameChange gameChange = new GameChange();
+
         PlayerState player = playerStateRepository.findById(playerId).orElseThrow(() ->
                 new PlayerNotFoundException(playerId));
         changePlayerPosition(player);
@@ -91,11 +95,14 @@ public class GameManager {
                 break;
             default:
                 if (hasOwner(cell)) {
-                    payToOwner(player, cell);
+                    payToOwner(player, cell, gameChange);
                 }
                 break;
         }
         playerStateRepository.save(player);
+        Gamer gamer = playerConverter.toDto(player);
+        gameChange.addGamerChange(gamer);
+        return gameChange;
     }
 
     public GameChange streetStep(UUID gameId, UUID playerId) {
@@ -108,7 +115,7 @@ public class GameManager {
 
         GameChange gameChange = new GameChange();
         Gamer gamer = playerConverter.toDto(playerState);
-        gameChange.setGamerChange(gamer);
+        gameChange.addGamerChange(gamer);
         Street street = cellConverter.toStreet(cell);
         gameChange.setStreetChange(street);
         return gameChange;
@@ -126,13 +133,15 @@ public class GameManager {
         firstStep(gameId, playerId);
     }
 
-    private void payToOwner(PlayerState playerState, CellState street) {
+    private void payToOwner(PlayerState playerState, CellState street, GameChange gameChange) {
         PlayerState owner = street.getOwner();
         int money = street.getCost();
         // TODO: If not enough money - bankrupt?
         playerState.setMoney(playerState.getMoney() - money);
         owner.setMoney(owner.getMoney() + money);
         playerStateRepository.save(owner);
+        Gamer gamer = playerConverter.toDto(owner);
+        gameChange.addGamerChange(gamer);
     }
 
     private boolean buyStreet(PlayerState playerState, CellState street) {
