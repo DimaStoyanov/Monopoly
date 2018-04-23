@@ -328,12 +328,12 @@ function init() {
             playerList.forEach(function (player) {
                 var circle = null;
                 if (useStart) {
-                    startCoords[0] += cellLength / 3;
+                    startCoords[0] -= cellLength / 3;
                     circle = buildCircle(startCoords, player.avatarUrl, player.name,
                         playersColors[player.order], player.score);
                     useStart = false;
                 } else {
-                    endCoords[0] += cellLength / 3;
+                    endCoords[0] -= cellLength / 3;
                     circle = buildCircle(endCoords, player.avatarUrl, player.name,
                         playersColors[player.order], player.score);
                     useStart = true;
