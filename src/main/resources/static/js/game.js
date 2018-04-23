@@ -311,11 +311,10 @@ function init() {
             var playerList = playerInCells[position];
             var startCoords = game.field[position].cellCoordinates[0];
             var endCoords = game.field[position].cellCoordinates[1];
-            alert(startCoords);
-            alert(endCoords);
             var useStart = true;
             playerList.forEach(function (player) {
                 alert(player.name);
+                alert(player.position);
                 var circle = null;
                 if (useStart) {
                     startCoords[0] += 0.67;
