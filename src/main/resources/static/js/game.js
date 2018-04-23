@@ -313,15 +313,14 @@ function init() {
                 playerInCells[position] = [];
             }
             playerInCells[position].push(player);
-            playerInCells[position].push(player);
 
         });
 
 
         for (var position in playerInCells) {
             var playerList = playerInCells[position];
-            var startCoords = game.field[position].cellCoordinates[0];
-            var endCoords = game.field[position].cellCoordinates[1];
+            var startCoords = game.field[position].cellCoordinates[1];
+            var endCoords = game.field[position].cellCoordinates[0];
             startCoords[1] -= cellLength / 5;
             endCoords[1] += cellLength / 5;
             endCoords[0] = startCoords[0];
