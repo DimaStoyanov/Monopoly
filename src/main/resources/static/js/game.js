@@ -324,7 +324,7 @@ function init() {
             var endCoords = game.field[position].cellCoordinates[1];
             startCoords[1] -= cellLength / 5;
             endCoords[1] += cellLength / 5;
-            endCoords[1] = startCoords[1];
+            endCoords[0] = startCoords[0];
             var useStart = true;
             playerList.forEach(function (player) {
                 var circle = null;
