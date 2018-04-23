@@ -317,12 +317,12 @@ function init() {
                 alert(player.position);
                 var circle = null;
                 if (useStart) {
-                    startCoords[0] += 0.67;
+                    startCoords[0] += 0.067;
                     circle = buildCircle(startCoords, player.avatarUrl, player.name, player.name,
                         playersColors[player.order]);
                     useStart = false;
                 } else {
-                    endCoords[0] -= 0.67;
+                    endCoords[0] -= 0.067;
                     circle = buildCircle(endCoords, player.avatarUrl, player.name, player.name,
                         playersColors[player.order]);
                     useStart = true;
