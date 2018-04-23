@@ -13,6 +13,8 @@ var selfInfo = null;
 var stompClient = null;
 var cells = [];
 
+var cellLength = 0.01;
+
 var playersColors = ['#5d80ca', '#3cc72d', '#b52dc7', '#b52dc7'];
 
 function connectSocket() {
@@ -269,7 +271,7 @@ function init() {
         return new ymaps.Circle([
             coords,
             // Радиус круга в метрах.
-            300
+            200
         ], {
             // Описываем свойства круга.
             // Содержимое балуна.
@@ -304,6 +306,11 @@ function init() {
                 playerInCells[position] = [];
             }
             playerInCells[position].push(player);
+            // JUST FOR TEST
+            playerInCells[position].push(player);
+            playerInCells[position].push(player);
+            playerInCells[position].push(player);
+            // END JUST FOR TEST
         });
 
 
@@ -317,12 +324,12 @@ function init() {
                 alert(player.position);
                 var circle = null;
                 if (useStart) {
-                    startCoords[0] += 0.0034;
+                    startCoords[0] += cellLength / 3;
                     circle = buildCircle(startCoords, player.avatarUrl, player.name, player.name,
                         playersColors[player.order]);
                     useStart = false;
                 } else {
-                    endCoords[0] -= 0.0034;
+                    endCoords[0] -= cellLength / 3;
                     circle = buildCircle(endCoords, player.avatarUrl, player.name, player.name,
                         playersColors[player.order]);
                     useStart = true;
