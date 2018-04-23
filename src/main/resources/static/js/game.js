@@ -286,13 +286,13 @@ function init() {
             // Цвет заливки.
             // Последний байт (77) определяет прозрачность.
             // Прозрачность заливки также можно задать используя опцию "fillOpacity".
-            fillOpacity: 0.3,
+            // fillOpacity: 0.,
             // fillColor: "#DB7377",
             fillImageHref: imgHref,
             // Цвет обводки.
             strokeColor: strokeColor,
             // Прозрачность обводки.
-            strokeOpacity: 0.7,
+            strokeOpacity: 0.5,
             // Ширина обводки в пикселях.
             strokeWidth: 5
 
