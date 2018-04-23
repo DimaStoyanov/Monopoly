@@ -319,21 +319,21 @@ function init() {
 
         for (var position in playerInCells) {
             var playerList = playerInCells[position];
-            var startCoords = game.field[position].cellCoordinates[1];
-            var endCoords = game.field[position].cellCoordinates[0];
+            var startCoords = game.field[position].cellCoordinates[0];
+            var endCoords = game.field[position].cellCoordinates[1];
             startCoords[1] -= cellLength / 5;
             endCoords[1] += cellLength / 5;
-            endCoords[0] = startCoords[0];
+            startCoords[0] = endCoords[0];
             var useStart = true;
             playerList.forEach(function (player) {
                 var circle = null;
                 if (useStart) {
-                    startCoords[0] -= cellLength / 3;
+                    startCoords[0] += cellLength / 3;
                     circle = buildCircle(startCoords, player.avatarUrl, player.name,
                         playersColors[player.order], player.score);
                     useStart = false;
                 } else {
-                    endCoords[0] -= cellLength / 3;
+                    endCoords[0] += cellLength / 3;
                     circle = buildCircle(endCoords, player.avatarUrl, player.name,
                         playersColors[player.order], player.score);
                     useStart = true;
