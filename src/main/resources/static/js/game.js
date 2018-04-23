@@ -27,7 +27,7 @@ function connectSocket() {
         });
 
             var socket = new SockJS('/lobby');
-        socket.onclose = onClose();
+        socket.onclose = onClose;
             stompClient = Stomp.over(socket);
             stompClient.connect({}, onConnected, onError);
             messageForm.addEventListener('submit', sendMessage, true);
