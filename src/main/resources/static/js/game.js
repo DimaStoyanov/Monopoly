@@ -292,7 +292,7 @@ function init() {
             // Цвет обводки.
             strokeColor: strokeColor,
             // Прозрачность обводки.
-            strokeOpacity: 0.5,
+            strokeOpacity: 0.7,
             // Ширина обводки в пикселях.
             strokeWidth: 5
 
@@ -321,8 +321,6 @@ function init() {
             var endCoords = game.field[position].cellCoordinates[1];
             var useStart = true;
             playerList.forEach(function (player) {
-                alert(player.name);
-                alert(player.position);
                 var circle = null;
                 if (useStart) {
                     startCoords[0] += cellLength / 3;
@@ -335,7 +333,6 @@ function init() {
                         playersColors[player.order]);
                     useStart = true;
                 }
-                alert(circle);
                 myMap.geoObjects.add(circle);
             });
         }
