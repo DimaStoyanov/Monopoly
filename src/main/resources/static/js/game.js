@@ -13,6 +13,8 @@ var selfInfo = null;
 var stompClient = null;
 var cells = [];
 
+var playersColors = ['#5d80ca', '#3cc72d', '#b52dc7', '#b52dc7'];
+
 function connectSocket() {
     $.get('/player/info', function (data) {
             selfInfo = data;
@@ -65,7 +67,6 @@ function onError() {
 }
 
 function onMessageReceived(payload) {
-
 
     var message = JSON.parse(payload.body);
     var messageElement = document.createElement('li');
@@ -175,7 +176,9 @@ function init() {
                 cells.push(cell);
                 var route = buildRoute(item.routeCoordinates, '#54d6f6');
                 myMap.geoObjects.add(route);
-            })
+            });
+
+            drawPlayers();
         })
     });
 
@@ -292,6 +295,45 @@ function init() {
 
         });
     };
+
+    function drawPlayers() {
+        var playerInCells = {};
+        game.players.forEach(function (player) {
+            var position = player.position;
+            if (playerInCells[player.position] === undefined) {
+                playerInCells[position] = [];
+            }
+            playerInCells[position].push(player);
+        });
+
+
+        for (var position in playerInCells) {
+            var playerList = playerInCells[position];
+            var startCoords = game.field[position].cellCoordinates[0];
+            var endCoords = game.field[position].cellCoordinates[1];
+            alert(startCoords);
+            alert(endCoords);
+            var useStart = true;
+            playerList.forEach(function (player) {
+                alert(player.name);
+                var circle = null;
+                if (useStart) {
+                    startCoords[0] += 0.67;
+                    circle = buildCircle(startCoords, player.avatarUrl, player.name, player.name,
+                        playersColors[player.order]);
+                    useStart = false;
+                } else {
+                    endCoords[0] -= 0.67;
+                    circle = buildCircle(endCoords, player.avatarUrl, player.name, player.name,
+                        playersColors[player.order]);
+                    useStart = true;
+                }
+                alert(circle);
+                myMap.geoObjects.add(circle);
+            });
+        }
+    }
+
 
 
     // Создаем круг.
