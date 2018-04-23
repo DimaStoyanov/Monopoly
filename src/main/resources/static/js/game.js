@@ -313,6 +313,8 @@ function init() {
                 playerInCells[position] = [];
             }
             playerInCells[position].push(player);
+            playerInCells[position].push(player);
+
         });
 
 
@@ -322,6 +324,7 @@ function init() {
             var endCoords = game.field[position].cellCoordinates[1];
             startCoords[1] -= cellLength / 5;
             endCoords[1] += cellLength / 5;
+            endCoords[1] = startCoords[1];
             var useStart = true;
             playerList.forEach(function (player) {
                 var circle = null;
@@ -331,7 +334,7 @@ function init() {
                         playersColors[player.order], player.score);
                     useStart = false;
                 } else {
-                    endCoords[0] -= cellLength / 3;
+                    endCoords[0] += cellLength / 3;
                     circle = buildCircle(endCoords, player.avatarUrl, player.name,
                         playersColors[player.order], player.score);
                     useStart = true;
