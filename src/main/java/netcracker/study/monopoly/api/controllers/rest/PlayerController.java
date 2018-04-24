@@ -23,6 +23,7 @@ public class PlayerController {
     private static final String ROOM_ID_KEY = "roomId";
     private static final String GAME_ID_KEY = "gameId";
 
+
     private final PlayerRepository playerRepository;
     private final PlayerInfoConverter playerInfoConverter;
 

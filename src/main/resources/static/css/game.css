@@ -1,3 +1,24 @@
+#map {
+    width: 100%;
+    height: 50%;
+}
+
+#menu {
+    position: absolute;
+    width: 12em;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding-bottom: 10px;
+    z-index: 2
+}
+
+#menu ul {
+    list-style-type: none;
+    padding: 20px;
+    margin: 0;
+}
+
 * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -19,17 +40,6 @@ body {
     color: #333;
     background-color: #f4f4f4;
     height: 100%;
-}
-
-body:before {
-    height: 50%;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: #128ff2;
-    content: "";
-    z-index: 0;
 }
 
 .clearfix:after {
@@ -55,6 +65,7 @@ body:before {
 
 input {
     padding-left: 10px;
+
     outline: none;
 }
 
@@ -122,55 +133,41 @@ button.green {
 
 #chat-page {
     position: relative;
-    height: 100%;
+    height: 50%;
 }
 
 .chat-container {
-    /*max-width: 900px;*/
-    left: calc(25%);
-    top: 50px;
-    width: calc(50% - 25px);
-    position: absolute;
-    background-color: #fff;
-    box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
-    height: calc(80% - 60px);
-    /*max-height: 600px;*/
-}
-
-.friend-container {
     left: 25px;
-    top: 50px;
-    width: calc(25% - 50px);
+    top: 10px;
+    width: 70%;
+    height: calc(80% - 60px);
     position: absolute;
     background-color: #fff;
     box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
-    height: 80%;
-    /*max-height: calc(80%);*/
 }
 
-.friend-list {
-    height: 80%;
+.score-list {
+    height: 75%;
     overflow: auto;
 }
 
-.room-container {
+.score-container {
     left: calc(75%);
-    top: 50px;
+    top: 10px;
     width: calc(25% - 25px);
     position: absolute;
     background-color: #fff;
     box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
-    max-height: calc(80%);
-    height: 80%;
+    height: 85%;
     /*position: relative;*/
 }
 
-.friend-list table {
+.score-list table {
     width: 100%;
     margin: 5px;
 }
 
-.friend-list tr {
+.score-list tr {
     width: inherit;
 }
 

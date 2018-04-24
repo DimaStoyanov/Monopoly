@@ -13,6 +13,7 @@ var selfInfo = null;
 var hostId = null;
 var roomId = null;
 var stompClient = null;
+var inRoom = [];
 
 $.get('/player/info', function (data) {
         selfInfo = data;
@@ -30,6 +31,7 @@ $.get('/player/info', function (data) {
 
 function init() {
     var socket = new SockJS('/lobby');
+    // socket.onclose = onClose;
     stompClient = Stomp.over(socket);
     stompClient.connect({}, onConnected, onError);
 
@@ -58,10 +60,6 @@ function onAddFriendClick() {
     friendNickname.value = ''
 }
 
-function onLeaveClick() {
-    $(location).attr('href', '/')
-}
-
 
 function getAndDrawFriends() {
     $.get('/player/friends', function (friends) {
@@ -83,7 +81,8 @@ function getAndDrawFriends() {
             onlineStatCell.innerHTML = item.status;
 
             var inviteCell = row.insertCell();
-            if (item.online) {
+            if (item.status === "Online" || item.status === "In room"
+                && inRoom.indexOf(item.nickname) > -1) {
                 var inviteButton = document.createElement("BUTTON");
                 inviteButton.className = 'green';
                 inviteButton.innerHTML = "Invite";
@@ -128,8 +127,17 @@ function addInRoom(playerInfo) {
     var nicknameCell = row.insertCell();
     nicknameCell.innerHTML = playerInfo.nickname;
 
+
     var kickCell = row.insertCell();
-    if (playerInfo.id !== selfInfo.id && hostId === selfInfo.id) {
+    if (playerInfo.id === selfInfo.id) {
+        var leaveButton = document.createElement("BUTTON");
+        leaveButton.className = 'accent';
+        leaveButton.innerHTML = "Leave";
+        leaveButton.addEventListener('click', function () {
+            $(location).attr('href', '/')
+        });
+        kickCell.appendChild(leaveButton);
+    } else if (hostId === selfInfo.id) {
         var kickButton = document.createElement("BUTTON");
         kickButton.className = 'accent';
         kickButton.innerHTML = "Kick";
@@ -157,7 +165,7 @@ function onConnected() {
         var msg = JSON.parse(payload.body);
         if (confirm("Player " + msg.from + " invite you. Join?")) {
             $.ajax({
-                url: '/rooms/current/id?id=' + msg.roomId,
+                url: '/player/room?roomId=' + msg.roomId,
                 type: 'PUT',
                 success: function () {
                     $(location).attr('href', '/room.html');
@@ -221,6 +229,10 @@ function onError() {
 }
 
 
+function onClose() {
+    init();
+}
+
 function sendMessage(event) {
     var messageContent = messageInput.value.trim();
     if (messageContent && stompClient) {
@@ -251,18 +263,29 @@ function onMessageReceived(payload) {
             nickname: message.nickname,
             avatarUrl: message.avatarUrl
         };
+        inRoom.push(playerInfo.nickname);
         addInRoom(playerInfo)
 
     } else if (message.type === 'LEAVE') {
-        deleteFromRoomTableIfExist(message);
-        messageElement.classList.add('event-message');
-        message.content = message.nickname + ' left!';
+        var index = inRoom.indexOf(message.nickname);
+        if (index > -1) {
+            deleteFromRoomTableIfExist(message);
+            messageElement.classList.add('event-message');
+            message.content = message.nickname + ' left!';
+            inRoom.splice(index, 1)
+        }
+
     } else if (message.type === 'KICK') {
+        index = inRoom.indexOf(message.nickname);
         if (message.playerId === selfInfo.id) {
             alert("You was kicked from room");
             $(location).attr('href', '/');
         }
-
+        if (index > -1) {
+            inRoom.splice(index, 1)
+        }
+        messageElement.classList.add('event-message');
+        message.content = message.nickname + ' was kicked!';
         deleteFromRoomTableIfExist(message);
     } else if (message.type === 'START') {
         $.ajax({

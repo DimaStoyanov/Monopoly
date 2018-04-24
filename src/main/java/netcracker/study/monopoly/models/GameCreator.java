@@ -1,8 +1,12 @@
 package netcracker.study.monopoly.models;
 
 import com.google.gson.Gson;
+import lombok.Cleanup;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.SneakyThrows;
+import netcracker.study.monopoly.api.dto.game.cells.Cell;
+import netcracker.study.monopoly.api.dto.game.cells.Start;
 import netcracker.study.monopoly.models.entities.CellState;
 import netcracker.study.monopoly.models.entities.Game;
 import netcracker.study.monopoly.models.entities.Player;
@@ -16,8 +20,8 @@ import java.util.stream.Collectors;
 import static netcracker.study.monopoly.models.entities.CellState.CellType.START;
 import static netcracker.study.monopoly.models.entities.CellState.CellType.STREET;
 
-public enum GameCreator {
 
+public enum GameCreator {
 
     INSTANCE();
 
@@ -26,14 +30,21 @@ public enum GameCreator {
             "src/main/resources/static/game/gamers/gamer.json";
 
     private final Collection<CellState> cells;
+    private final List<Start> dtoCells;
     private final PlayerConfig playerConfig;
     private final Gson gson;
 
+    private final Map<Integer, Start> cellsMap;
+
+
     GameCreator() {
         gson = new Gson();
+        cellsMap = new TreeMap<>();
         cells = initCells();
+        dtoCells = initDtoCells();
         playerConfig = initPlayerConfig();
     }
+
 
     @SneakyThrows
     private PlayerConfig initPlayerConfig() {
@@ -43,23 +54,32 @@ public enum GameCreator {
 
     @SneakyThrows
     private Collection<CellState> initCells() {
-        Map<Integer, CellState> cellsMap = new TreeMap<>();
+        Map<Integer, CellState> cellsStateMap = new TreeMap<>();
         File cellsDir = new File(cellsPath);
-        putCells(cellsDir, cellsMap);
-        return cellsMap.values();
+        putCells(cellsDir, cellsMap, cellsStateMap);
+        return cellsStateMap.values();
+    }
+
+
+    private List<Start> initDtoCells() {
+        return new ArrayList<>(cellsMap.values());
     }
 
 
     @SneakyThrows
-    private void putCells(File file, Map<Integer, CellState> cellsMap) {
+    private void putCells(File file, Map<Integer, Start> cellsMap, Map<Integer, CellState> cellStateMap) {
         if (file.isDirectory()) {
             for (File f : Objects.requireNonNull(file.listFiles())) {
-                putCells(f, cellsMap);
+                putCells(f, cellsMap, cellStateMap);
             }
         } else if (file.isFile()) {
-            CellState cell = gson.fromJson(new FileReader(file), CellState.class);
-            // TODO fix json file positions and delete this if (to read all cells)
-            if (cell.getType() == STREET || cell.getType() == START) {
+            @Cleanup
+            FileReader json = new FileReader(file);
+            CellState cellState = gson.fromJson(json, CellState.class);
+            json = new FileReader(file);
+            Start cell = gson.fromJson(json, Start.class);
+            if (cellState.getType() == START || cellState.getType() == STREET) {
+                cellStateMap.put(cellState.getPosition(), cellState);
                 cellsMap.put(cell.getPosition(), cell);
             }
         }
@@ -90,6 +110,10 @@ public enum GameCreator {
     public Game createGame(List<Player> players) {
         List<PlayerState> gamers = getGamers(players);
         return new Game(gamers, getCells());
+    }
+
+    public Cell getInitCell(@NonNull Integer position) {
+        return dtoCells.get(position);
     }
 
 

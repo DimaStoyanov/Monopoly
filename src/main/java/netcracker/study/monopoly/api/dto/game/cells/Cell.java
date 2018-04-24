@@ -4,16 +4,30 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
-public abstract class Cell {
+public abstract class Cell implements Serializable {
     @NonNull
-    String name;
+    private String type;
 
     @NonNull
-    Integer position;
+    private String name;
 
     @NonNull
-    Integer cost;
+    private Integer position;
+
+    @NonNull
+    private Integer cost;
+
+    @NonNull
+    private String imgPath;
+
+    @NonNull
+    private Double[][] cellCoordinates;
+
+    @NonNull
+    private Double[][] routeCoordinates;
 
 }

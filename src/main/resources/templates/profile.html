@@ -102,7 +102,14 @@ http://www.thymeleaf.org/dandelion/datatables ">
     function onMessageReceived(payload) {
         var msg = JSON.parse(payload.body);
         if (confirm("Player " + msg.from + " invite you. Join?")) {
-            $(location).attr('href', msg.url);
+            $.ajax({
+                url: '/player/room?roomId=' + msg.roomId,
+                type: 'PUT',
+                success: function () {
+                    $(location).attr('href', '/room.html');
+                }
+            })
+
         }
     }
 </script>
