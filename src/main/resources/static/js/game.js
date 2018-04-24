@@ -13,6 +13,10 @@ var selfInfo = null;
 var stompClient = null;
 var cells = [];
 
+var cellLength = 0.01;
+
+var playersColors = ['#5d80ca', '#3cc72d', '#b52dc7', '#b52dc7'];
+
 function connectSocket() {
     $.get('/player/info', function (data) {
             selfInfo = data;
@@ -23,6 +27,7 @@ function connectSocket() {
         });
 
             var socket = new SockJS('/lobby');
+        // socket.onclose = onClose;
             stompClient = Stomp.over(socket);
             stompClient.connect({}, onConnected, onError);
             messageForm.addEventListener('submit', sendMessage, true);
@@ -64,8 +69,11 @@ function onError() {
     connectingElement.style.color = 'red';
 }
 
-function onMessageReceived(payload) {
+function onClose() {
+    connectSocket();
+}
 
+function onMessageReceived(payload) {
 
     var message = JSON.parse(payload.body);
     var messageElement = document.createElement('li');
@@ -145,6 +153,7 @@ function drawScoreTable() {
 
 setInterval(drawScoreTable, 10000);
 
+
 ymaps.ready(init);
 
 function init() {
@@ -165,7 +174,6 @@ function init() {
             game = data;
             connectSocket();
             drawScoreTable();
-          
             game.players.forEach(function (item) {
                 playersMap[item.id] = item;
             });
@@ -175,7 +183,9 @@ function init() {
                 cells.push(cell);
                 var route = buildRoute(item.routeCoordinates, '#54d6f6');
                 myMap.geoObjects.add(route);
-            })
+            });
+
+            drawPlayers();
         })
     });
 
@@ -261,19 +271,20 @@ function init() {
         }
     });
 
-    var buildCircle = function (coords, imgHref, name, hintContent, strokeColor) {
+    var buildCircle = function (coords, imgHref, name, strokeColor, score) {
         // Создаем круг.
         return new ymaps.Circle([
             coords,
             // Радиус круга в метрах.
-            300
+            200
         ], {
             // Описываем свойства круга.
             // Содержимое балуна.
             balloonContent: '<img height="100px" src=' + imgHref + '>\<' +
-            'br><div align="center">' + name + '</div>',
+            'br><div align="center">' + name + '</div>' +
+            '<br><div align="center">Score: ' + score + '</div>',
             // Содержимое хинта.
-            hintContent: hintContent
+            hintContent: name
         }, {
             // Задаем опции круга.
             // Включаем возможность перетаскивания круга.
@@ -281,8 +292,9 @@ function init() {
             // Цвет заливки.
             // Последний байт (77) определяет прозрачность.
             // Прозрачность заливки также можно задать используя опцию "fillOpacity".
-            fillOpacity: 0.3,
-            fillColor: "#DB7377",
+            // fillOpacity: 0.,
+            // fillColor: "#DB7377",
+            fillImageHref: imgHref,
             // Цвет обводки.
             strokeColor: strokeColor,
             // Прозрачность обводки.
@@ -293,12 +305,43 @@ function init() {
         });
     };
 
+    function drawPlayers() {
+        var playerInCells = {};
+        game.players.forEach(function (player) {
+            var position = player.position;
+            if (playerInCells[player.position] === undefined) {
+                playerInCells[position] = [];
+            }
+            playerInCells[position].push(player);
 
-    // Создаем круг.
-    var myCircle = buildCircle([55.71, 37.53], "https://pp.userapi.com/c841133/v841133895/1a3d4/TxeNVM5X_RA.jpg",
-        "Dmitriy Stoyanov", "Player1", "#391066"),
-        myCircle2 = buildCircle([55.61, 37.69], "https://pp.userapi.com/c636620/v636620219/75c85/bzeG7tSUYdw.jpg",
-            "Konstantin Risov", "Player2", "#5FA000");
+        });
+
+
+        for (var position in playerInCells) {
+            var playerList = playerInCells[position];
+            var startCoords = game.field[position].cellCoordinates[0];
+            var endCoords = game.field[position].cellCoordinates[1];
+            startCoords[1] -= cellLength / 5;
+            endCoords[1] += cellLength / 5;
+            startCoords[0] = endCoords[0];
+            var useStart = true;
+            playerList.forEach(function (player) {
+                var circle = null;
+                if (useStart) {
+                    startCoords[0] -= cellLength / 3;
+                    circle = buildCircle(startCoords, player.avatarUrl, player.name,
+                        playersColors[player.order], player.score);
+                    useStart = false;
+                } else {
+                    endCoords[0] -= cellLength / 3;
+                    circle = buildCircle(endCoords, player.avatarUrl, player.name,
+                        playersColors[player.order], player.score);
+                    useStart = true;
+                }
+                myMap.geoObjects.add(circle);
+            });
+        }
+    }
 
 
     var balloonLayout = ymaps.templateLayoutFactory.createClass("", {}

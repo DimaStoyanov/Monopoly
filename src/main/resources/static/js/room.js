@@ -31,6 +31,7 @@ $.get('/player/info', function (data) {
 
 function init() {
     var socket = new SockJS('/lobby');
+    // socket.onclose = onClose;
     stompClient = Stomp.over(socket);
     stompClient.connect({}, onConnected, onError);
 
@@ -227,6 +228,10 @@ function onError() {
     connectingElement.style.color = 'red';
 }
 
+
+function onClose() {
+    init();
+}
 
 function sendMessage(event) {
     var messageContent = messageInput.value.trim();

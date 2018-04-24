@@ -9,7 +9,6 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 public class PlayerInfo {
-    @NonNull
     private UUID id;
 
     @NonNull

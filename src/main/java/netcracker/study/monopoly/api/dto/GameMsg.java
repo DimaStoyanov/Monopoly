@@ -16,8 +16,6 @@ public class GameMsg implements Serializable {
 
     private UUID idFrom;
 
-    private String avatarUrl;
-
     private GameChange gameChange;
 
     private Date sendAt;

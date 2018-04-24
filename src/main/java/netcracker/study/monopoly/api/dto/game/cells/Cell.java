@@ -10,24 +10,24 @@ import java.io.Serializable;
 @NoArgsConstructor
 public abstract class Cell implements Serializable {
     @NonNull
-    String type;
+    private String type;
 
     @NonNull
-    String name;
+    private String name;
 
     @NonNull
-    Integer position;
+    private Integer position;
 
     @NonNull
-    Integer cost;
+    private Integer cost;
 
     @NonNull
-    String imgPath;
+    private String imgPath;
 
     @NonNull
-    Double[][] cellCoordinates;
+    private Double[][] cellCoordinates;
 
     @NonNull
-    Double[][] routeCoordinates;
+    private Double[][] routeCoordinates;
 
 }
