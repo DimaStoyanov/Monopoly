@@ -24,6 +24,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static netcracker.study.monopoly.api.controllers.websocket.WebSocketEventListener.LEAVE_MSG_KEY;
+import static netcracker.study.monopoly.api.dto.OnlineStatusMsg.Place.ROOM;
+import static netcracker.study.monopoly.api.dto.OnlineStatusMsg.Status.OFFLINE;
+import static netcracker.study.monopoly.api.dto.OnlineStatusMsg.Status.ONLINE;
 import static netcracker.study.monopoly.api.dto.RoomMsg.Type.LEAVE;
 
 @Controller
@@ -37,14 +40,17 @@ public class RoomController {
     private final Map<Integer, Set<UUID>> usersInRooms;
     private final PlayerInfoConverter playerInfoConverter;
     private final GameManager gameManager;
+    private final PlayersTracking playersTracking;
 
     @Autowired
     public RoomController(SimpMessagingTemplate template, PlayerRepository playerRepository,
-                          PlayerInfoConverter playerInfoConverter, GameManager gameManager) {
+                          PlayerInfoConverter playerInfoConverter, GameManager gameManager,
+                          PlayersTracking playersTracking) {
         this.template = template;
         this.playerRepository = playerRepository;
         this.playerInfoConverter = playerInfoConverter;
         this.gameManager = gameManager;
+        this.playersTracking = playersTracking;
         lastRoomId = new AtomicInteger();
         usersInRooms = new HashMap<>();
     }
@@ -85,13 +91,14 @@ public class RoomController {
     }
 
     @MessageMapping("/rooms/{roomId}")
-    public void sendToRoom(@Payload RoomMsg msg, @DestinationVariable Integer roomId,
-                           SimpMessageHeaderAccessor headerAccessor) {
+    private void sendToRoom(@Payload RoomMsg msg, @DestinationVariable Integer roomId,
+                            SimpMessageHeaderAccessor headerAccessor) {
         log.info(msg);
         usersInRooms.computeIfAbsent(roomId, i -> new LinkedHashSet<>());
         Set<UUID> players = usersInRooms.get(roomId);
         switch (msg.getType()) {
             case JOIN:
+                playersTracking.setPlayerStatus(msg.getPlayerId(), ROOM, ONLINE, headerAccessor);
                 Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
                 RoomMsg leaveMsg = new RoomMsg(LEAVE, msg.getNickname(), msg.getPlayerId());
                 Runnable sendMsg = () -> this.sendToRoom(leaveMsg, roomId, headerAccessor);
@@ -99,12 +106,10 @@ public class RoomController {
                 players.add(msg.getPlayerId());
                 break;
             case LEAVE:
-                players.remove(msg.getPlayerId());
-                break;
             case KICK:
+                playersTracking.setPlayerStatus(msg.getPlayerId(), ROOM, OFFLINE, headerAccessor);
                 players.remove(msg.getPlayerId());
                 break;
-
 
         }
 

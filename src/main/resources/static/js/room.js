@@ -187,13 +187,6 @@ function onConnected() {
         })
     );
 
-    stompClient.send('/app/status', {}, JSON.stringify({
-        place: "ROOM",
-        status: "ONLINE",
-        playerId: selfInfo.id
-    }));
-
-
     connectingElement.classList.add('hidden');
     setTimeout(function () {
 

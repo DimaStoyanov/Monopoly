@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 public interface CellConverter {
     @Mappings({
             @Mapping(source = "owner.player.nickname", target = "owner.name"),
+            @Mapping(source = "owner.player.avatarUrl", target = "owner.avatarUrl"),
             @Mapping(target = "imgPath", ignore = true),
             @Mapping(target = "cellCoordinates", ignore = true),
             @Mapping(target = "routeCoordinates", ignore = true)
@@ -41,7 +42,6 @@ public interface CellConverter {
 
     @AfterMapping
     default void setCoordinatesAndImgHref(CellState cellState, @MappingTarget Cell cell) {
-        System.out.println(cellState);
         Cell initCell = GameCreator.INSTANCE.getInitCell(cell.getPosition());
         cell.setImgPath(initCell.getImgPath());
         cell.setCellCoordinates(initCell.getCellCoordinates());

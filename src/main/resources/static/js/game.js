@@ -51,13 +51,6 @@ function onConnected() {
         })
     );
 
-    stompClient.send('/app/status', {}, JSON.stringify({
-        place: "GAME",
-        status: "ONLINE",
-        playerId: selfInfo.id
-    }));
-
-
     connectingElement.classList.add('hidden');
 
 }
@@ -92,6 +85,7 @@ function onMessageReceived(payload) {
 
     } else if (message.type === 'STEP') {
         messageElement.classList.add('event-message');
+
     } else {
         messageElement.classList.add('chat-message');
 
