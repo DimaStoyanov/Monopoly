@@ -1,12 +1,14 @@
 package netcracker.study.monopoly.api.controllers.filters;
 
 import lombok.extern.log4j.Log4j2;
+import netcracker.study.monopoly.api.dto.GithubUser;
 import netcracker.study.monopoly.models.entities.Player;
 import netcracker.study.monopoly.models.repositories.PlayerRepository;
 import org.apache.catalina.session.StandardSessionFacade;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
@@ -16,6 +18,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +42,6 @@ public class RegistrationFilter extends GenericFilterBean {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         StandardSessionFacade session = (StandardSessionFacade) req.getSession(false);
-        // "Infinity" session
         OAuth2Authentication authentication = (OAuth2Authentication)
                 SecurityContextHolder.getContext().getAuthentication();
 
@@ -51,10 +53,21 @@ public class RegistrationFilter extends GenericFilterBean {
 
             Player player = playerRepository.findByNickname(name)
                     .orElseGet(() -> new Player(name));
+
             player.setAvatarUrl((String) details.get("avatar_url"));
+            RestTemplate restTemplate = new RestTemplate();
+            String followers_url = (String) details.get("followers_url");
+            GithubUser[] githubFollowers = restTemplate.getForObject(followers_url, GithubUser[].class, new HashMap<>());
+
+            for (GithubUser githubUser : githubFollowers) {
+                // TODO: not add followers, that user already removes from friends
+                playerRepository.findByNickname(githubUser.getLogin())
+                        .ifPresent(player::addFriend);
+            }
+
             playerRepository.save(player);
             log.info(String.format("Player %s logged in", player.getNickname()));
-            session.setMaxInactiveInterval(0);
+            session.setMaxInactiveInterval(60 * 60);
             session.setAttribute("id", player.getId());
         }
 
