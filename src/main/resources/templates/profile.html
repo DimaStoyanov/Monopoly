@@ -39,6 +39,8 @@ http://www.thymeleaf.org/dandelion/datatables ">
 <input id="friend_nickname" type="text" title="Nickname">
 <button onclick="onAddFriendClick()"> Add friend</button>
 
+<button onclick="onAddFollowersClick()">Add followers to friends</button>
+<button onclick="onRemoveAllFriendsClick()">Remove all friends</button>
 
 <button onclick="onCreateRoomClick()">Create room</button>
 
@@ -56,6 +58,21 @@ http://www.thymeleaf.org/dandelion/datatables ">
         });
     }
 
+    function onAddFollowersClick() {
+        if (confirm("Are you sure you want add ALL your Github followers, registered in this game, to list of your friends?")) {
+            $.ajax({
+                url: '/player/add_followers',
+                type: 'PUT',
+                success: function (data) {
+                    alert(data)
+                },
+                error: function (data) {
+                    alert(data)
+                }
+            })
+        }
+    }
+
     function onRemoveFriendClick(el) {
         var nickname = el.id.substr(7);
         $.ajax({
@@ -63,8 +80,26 @@ http://www.thymeleaf.org/dandelion/datatables ">
             type: 'PUT',
             success: function (data) {
                 alert(data)
+            },
+            error: function (e) {
+                alert(e)
             }
         })
+    }
+
+    function onRemoveAllFriendsClick() {
+        if (confirm("Are you sure you want to CLEAR your friend list")) {
+            $.ajax({
+                url: '/player/remove_friends',
+                type: 'PUT',
+                success: function (data) {
+                    alert(data)
+                },
+                error: function (e) {
+                    alert(e)
+                }
+            })
+        }
     }
 
     function onCreateRoomClick() {

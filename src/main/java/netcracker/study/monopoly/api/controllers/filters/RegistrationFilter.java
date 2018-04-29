@@ -1,7 +1,6 @@
 package netcracker.study.monopoly.api.controllers.filters;
 
 import lombok.extern.log4j.Log4j2;
-import netcracker.study.monopoly.api.dto.GithubUser;
 import netcracker.study.monopoly.models.entities.Player;
 import netcracker.study.monopoly.models.repositories.PlayerRepository;
 import org.apache.catalina.session.StandardSessionFacade;
@@ -18,7 +17,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,14 +54,6 @@ public class RegistrationFilter extends GenericFilterBean {
 
             player.setAvatarUrl((String) details.get("avatar_url"));
             RestTemplate restTemplate = new RestTemplate();
-            String followers_url = (String) details.get("followers_url");
-            GithubUser[] githubFollowers = restTemplate.getForObject(followers_url, GithubUser[].class, new HashMap<>());
-
-            for (GithubUser githubUser : githubFollowers) {
-                // TODO: not add followers, that user already removes from friends
-                playerRepository.findByNickname(githubUser.getLogin())
-                        .ifPresent(player::addFriend);
-            }
 
             playerRepository.save(player);
             log.info(String.format("Player %s logged in", player.getNickname()));

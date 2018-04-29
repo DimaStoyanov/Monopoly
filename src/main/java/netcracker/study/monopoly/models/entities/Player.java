@@ -54,5 +54,9 @@ public class Player extends AbstractIdentifiableObject implements Serializable {
         return friends.remove(player);
     }
 
+    public void removeAllFriends() {
+        friends = new HashSet<>();
+    }
+
 
 }

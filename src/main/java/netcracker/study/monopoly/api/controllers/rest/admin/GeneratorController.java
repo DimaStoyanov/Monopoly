@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 public class GeneratorController {
 
+
     @GetMapping("/images")
     public List<String> getImages() {
         File file = new File("src/main/resources/static/game/images");

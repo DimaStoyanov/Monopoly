@@ -1,11 +1,25 @@
 ymaps.ready(init);
 
+var images = null;
+
+$.ajax({
+    url: "/admin/images",
+    error: function () {
+        alert("Not allowed");
+        $(location).attr('href', '/')
+    },
+    success: function (data) {
+        images = data
+    }
+});
+
+
 function init() {
-    var center = [55.674, 37.601];
+    var center = [59.91, 30.33];
 
     var myMap = new ymaps.Map('map', {
         center: center,
-        zoom: 11,
+        zoom: 12,
         controls: ['routePanelControl']
     }, {
         searchControlProvider: 'yandex#search'
@@ -14,31 +28,23 @@ function init() {
     var cells = [];
     var routeCount = 0;
 
-    $.ajax({
-        url: "/admin/images",
-        error: function () {
-            alert("Need admin role");
-            $(location).attr('href', '/admin/upgrade')
-        },
-        success: function (data) {
-            data.forEach(function (item) {
-                var startCoords = [center[0] + Math.random() * 0.2,
-                    center[1] + Math.random() * 0.2];
-                var cell = buildRectangle([
-                    startCoords,
-                    [startCoords[0] + 0.01, startCoords[1] + 0.01]
-                ], item);
-                cells.push({
-                    imgPath: item,
-                    cell: cell
-                });
-                myMap.geoObjects.add(cell)
-            })
 
-        }
+    images.forEach(function (item) {
+        var startCoords = [center[0] + Math.random() * 0.1,
+            center[1] + Math.random() * 0.1];
+        var cell = buildRectangle([
+            startCoords,
+            [startCoords[0] + 0.01, startCoords[1] + 0.01]
+        ], item);
+        cells.push({
+            imgPath: item,
+            cell: cell
+        });
+        myMap.geoObjects.add(cell)
     });
 
-    var buildRectangle = function (coords, imgHref) {
+
+    function buildRectangle(coords, imgHref) {
         return new ymaps.Rectangle(coords, null, {
             // Опции.
             // Цвет и прозрачность заливки.
@@ -60,9 +66,7 @@ function init() {
             borderRadius: 6
         });
 
-    };
-
-
+    }
     var balloonLayout = ymaps.templateLayoutFactory.createClass("", {}
     );
 
@@ -98,7 +102,7 @@ function init() {
 
     var control = myMap.controls.get('routePanelControl');
 
-    // Зададим состояние панели для построения машрутов.
+// Зададим состояние панели для построения машрутов.
     control.routePanel.state.set({
         // Тип маршрутизации.
         // type: 'masstransit',

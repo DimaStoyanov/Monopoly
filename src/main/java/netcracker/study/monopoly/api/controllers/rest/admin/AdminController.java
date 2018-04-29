@@ -1,5 +1,6 @@
 package netcracker.study.monopoly.api.controllers.rest.admin;
 
+import lombok.extern.log4j.Log4j2;
 import netcracker.study.monopoly.exceptions.PlayerNotFoundException;
 import netcracker.study.monopoly.models.entities.Player;
 import netcracker.study.monopoly.models.repositories.PlayerRepository;
@@ -14,15 +15,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
+@Log4j2
 public class AdminController {
     private final PlayerRepository playerRepository;
 
-    private static final List<String> ADMINS = Collections.unmodifiableList(Arrays.asList(
-            "DimaStoyanov", "Kest1996", "bonart6"
+    private static final List<String> ADMINS = Collections.unmodifiableList(Collections.singletonList(
+            "DimaStoyanov"
     ));
 
     public AdminController(PlayerRepository playerRepository) {
@@ -65,9 +70,12 @@ public class AdminController {
     public String upgradeAuthorities() {
         OAuth2Authentication authentication =
                 (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
+
         if (!ADMINS.contains(authentication.getName())) {
             return "Not allowed";
         }
+
+        log.info(String.format("%s upgraded to ADMIN role", authentication.getName()));
         Collection<GrantedAuthority> authorities =
                 authentication.getAuthorities();
         SimpleGrantedAuthority admin = new SimpleGrantedAuthority("ROLE_ADMIN");
