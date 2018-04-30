@@ -1,0 +1,27 @@
+{
+  "type": "STREET",
+  "name": "Admiralteyskaya",
+  "position": 21,
+  "cost": 350,
+  "imgPath": "game/images/admiralteyskaya.jpg",
+  "cellCoordinates": [
+    [
+      59.9328691679201,
+      30.308371935579697
+    ],
+    [
+      59.942884247885246,
+      30.318371935579645
+    ]
+  ],
+  "routeCoordinates": [
+    [
+      60.02901871179007,
+      30.447737813633363
+    ],
+    [
+      60.01505706563303,
+      30.341050267857614
+    ]
+  ]
+}

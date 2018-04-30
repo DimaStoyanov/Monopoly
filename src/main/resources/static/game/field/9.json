@@ -1,0 +1,27 @@
+{
+  "type": "STREET",
+  "name": "Ladozhskiy railway station",
+  "position": 9,
+  "cost": 180,
+  "imgPath": "game/images/ladozhskiy_vokzal.jpg",
+  "cellCoordinates": [
+    [
+      59.929553146513776,
+      30.437175568979924
+    ],
+    [
+      59.93957118564495,
+      30.447175568980025
+    ]
+  ],
+  "routeCoordinates": [
+    [
+      59.925470341689724,
+      30.394996356376268
+    ],
+    [
+      59.933676976395425,
+      30.43692464769705
+    ]
+  ]
+}

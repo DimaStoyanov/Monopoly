@@ -1,0 +1,27 @@
+{
+  "type": "STREET",
+  "name": "Kamenoostrovskiy av.",
+  "position": 19,
+  "cost": 300,
+  "imgPath": "game/images/kamenoostrovskiy.jpg",
+  "cellCoordinates": [
+    [
+      59.961725158870856,
+      30.30620866567589
+    ],
+    [
+      59.971725154638605,
+      30.316208665675862
+    ]
+  ],
+  "routeCoordinates": [
+    [
+      59.93056189876509,
+      30.24789979651714
+    ],
+    [
+      59.91395109763434,
+      30.297467019113412
+    ]
+  ]
+}

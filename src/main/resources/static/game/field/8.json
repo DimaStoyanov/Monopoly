@@ -1,0 +1,27 @@
+{
+  "type": "STREET",
+  "name": "Alexander Nevsky Square",
+  "position": 8,
+  "cost": 160,
+  "imgPath": "game/images/aleksandra_nevskogo.jpg",
+  "cellCoordinates": [
+    [
+      59.91955392536638,
+      30.384751502584255
+    ],
+    [
+      59.92957663750225,
+      30.39475150258461
+    ]
+  ],
+  "routeCoordinates": [
+    [
+      60.01463485784772,
+      30.34046039582963
+    ],
+    [
+      60.00784512506452,
+      30.263470268266794
+    ]
+  ]
+}

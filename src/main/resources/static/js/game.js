@@ -152,10 +152,13 @@ ymaps.ready(init);
 
 function init() {
     var myMap = new ymaps.Map('map', {
-        center: [55.675, 37.658],
+        center: [
+            60.01517978948965,
+            30.338276861514988
+        ],
         zoom: 12
     }, {
-        searchControlProvider: 'yandex#search'
+        // searchControlProvider: 'yandex#search'
     });
 
 
@@ -206,15 +209,7 @@ function init() {
 
     };
 
-    var myRectangle = buildRectangle([[55.70, 37.55], [55.72, 37.53]], '#0000FF',
-        'game/images/arbat.png'),
-        myRectangle2 = buildRectangle([[55.66, 37.60], [55.68, 37.62]], '#0000FF',
-            'https://pp.userapi.com/c846419/v846419978/37f0/PXkX-6KioZs.jpg'),
-        myRectangle3 = buildRectangle([[55.65, 37.55], [55.67, 37.53]], '#0000FF',
-            'https://pp.userapi.com/c846419/v846419978/37d2/mQO76o1afHw.jpg'),
-        myRectangle4 = buildRectangle([[55.60, 37.59], [55.62, 37.57]], '#0000FF',
-            'https://pp.userapi.com/c846419/v846419978/37cb/WLLZYFaEjcg.jpg'),
-        myRectangle5 = buildRectangle([[55.62, 37.66], [55.60, 37.69]], '#FF0000',
+    var myRectangle5 = buildRectangle([[55.62, 37.66], [55.60, 37.69]], '#FF0000',
             'https://pp.userapi.com/c846419/v846419978/37b0/uNV-aWK8C7s.jpg');
 
     myRectangle5.events.add('click', function (e) {

@@ -1,0 +1,27 @@
+{
+  "type": "STREET",
+  "name": "Petropavlovskaya fortress",
+  "position": 20,
+  "cost": 320,
+  "imgPath": "game/images/petropavlovskaya.jpg",
+  "cellCoordinates": [
+    [
+      59.94730441009711,
+      30.309522646473734
+    ],
+    [
+      59.95731697757274,
+      30.31952264647353
+    ]
+  ],
+  "routeCoordinates": [
+    [
+      59.943024886470724,
+      30.275241878356926
+    ],
+    [
+      59.92450307222573,
+      30.317556407775815
+    ]
+  ]
+}

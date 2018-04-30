@@ -1,0 +1,27 @@
+{
+  "type": "STREET",
+  "name": "Pirogovskaya embankment",
+  "position": 18,
+  "cost": 300,
+  "imgPath": "game/images/pirogovskaya.jpg",
+  "cellCoordinates": [
+    [
+      59.963021165697036,
+      30.333995384944153
+    ],
+    [
+      59.97302805120698,
+      30.34399538494418
+    ]
+  ],
+  "routeCoordinates": [
+    [
+      59.91904144840185,
+      30.324818081485418
+    ],
+    [
+      59.921562302812845,
+      30.34580368481822
+    ]
+  ]
+}

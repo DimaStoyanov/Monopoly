@@ -1,0 +1,27 @@
+{
+  "type": "STREET",
+  "name": "Baltiysliy railway station",
+  "position": 6,
+  "cost": 140,
+  "imgPath": "game/images/baltiyskiy.jpg",
+  "cellCoordinates": [
+    [
+      59.90361311928614,
+      30.294527180808796
+    ],
+    [
+      59.91363856371778,
+      30.30452718080877
+    ]
+  ],
+  "routeCoordinates": [
+    [
+      60.00488114242732,
+      30.25734548177074
+    ],
+    [
+      59.987125090625824,
+      30.21717671956361
+    ]
+  ]
+}

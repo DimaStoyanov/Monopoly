@@ -1,0 +1,27 @@
+{
+  "type": "STREET",
+  "name": "Tauride Gardens",
+  "position": 17,
+  "cost": 280,
+  "imgPath": "game/images/tavricheskiy.jpg",
+  "cellCoordinates": [
+    [
+      59.94015925373779,
+      30.36854372005853
+    ],
+    [
+      59.95015792460218,
+      30.378543720058275
+    ]
+  ],
+  "routeCoordinates": [
+    [
+      59.95053669192179,
+      30.309421508715726
+    ],
+    [
+      59.94095620377752,
+      30.30817696373261
+    ]
+  ]
+}

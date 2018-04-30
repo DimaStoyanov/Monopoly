@@ -1,0 +1,27 @@
+{
+  "type": "STREET",
+  "name": "Komendantskiy av.",
+  "position": 2,
+  "cost": 60,
+  "imgPath": "game/images/komendtanskiy.jpg",
+  "cellCoordinates": [
+    [
+      60.005022117889936,
+      30.252224893016237
+    ],
+    [
+      60.01502308292304,
+      30.262224893015983
+    ]
+  ],
+  "routeCoordinates": [
+    [
+      59.90846898573464,
+      30.304801226448266
+    ],
+    [
+      59.90214243711362,
+      30.318555594276802
+    ]
+  ]
+}

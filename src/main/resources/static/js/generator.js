@@ -16,6 +16,8 @@ $.ajax({
 
 function init() {
     var center = [59.91, 30.33];
+    var cellIndex = 0;
+
 
     var myMap = new ymaps.Map('map', {
         center: center,
@@ -36,10 +38,11 @@ function init() {
             startCoords,
             [startCoords[0] + 0.01, startCoords[1] + 0.01]
         ], item);
-        cells.push({
+        var lastIndex = cells.push({
             imgPath: item,
             cell: cell
-        });
+        }) - 1;
+        addMenu(cell, cells[lastIndex]);
         myMap.geoObjects.add(cell)
     });
 
@@ -67,6 +70,41 @@ function init() {
         });
 
     }
+
+
+    function addMenu(rectangle, cell) {
+        rectangle.events.add('click', function (e) {
+            // Если меню метки уже отображено, то убираем его.
+            if ($('#menu').css('display') === 'block') {
+                $('#menu').remove();
+            } else {
+                // HTML-содержимое контекстного меню.
+                var menuContent =
+                    '<div id="menu">\
+                <div align="center"><input id="setnext" value="Set next"/></div>\
+                </div>';
+
+                // Размещаем контекстное меню на странице
+                $('body').append(menuContent);
+
+                // Задаем позицию меню.
+                $('#menu').css({
+                    left: e.get('pagePixels')[0],
+                    top: e.get('pagePixels')[1]
+                });
+
+
+                $('#menu').find('input[id="setnext"]').click(function () {
+                    cell['position'] = cellIndex++;
+                    // Удаляем контекстное меню.
+                    $('#menu').remove();
+                });
+            }
+        });
+
+    }
+
+
     var balloonLayout = ymaps.templateLayoutFactory.createClass("", {}
     );
 
@@ -116,6 +154,12 @@ function init() {
         //to: 'Петербург'
     });
 
+    function sortCells() {
+        cells.sort(function (a, b) {
+            return !a.position ? b : !b.position ? a : a.position - b.position;
+        })
+    }
+
 
     var addRouteButton = document.getElementById("btn_add_route");
     addRouteButton.addEventListener('click', function () {
@@ -140,6 +184,9 @@ function init() {
 
         var headerRow = table.insertRow();
 
+        var position = headerRow.insertCell();
+        position.innerHTML = "Position";
+
         var path = headerRow.insertCell();
         path.innerHTML = "Image path";
 
@@ -149,9 +196,13 @@ function init() {
         var routeCoords = headerRow.insertCell();
         routeCoords.innerHTML = "Route coordinates";
 
+        sortCells();
 
         cells.forEach(function (item) {
             var row = table.insertRow();
+
+            var position = row.insertCell();
+            position.innerHTML = item.position;
 
             var path = row.insertCell();
             path.innerHTML = item.imgPath;
@@ -162,6 +213,35 @@ function init() {
             var routeCoords = row.insertCell();
             routeCoords.innerHTML = item.routeCoords.join("\n")
 
+        })
+    });
+
+    var saveResultsButton = document.getElementById("btn_save_results");
+    saveResultsButton.addEventListener('click', function () {
+
+        sortCells();
+
+        var reqBody = [];
+        cells.forEach(function (value) {
+            reqBody.push({
+                position: value.position,
+                imgPath: value.imgPath,
+                cellCoordinates: value.cell.geometry.getCoordinates(),
+                routeCoordinates: value.routeCoords
+            })
+        });
+        $.ajax({
+            url: '/admin/field',
+            type: 'PUT',
+            data: JSON.stringify(reqBody),
+            // dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                alert(data)
+            },
+            error: function (e) {
+                alert(e.error)
+            }
         })
     })
 

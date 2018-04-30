@@ -1,0 +1,27 @@
+{
+  "type": "STREET",
+  "name": "Krestovskiy island",
+  "position": 13,
+  "cost": 220,
+  "imgPath": "game/images/krestovskiy.jpg",
+  "cellCoordinates": [
+    [
+      59.96753594642461,
+      30.25485784619209
+    ],
+    [
+      59.977519435627215,
+      30.264857846192342
+    ]
+  ],
+  "routeCoordinates": [
+    [
+      59.89337242928115,
+      30.325727983414883
+    ],
+    [
+      59.921282667819746,
+      30.395204239409903
+    ]
+  ]
+}

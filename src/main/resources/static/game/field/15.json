@@ -1,0 +1,27 @@
+{
+  "type": "STREET",
+  "name": "Technologicheskiy institute",
+  "position": 15,
+  "cost": 260,
+  "imgPath": "game/images/technologicheskiy.jpg",
+  "cellCoordinates": [
+    [
+      59.9143175505622,
+      30.314239658587297
+    ],
+    [
+      59.92433568202636,
+      30.324239658587118
+    ]
+  ],
+  "routeCoordinates": [
+    [
+      59.93627259495201,
+      30.318410553008967
+    ],
+    [
+      59.93383900979864,
+      30.338344730407577
+    ]
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "type": "STREET",
+  "name": "The Moscow gates",
+  "position": 7,
+  "cost": 140,
+  "imgPath": "game/images/moskovskie_vorota.jpg",
+  "cellCoordinates": [
+    [
+      59.89199380682871,
+      30.31542551638272
+    ],
+    [
+      59.90202102746296,
+      30.32542551638292
+    ]
+  ],
+  "routeCoordinates": [
+    [
+      59.99952238025525,
+      30.35733519003681
+    ],
+    [
+      59.99019260435763,
+      30.299013237216013
+    ]
+  ]
+}
