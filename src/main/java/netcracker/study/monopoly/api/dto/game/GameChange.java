@@ -12,8 +12,14 @@ public class GameChange {
     private UUID turnOf;
     private List<Gamer> gamersChange = new ArrayList<>();
     private Street streetChange;
+    private List<String> changeDescriptions = new ArrayList<>();
 
     public void addGamerChange(Gamer gamer) {
         gamersChange.add(gamer);
     }
+
+    public void addChangeDescription(String description) {
+        changeDescriptions.add(description);
+    }
 }
+

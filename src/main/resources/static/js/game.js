@@ -16,6 +16,16 @@ var cells = [];
 var cellLength = 0.01;
 
 var playersColors = ['#5d80ca', '#3cc72d', '#b52dc7', '#b52dc7'];
+var panOptions = {
+    flying: true
+};
+
+
+$.get('/player/game', function (gameId) {
+    if (!gameId) {
+        $(location).attr('href', '/');
+    }
+});
 
 function connectSocket() {
     $.get('/player/info', function (data) {
@@ -153,38 +163,69 @@ ymaps.ready(init);
 function init() {
     var myMap = new ymaps.Map('map', {
         center: [
-            60.01517978948965,
-            30.338276861514988
+            59.929732867914836,
+            30.338352053926247
         ],
-        zoom: 12
+        zoom: 11
     }, {
         // searchControlProvider: 'yandex#search'
     });
 
 
-    $.get('/player/game', function (gameId) {
-        if (!gameId) {
-            $(location).attr('href', '/');
-            return;
-        }
-        $.get('/api/game/' + gameId, function (data) {
-            game = data;
-            connectSocket();
-            drawScoreTable();
-            game.players.forEach(function (item) {
-                playersMap[item.id] = item;
-            });
-            game.field.forEach(function (item) {
-                var cell = buildRectangle(item.cellCoordinates, '#999966', item.imgPath);
-                myMap.geoObjects.add(cell);
-                cells.push(cell);
-                var route = buildRoute(item.routeCoordinates, '#54d6f6');
-                myMap.geoObjects.add(route);
-            });
+    $.get('/api/v1/game/', function (data) {
+        game = data;
+        connectSocket();
+        drawScoreTable();
+        game.players.forEach(function (item) {
+            playersMap[item.id] = item;
+        });
+        game.field.forEach(function (item) {
+            var cell = buildRectangle(item.cellCoordinates, '#999966', item.imgPath);
+            myMap.geoObjects.add(cell);
+            cells.push(cell);
+            var route = buildRoute(item.routeCoordinates, '#54d6f6');
+            myMap.geoObjects.add(route);
+        });
 
-            drawPlayers();
-        })
+        cells.forEach(addMenu);
+        drawButtons();
+        drawPlayers();
     });
+
+    function getSelfPlayerState() {
+        var result = null;
+        game.players.forEach(function (item) {
+            if (item.name === selfInfo.nickname) {
+                result = item;
+            }
+        });
+        return result;
+    }
+
+    function drawButtons() {
+        var btnYourLocation = new ymaps.control.Button('Move to your position'),
+            btnTurnOfLocation = new ymaps.control.Button('Move to walking player');
+
+        btnYourLocation.options.set('maxWidth', 200);
+        btnTurnOfLocation.options.set('maxWidth', 200);
+
+        btnYourLocation.events.add('click', function () {
+            var position = getSelfPlayerState().position;
+            var coords = game.field[position].cellCoordinates[0];
+            myMap.panTo(coords, panOptions);
+            btnYourLocation.deselect();
+        });
+        btnTurnOfLocation.events.add('click', function () {
+            var position = game.turnOf.position;
+            var coords = game.field[position].cellCoordinates[0];
+            myMap.panTo(coords, panOptions);
+            btnTurnOfLocation.deselect();
+        });
+
+        myMap.controls
+            .add(btnYourLocation)
+            .add(btnTurnOfLocation)
+    }
 
     var buildRectangle = function (coords, strokeColor, imgHref) {
         return new ymaps.Rectangle(coords, null, {
@@ -209,8 +250,54 @@ function init() {
 
     };
 
+    function getPrevIndexSafely(index) {
+        return index - 1 < 0 ? cells.length - 1 : index - 1;
+    }
+
+    function getNextIndexSafely(index) {
+        return index + 1 >= cells.length ? 0 : index + 1;
+    }
+
+    function addMenu(rectangle, index) {
+        rectangle.events.add('click', function (e) {
+            if ($('#menu').css('display') === 'block') {
+                $('#menu').remove();
+            } else {
+                // HTML-содержимое контекстного меню.
+                var menuContent =
+                    '<div id="menu">\
+                <div align="center"><input id="next" value="Next cell"/></div>\
+                <div align="center"><input id="prev" value="Previous cell"/></div>\
+                </div>';
+
+                // Размещаем контекстное меню на странице
+                $('body').append(menuContent);
+
+                // Задаем позицию меню.
+                $('#menu').css({
+                    left: e.get('pagePixels')[0],
+                    top: e.get('pagePixels')[1]
+                });
+
+
+                $('#menu').find('input[id="next"]').click(function () {
+                    var nextCell = cells[getNextIndexSafely(index)];
+                    var coords = nextCell.geometry.getCoordinates()[0];
+                    myMap.panTo(coords, panOptions);
+                    $('#menu').remove();
+                });
+                $('#menu').find('input[id="prev"]').click(function () {
+                    var prevCell = cells[getPrevIndexSafely(index)];
+                    var coords = prevCell.geometry.getCoordinates()[0];
+                    myMap.panTo(coords, panOptions);
+                    $('#menu').remove();
+                });
+            }
+        })
+    }
+
     var myRectangle5 = buildRectangle([[55.62, 37.66], [55.60, 37.69]], '#FF0000',
-            'https://pp.userapi.com/c846419/v846419978/37b0/uNV-aWK8C7s.jpg');
+        'https://pp.userapi.com/c846419/v846419978/37b0/uNV-aWK8C7s.jpg');
 
     myRectangle5.events.add('click', function (e) {
         // Если меню метки уже отображено, то убираем его.

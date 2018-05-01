@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static netcracker.study.monopoly.api.controllers.rest.PlayerController.PROFILE_ID_KEY;
+
 
 /**
  * This filter insert into database new players and update profile if session is new
@@ -58,7 +60,7 @@ public class RegistrationFilter extends GenericFilterBean {
             playerRepository.save(player);
             log.info(String.format("Player %s logged in", player.getNickname()));
             session.setMaxInactiveInterval(60 * 60);
-            session.setAttribute("id", player.getId());
+            session.setAttribute(PROFILE_ID_KEY, player.getId());
         }
 
         sessionsId.add(session.getId());

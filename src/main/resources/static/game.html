@@ -14,11 +14,7 @@
 <body>
 
 <div id="map"></div>
-
-
 <div id="chat-page">
-
-
     <div class="chat-container">
         <div class="chat-header">
             <h2>Game chat</h2>
@@ -29,7 +25,7 @@
         <ul id="messageArea">
 
         </ul>
-        <form id="messageForm" name="messageForm" nameForm="messageForm">
+        <form id="messageForm" name="messageForm">
             <div class="form-group">
                 <div class="input-group clearfix">
                     <input type="text" id="message" placeholder="Type a message..." autocomplete="off"
@@ -38,6 +34,15 @@
                 </div>
             </div>
         </form>
+    </div>
+    <div class="owns-container">
+        <div class="chat-header">
+            <h2>Owns</h2>
+        </div>
+        <div class="score-list">
+            <table id="owns-table">
+            </table>
+        </div>
     </div>
     <div class="score-container">
         <div class="chat-header">
@@ -49,6 +54,8 @@
         </div>
     </div>
 </div>
+
+
 <script type="text/javascript" src="js/game.js"></script>
 </body>
 

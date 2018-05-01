@@ -29,8 +29,9 @@ import static java.lang.String.format;
 @Log4j2
 public class PlayerController {
 
-    private static final String ROOM_ID_KEY = "roomId";
-    private static final String GAME_ID_KEY = "gameId";
+    public static final String ROOM_ID_KEY = "roomId";
+    public static final String GAME_ID_KEY = "gameId";
+    public static final String PROFILE_ID_KEY = "id";
 
 
     private final PlayerRepository playerRepository;

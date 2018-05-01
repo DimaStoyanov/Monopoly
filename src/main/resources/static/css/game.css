@@ -1,6 +1,6 @@
 #map {
     width: 100%;
-    height: 50%;
+    height: 100%;
 }
 
 #menu {
@@ -131,35 +131,36 @@ button.green {
     margin-top: 10px;
 }
 
-#chat-page {
-    position: relative;
-    height: 50%;
-}
-
-.chat-container {
-    left: 25px;
-    top: 10px;
-    width: 70%;
-    height: calc(80% - 60px);
-    position: absolute;
-    background-color: #fff;
-    box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
-}
-
 .score-list {
-    height: 75%;
+    height: 100%;
+    width: 100%;
     overflow: auto;
 }
 
 .score-container {
-    left: calc(75%);
-    top: 10px;
-    width: calc(25% - 25px);
+    width: calc(25% - 5px);
     position: absolute;
-    background-color: #fff;
-    box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
-    height: 85%;
-    /*position: relative;*/
+    height: 40%;
+    left: 75%;
+    bottom: 5px;
+    opacity: 0.8;
+    padding: 5px;
+    font-family: Courier, sans-serif;
+    font-size: 14px;
+    background: white;
+}
+
+.owns-container {
+    width: calc(35%);
+    position: absolute;
+    height: 40%;
+    left: calc(40% + 5px);
+    bottom: 5px;
+    opacity: 0.8;
+    padding: 5px;
+    font-family: Courier, sans-serif;
+    font-size: 14px;
+    background: white;
 }
 
 .score-list table {
@@ -169,16 +170,31 @@ button.green {
 
 .score-list tr {
     width: inherit;
+
+}
+
+.chat-container {
+    width: 40%;
+    position: absolute;
+    height: 40%;
+    left: 5px;
+    bottom: 5px;
+    opacity: 0.8;
+    padding: 5px;
+    font-family: Courier, sans-serif;
+    font-size: 14px;
+    background: white;
 }
 
 #chat-page ul {
+
     list-style-type: none;
     background-color: #FFF;
     margin: 0;
     overflow: auto;
-    overflow-y: scroll;
+    /*overflow-y: ;*/
     padding: 0 20px 0 20px;
-    height: calc(100% - 50px);
+    height: calc(50%);
 }
 
 #chat-page #messageForm {
