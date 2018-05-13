@@ -121,6 +121,22 @@ button.yellow {
     color: #fff;
 }
 
+button.frame {
+    opacity: 0.3;
+
+    height: 40px;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12);
+
+    color: #fff;
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+}
+
+image.in-frame-button {
+    height: 40px;
+}
+
 button.green {
     background-color: limegreen;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12);
@@ -138,29 +154,85 @@ button.green {
 }
 
 .score-container {
-    width: calc(25% - 5px);
+    width: 25%;
     position: absolute;
     height: 40%;
     left: 75%;
-    bottom: 5px;
+    bottom: 0;
     opacity: 0.8;
-    padding: 5px;
+    padding: 0;
     font-family: Courier, sans-serif;
     font-size: 14px;
     background: white;
 }
 
 .owns-container {
-    width: calc(35%);
+    width: 35%;
     position: absolute;
     height: 40%;
-    left: calc(40% + 5px);
-    bottom: 5px;
+    left: 40%;
+    bottom: 0;
     opacity: 0.8;
-    padding: 5px;
+    padding: 0;
     font-family: Courier, sans-serif;
     font-size: 14px;
     background: white;
+}
+
+.turnof-container {
+    width: 10%;
+    position: absolute;
+    height: 20%;
+    left: 90%;
+    top: 0;
+    /*padding: 5px;*/
+    /*text-align: center;*/
+    font-family: Courier, sans-serif;
+    font-size: 14px;
+    background: white;
+    opacity: 0.8;
+}
+
+.offers-container {
+    width: 25%;
+    position: absolute;
+    height: 40%;
+    left: 75%;
+    bottom: 0;
+    opacity: 0.8;
+    padding: 0;
+    font-family: Courier, sans-serif;
+    font-size: 14px;
+    background: white;
+    visibility: hidden;
+}
+
+.auction-container {
+    width: 35%;
+    position: absolute;
+    height: 40%;
+    left: 40%;
+    bottom: 0;
+    opacity: 0.8;
+    padding: 0;
+    font-family: Courier, sans-serif;
+    font-size: 14px;
+    background: white;
+    visibility: hidden;
+}
+
+.owns-buttons {
+    position: absolute;
+    left: calc(40% + 5px);
+    bottom: calc(40% - 52px);
+    padding: 5px;
+}
+
+.score-buttons {
+    position: absolute;
+    left: 75%;
+    bottom: calc(40% - 52px);
+    padding: 5px;
 }
 
 .score-list table {
@@ -177,16 +249,16 @@ button.green {
     width: 40%;
     position: absolute;
     height: 40%;
-    left: 5px;
-    bottom: 5px;
+    left: 0;
+    bottom: 0;
     opacity: 0.8;
-    padding: 5px;
+    padding: 0;
     font-family: Courier, sans-serif;
     font-size: 14px;
     background: white;
 }
 
-#chat-page ul {
+#frames ul {
 
     list-style-type: none;
     background-color: #FFF;
@@ -197,39 +269,46 @@ button.green {
     height: calc(50%);
 }
 
-#chat-page #messageForm {
+#frames #messageForm {
     padding: 20px;
 }
 
-#chat-page ul li {
+.dropdown-menu {
+    top: auto;
+    left: auto;
+    overflow: auto;
+    max-height: 240px;
+}
+
+#frames ul li {
     line-height: 1.5rem;
     padding: 10px 20px;
     margin: 0;
     border-bottom: 1px solid #f4f4f4;
 }
 
-#chat-page ul li p {
+#frames ul li p {
     margin: 0;
 }
 
-#chat-page .event-message {
+#frames .event-message {
     width: 100%;
     text-align: center;
     clear: both;
 }
 
-#chat-page .event-message p {
+#frames .event-message p {
     color: #777;
     font-size: 14px;
     word-wrap: break-word;
 }
 
-#chat-page .chat-message {
+#frames .chat-message {
     padding-left: 68px;
     position: relative;
 }
 
-#chat-page .chat-message i {
+#frames .chat-message i {
     position: absolute;
     width: 42px;
     height: 42px;
@@ -246,7 +325,11 @@ button.green {
     text-transform: uppercase;
 }
 
-#chat-page .chat-message img {
+img {
+    height: 40px;
+}
+
+#frames .chat-message img {
     position: absolute;
     width: 42px;
     height: 42px;
@@ -263,12 +346,12 @@ button.green {
     text-transform: uppercase;
 }
 
-#chat-page .chat-message span {
+#frames .chat-message span {
     color: #333;
     font-weight: 600;
 }
 
-#chat-page .chat-message p {
+#frames .chat-message p {
     color: #43464b;
 }
 
@@ -290,9 +373,36 @@ button.green {
     border-bottom: 1px solid #ececec;
 }
 
+.turnof-header {
+    text-align: center;
+    padding: 5px;
+    border-bottom: 1px solid #ececec;
+}
+
+#turnof-img {
+    position: absolute;
+    height: 50%;
+    padding: 5px;
+    left: 25%;
+
+}
+
+#turnof-name {
+    position: absolute;
+    text-align: center;
+    bottom: 5px;
+    height: 15%;
+    width: 100%;
+}
+
 .chat-header h2 {
     margin: 0;
     font-weight: 500;
+}
+
+.turnof-header h3 {
+    margin: 0;
+    font-weight: 200;
 }
 
 .connecting {
@@ -318,7 +428,7 @@ button.green {
         height: calc(100% - 30px);
     }
 
-    #chat-page ul {
+    #frames ul {
         height: calc(100% - 120px);
     }
 

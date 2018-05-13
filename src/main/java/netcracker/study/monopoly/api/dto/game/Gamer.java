@@ -19,6 +19,8 @@ public class Gamer implements Serializable {
 
     private Boolean canGo = true;
 
+    private Boolean isBankrupt = false;
+
     private String avatarUrl;
 
     private Integer score = 0;

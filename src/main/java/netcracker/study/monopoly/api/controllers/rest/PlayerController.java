@@ -4,8 +4,13 @@ import lombok.extern.log4j.Log4j2;
 import netcracker.study.monopoly.api.dto.GithubUser;
 import netcracker.study.monopoly.api.dto.PlayerInfo;
 import netcracker.study.monopoly.converters.PlayerInfoConverter;
+import netcracker.study.monopoly.exceptions.GameNotFoundException;
+import netcracker.study.monopoly.exceptions.NotAllowedOperationException;
 import netcracker.study.monopoly.exceptions.PlayerNotFoundException;
+import netcracker.study.monopoly.models.entities.Game;
 import netcracker.study.monopoly.models.entities.Player;
+import netcracker.study.monopoly.models.entities.PlayerState;
+import netcracker.study.monopoly.models.repositories.GameRepository;
 import netcracker.study.monopoly.models.repositories.PlayerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +22,10 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static java.lang.String.format;
+import static netcracker.study.monopoly.models.entities.Game.GameState.NOT_STARTED;
 
 @RestController
 @RequestMapping("/player")
@@ -32,14 +35,17 @@ public class PlayerController {
     public static final String ROOM_ID_KEY = "roomId";
     public static final String GAME_ID_KEY = "gameId";
     public static final String PROFILE_ID_KEY = "id";
+    public static final String PLAYER_STATE_ID_KEY = "psId";
 
 
     private final PlayerRepository playerRepository;
+    private final GameRepository gameRepository;
     private final PlayerInfoConverter playerInfoConverter;
 
     public PlayerController(PlayerRepository playerRepository,
-                            PlayerInfoConverter playerInfoConverter) {
+                            GameRepository gameRepository, PlayerInfoConverter playerInfoConverter) {
         this.playerRepository = playerRepository;
+        this.gameRepository = gameRepository;
         this.playerInfoConverter = playerInfoConverter;
     }
 
@@ -79,10 +85,24 @@ public class PlayerController {
     }
 
     @PutMapping("/game")
-    public void setGameId(@RequestParam(name = GAME_ID_KEY) UUID gameId,
-                          HttpSession session, Principal principal) {
-        log.info(format("Player %s join in game %s", principal.getName(), gameId));
-        session.setAttribute(GAME_ID_KEY, gameId);
+    public boolean setGameId(@RequestParam(name = GAME_ID_KEY) UUID gameId,
+                             HttpSession session, Principal principal) {
+        log.info(format("Player %s join in game {%s}", principal.getName(), gameId));
+        Game game = gameRepository.findById(gameId).orElseThrow(() -> new GameNotFoundException(gameId));
+
+        if (game.getCurrentState() != NOT_STARTED) {
+            throw new NotAllowedOperationException("Can't join in the game. Game already started.");
+        }
+
+        for (PlayerState playerState : game.getPlayerStates()) {
+            if (Objects.equals(playerState.getPlayer().getNickname(), principal.getName())) {
+                session.setAttribute(PLAYER_STATE_ID_KEY, playerState.getId());
+                session.setAttribute(GAME_ID_KEY, gameId);
+                session.setAttribute(ROOM_ID_KEY, null);
+                return true;
+            }
+        }
+        return false;
     }
 
     @PutMapping("/add_friend")

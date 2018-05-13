@@ -1,5 +1,6 @@
 package netcracker.study.monopoly.managers;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import netcracker.study.monopoly.api.dto.game.GameChange;
 import netcracker.study.monopoly.api.dto.game.GameDto;
@@ -25,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 import static java.lang.String.format;
+import static netcracker.study.monopoly.models.entities.CellState.CellType.STREET;
+import static netcracker.study.monopoly.models.entities.Game.GameState.*;
 
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Service
@@ -61,11 +64,27 @@ public class GameManager {
 
         Game game = gameCreator.createGame(players);
         log.trace("Saving game " + game);
-        changePlayerPosition(game.getTurnOf(), new GameChange());
         gameRepository.save(game);
         return gameConverter.toDto(game);
     }
 
+    public GameChange startGame(UUID gameId, UUID playerId) {
+        Game game = gameRepository.findById(gameId).orElseThrow(() -> new GameNotFoundException(gameId));
+        if (game.getCurrentState() != NOT_STARTED || !Objects.equals(playerId, game.getTurnOf().getId())) {
+            throw new NotAllowedOperationException();
+        }
+
+        GameChange gameChange = new GameChange();
+        changePlayerPosition(game.getTurnOf(), gameChange);
+        updateGameState(game);
+        Gamer dtoPlayer = playerConverter.toDto(game.getTurnOf());
+        gameChange.setGamersChange(Collections.singletonList(dtoPlayer));
+        gameChange.setCurrentState(game.getCurrentState());
+        gameChange.addChangeDescription(format("%s move to %s", dtoPlayer.getName(), game.getField().get(dtoPlayer.getPosition()).getName()));
+        gameRepository.save(game);
+
+        return gameChange;
+    }
 
     public GameDto getGame(UUID gameId) {
         Game game = gameRepository.findById(gameId).orElseThrow(() ->
@@ -74,29 +93,26 @@ public class GameManager {
         return gameConverter.toDto(game);
     }
 
-    public GameChange finishStep(UUID gameId, UUID playerId) {
-        Game game = gameRepository.findById(gameId).orElseThrow(() -> new GameNotFoundException(gameId));
-        if (!Objects.equals(game.getTurnOf().getId(), playerId)) {
-            throw new NotYourStepException();
-        }
-        log.info("%s end turn in game {%s}", game.getTurnOf().getPlayer().getNickname(), gameId);
 
-        Integer order = (game.getTurnOf().getOrder() + 1) % game.getPlayerStates().size();
-        game.setTurnOf(game.getPlayerStates().get(order));
-        gameRepository.save(game);
-        GameChange gameChange = new GameChange();
-        UUID turnId = game.getTurnOf().getId();
-        gameChange.setTurnOf(turnId);
-        String nickname = game.getTurnOf().getPlayer().getNickname();
-        gameChange.addChangeDescription(format("Now it's %s turn", nickname));
-        return firstStep(gameChange, gameId, turnId);
+    private void updateGameState(Game game) {
+        PlayerState turnOf = game.getTurnOf();
+        CellState currentCell = game.getField().get(turnOf.getPosition());
+        if (currentCell.getType() == STREET && currentCell.getOwner() == null) {
+            game.setCurrentState(CAN_BUY_STREET);
+        } else {
+            game.setCurrentState(CAN_ONLY_SELL);
+        }
     }
 
     private GameChange firstStep(GameChange gameChange, UUID gameId, UUID playerId) {
 
         PlayerState player = playerStateRepository.findById(playerId).orElseThrow(() ->
                 new PlayerNotFoundException(playerId));
+        Game game = gameRepository.findById(gameId).orElseThrow(() ->
+                new GameNotFoundException(gameId));
         changePlayerPosition(player, gameChange);
+        updateGameState(game);
+
         Integer position = player.getPosition();
         CellState cell = cellStateRepository.findByGameIdAndPosition(gameId, position)
                 .orElseThrow(() -> new CellNotFoundException(gameId, position));
@@ -112,13 +128,16 @@ public class GameManager {
                 break;
             default:
                 if (cell.getOwner() == null) {
-                    payToOwner(player, cell, gameChange);
+                    if (!payToOwner(player, cell, gameChange)) {
+                        game.setCurrentState(NEED_TO_PAY_OWNER);
+                    }
                 }
                 break;
         }
         playerStateRepository.save(player);
         Gamer gamer = playerConverter.toDto(player);
         gameChange.addGamerChange(gamer);
+        gameChange.setCurrentState(game.getCurrentState());
         return gameChange;
     }
 
@@ -141,10 +160,13 @@ public class GameManager {
     }
 
 
-    private void payToOwner(PlayerState playerState, CellState street, GameChange gameChange) {
+    private boolean payToOwner(PlayerState playerState, CellState street, GameChange gameChange) {
         PlayerState owner = street.getOwner();
         int money = street.getCost();
-        // TODO: If not enough money - bankrupt?
+        if (playerState.getMoney() < money) {
+            playerState.setIsBankrupt(true);
+            return false;
+        }
         playerState.setMoney(playerState.getMoney() - money);
         owner.setMoney(owner.getMoney() + money);
         playerStateRepository.save(owner);
@@ -152,15 +174,13 @@ public class GameManager {
         gameChange.addGamerChange(gamer);
         gameChange.addChangeDescription(format("%s pay to %s M%s as a rent of %s",
                 playerState.getPlayer().getNickname(), owner.getPlayer().getNickname(), money, street.getName()));
+        return true;
     }
 
 
-    public GameChange streetStep(UUID gameId, UUID playerId, UUID playerProfileId) {
+    public GameChange streetStep(UUID gameId, UUID playerId) {
         PlayerState playerState = playerStateRepository.findById(playerId).orElseThrow(() ->
                 new PlayerNotFoundException(playerId));
-        if (!Objects.equals(playerState.getPlayer().getId(), playerProfileId)) {
-            throw new NotAllowedOpertationException();
-        }
         Integer position = playerState.getPosition();
         CellState cell = cellStateRepository.findByGameIdAndPosition(gameId, position)
                 .orElseThrow(() -> new CellNotFoundException(gameId, position));
@@ -175,40 +195,181 @@ public class GameManager {
     }
 
 
-
-    private boolean buyStreet(PlayerState playerState, CellState street) {
+    private void buyStreet(PlayerState playerState, CellState street) {
         if (street.getOwner() != null) {
-            return false;
+            throw new BuyStreetException("Can't buy street. It already has owner");
         }
         int cost = street.getCost();
         if (playerState.getMoney() < cost) {
-            return false;
+            throw new BuyStreetException("Can't buy street. Not enough money");
         }
         playerState.setMoney(playerState.getMoney() - cost);
         street.setOwner(playerState);
+        playerState.addScore(cost);
         playerStateRepository.save(playerState);
         cellStateRepository.save(street);
-        return true;
+    }
+
+    public String validateOffer(UUID gameId, UUID sellerId, @NonNull UUID buyerId, @NonNull Integer cost) {
+        // Retrieve data
+        PlayerState seller = playerStateRepository.findById(sellerId).orElseThrow(() ->
+                new PlayerNotFoundException(sellerId));
+        PlayerState buyer = playerStateRepository.findById(buyerId).orElseThrow(() ->
+                new PlayerNotFoundException(sellerId));
+        Game game = gameRepository.findById(gameId).orElseThrow(() ->
+                new GameNotFoundException(gameId));
+        CellState street = game.getField().get(seller.getPosition());
+
+        validateSellStreet(buyer, seller, street, game, cost);
+        return format("%s wants to sell you %s for M%s. Agree to buy?", seller.getPlayer().getNickname(),
+                street.getName(), cost);
+    }
+
+    public GameChange sellStreet(UUID gameId, UUID sellerId, @NonNull UUID buyerId, @NonNull Integer cost) {
+        // Retrieve data
+        PlayerState seller = playerStateRepository.findById(sellerId).orElseThrow(() ->
+                new PlayerNotFoundException(sellerId));
+        PlayerState buyer = playerStateRepository.findById(buyerId).orElseThrow(() ->
+                new PlayerNotFoundException(sellerId));
+        Game game = gameRepository.findById(gameId).orElseThrow(() ->
+                new GameNotFoundException(gameId));
+        CellState street = game.getField().get(seller.getPosition());
+        // Validating
+        validateSellStreet(buyer, seller, street, game, cost);
+        // Business logic
+        street.setOwner(buyer);
+        seller.addMoney(cost);
+        buyer.removeMoney(cost);
+        seller.removeScore(street.getCost());
+        street.setCost(cost);
+        buyer.addScore(cost);
+        gameRepository.save(game);
+        // Build response
+        return getGameChangeForSellStreet(buyer, seller, street, game);
+    }
+
+    private void validateSellStreet(PlayerState buyer, PlayerState seller, CellState street, Game game, Integer cost) {
+        if (cost < 0) {
+            throw new SellStreetException("Can't sell street for a negative cost");
+        }
+        // validation that both players play in same game
+        if (!Objects.equals(buyer.getGame().getId(), game.getId())) {
+            throw new NotAllowedOperationException();
+        }
+        // validation that seller owns street
+        if (!Objects.equals(street.getOwner(), seller)) {
+            throw new NotAllowedOperationException();
+        }
+        // validation that seller is walking player now
+        if (!Objects.equals(game.getTurnOf().getId(), buyer.getId())) {
+            throw new NotYourStepException();
+        }
+        if (buyer.getMoney() < cost) {
+            throw new SellStreetException("Can't sell street. Buyer has not enough money");
+        }
+    }
+
+    private GameChange getGameChangeForSellStreet(PlayerState buyer, PlayerState seller, CellState street, Game game) {
+        GameChange gameChange = new GameChange();
+        gameChange.addGamerChange(playerConverter.toDto(buyer));
+        gameChange.addGamerChange(playerConverter.toDto(seller));
+        gameChange.setStreetChange(cellConverter.toStreet(street));
+        gameChange.setTurnOf(game.getTurnOf().getId());
+        gameChange.setCurrentState(game.getCurrentState());
+        gameChange.addChangeDescription(format("%s sell %s to %s for M%s", seller.getPlayer().getNickname(),
+                street.getName(), buyer.getPlayer().getNickname(), street.getCost()));
+        return gameChange;
+    }
+
+    public GameChange finishStep(UUID gameId, UUID playerId) {
+        Game game = gameRepository.findById(gameId).orElseThrow(() -> new GameNotFoundException(gameId));
+        if (!Objects.equals(game.getTurnOf().getId(), playerId)) {
+            throw new NotYourStepException();
+        }
+        log.info("%s end turn in game {%s}", game.getTurnOf().getPlayer().getNickname(), gameId);
+        GameChange gameChange = new GameChange();
+
+
+        if (checkIsGameFinished(game)) {
+            calculateFinalScore(game);
+            PlayerState winner = findWinner(game);
+            finishGame(game, winner);
+            gameChange.setCurrentState(game.getCurrentState());
+            game.getPlayerStates().forEach(p -> gameChange.addGamerChange(playerConverter.toDto(p)));
+            gameChange.addChangeDescription(format("Game is finished. %s won!", winner.getPlayer().getNickname()));
+            return gameChange;
+        }
+
+        PlayerState turnOf = findNextPlayer(game);
+        game.setTurnOf(turnOf);
+        updateGameState(game);
+        gameRepository.save(game);
+
+        UUID turnId = game.getTurnOf().getId();
+        gameChange.setTurnOf(turnId);
+        String nickname = game.getTurnOf().getPlayer().getNickname();
+        gameChange.addChangeDescription(format("Now it's %s turn", nickname));
+        return firstStep(gameChange, gameId, turnId);
+    }
+
+    private PlayerState findNextPlayer(Game game) {
+        PlayerState turnOf = game.getTurnOf();
+        Integer order = turnOf.getOrder();
+        do {
+            order = (order + 1) % game.getPlayerStates().size();
+            turnOf = game.getPlayerStates().get(order);
+        } while (turnOf.getIsBankrupt());
+        return turnOf;
+    }
+
+    private boolean checkIsGameFinished(Game game) {
+        int bankruptCount = 0;
+        List<PlayerState> playerStates = game.getPlayerStates();
+        for (PlayerState playerState : playerStates) {
+            if (playerState.getIsBankrupt()) {
+                bankruptCount++;
+            }
+        }
+
+        if (playerStates.size() < 2) {
+            throw new IllegalStateException("In game must be at least 2 players, but found " + playerStates.size());
+        } else if (playerStates.size() < 4) {
+            return bankruptCount >= 1;
+        } else {
+            return bankruptCount >= 2;
+        }
+    }
+
+    private void calculateFinalScore(Game game) {
+        for (PlayerState playerState : game.getPlayerStates()) {
+            if (playerState.getIsBankrupt()) {
+                playerState.setScore(0);
+            } else {
+                playerState.addScore(playerState.getMoney());
+            }
+        }
+    }
+
+    private PlayerState findWinner(Game game) {
+        return game.getPlayerStates().stream().max(Comparator.comparing(PlayerState::getScore)).orElseThrow(() ->
+                new IllegalStateException("Game has no players"));
     }
 
 
-    public void finishGame(UUID gameId, UUID winnerStateId) {
-        Game game = gameRepository.findById(gameId).orElseThrow(() ->
-                new GameNotFoundException(gameId));
-        if (game.isFinished()) {
+    private void finishGame(Game game, PlayerState winner) {
+        if (game.getCurrentState() == FINISHED) {
             throw new IllegalStateException(format("Game %s has already finished", game));
         }
 
-        Player winner = playerStateRepository.findById(winnerStateId)
-                .orElseThrow(() -> new PlayerNotFoundException(winnerStateId)).getPlayer();
-        game.setWinner(winner);
+        game.setWinner(winner.getPlayer());
         game.setFinishedAt(new Date());
         game.getWinner().getStat().incrementTotalWins();
         game.getPlayerStates().forEach(p -> {
             p.getPlayer().getStat().incrementTotalGames();
             p.getPlayer().getStat().addTotalScore(p.getScore());
         });
-        game.setFinished(true);
+        game.setCurrentState(FINISHED);
+        gameRepository.save(game);
     }
 
 

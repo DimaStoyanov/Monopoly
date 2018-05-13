@@ -8,6 +8,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import static netcracker.study.monopoly.models.entities.Game.GameState.NOT_STARTED;
+
 
 @Entity
 @Getter
@@ -33,10 +35,6 @@ public class Game extends AbstractIdentifiableObject implements Serializable {
     @OrderBy("position")
     private List<CellState> field;
 
-    @Setter
-    private boolean finished = false;
-
-
     @Temporal(TemporalType.TIMESTAMP)
     @Column(updatable = false)
     private Date startedAt;
@@ -50,6 +48,13 @@ public class Game extends AbstractIdentifiableObject implements Serializable {
     @JsonIgnore
     @Setter
     private Player winner;
+
+    @Setter
+    private GameState currentState = NOT_STARTED;
+
+    public enum GameState {
+        CAN_BUY_STREET, NEED_TO_PAY_OWNER, CAN_ONLY_SELL, NOT_STARTED, FINISHED
+    }
 
     public Game(List<PlayerState> playerStates, List<CellState> field) {
         this.playerStates = playerStates;

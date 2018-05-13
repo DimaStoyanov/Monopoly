@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
+import static netcracker.study.monopoly.api.controllers.rest.GameController.TOPIC_PREFIX;
 import static netcracker.study.monopoly.api.controllers.websocket.WebSocketEventListener.LEAVE_MSG_KEY;
 import static netcracker.study.monopoly.api.dto.OnlineStatusMsg.Place.GAME;
 import static netcracker.study.monopoly.api.dto.OnlineStatusMsg.Status.OFFLINE;
@@ -51,6 +52,6 @@ public class GameMessaging {
                 msg.setSendAt(new Date());
                 break;
         }
-        messagingTemplate.convertAndSend("/topic/games/" + gameId, msg);
+        messagingTemplate.convertAndSend(TOPIC_PREFIX + gameId, msg);
     }
 }

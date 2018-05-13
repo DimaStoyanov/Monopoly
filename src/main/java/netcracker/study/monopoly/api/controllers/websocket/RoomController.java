@@ -83,6 +83,7 @@ public class RoomController {
     UUID startGame(@PathVariable Integer roomId) {
         log.info("Create game in room " + roomId);
         Set<UUID> players = usersInRooms.get(roomId);
+        // TODO
 //        if (players.size() < 2) {
 //            throw new NotEnoughPlayersException(players.size());
 //        }

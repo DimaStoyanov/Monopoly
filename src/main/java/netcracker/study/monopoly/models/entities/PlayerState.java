@@ -20,6 +20,9 @@ public class PlayerState extends AbstractIdentifiableObject implements Serializa
     private Boolean canGo = true;
 
     @Setter
+    private Boolean isBankrupt = false;
+
+    @Setter
     private Integer score = 0;
 
     @Setter
@@ -42,6 +45,21 @@ public class PlayerState extends AbstractIdentifiableObject implements Serializa
     @Setter
     private Game game;
 
+    public void addScore(@NonNull Integer score) {
+        this.score += score;
+    }
+
+    public void removeScore(@NonNull Integer score) {
+        this.score -= score;
+    }
+
+    public void addMoney(@NonNull Integer money) {
+        this.money += money;
+    }
+
+    public void removeMoney(@NonNull Integer money) {
+        this.money -= money;
+    }
 
     public PlayerState(Integer order, Player player) {
         this.money = 2000;

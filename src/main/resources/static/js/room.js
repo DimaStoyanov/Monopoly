@@ -82,7 +82,7 @@ function getAndDrawFriends() {
 
             var inviteCell = row.insertCell();
             if (item.status === "Online" || item.status === "In room"
-                && inRoom.indexOf(item.nickname) > -1) {
+                && inRoom.indexOf(item.nickname) === -1) {
                 var inviteButton = document.createElement("BUTTON");
                 inviteButton.className = 'green';
                 inviteButton.innerHTML = "Invite";

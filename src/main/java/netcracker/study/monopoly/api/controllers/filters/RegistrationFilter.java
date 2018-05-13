@@ -7,7 +7,6 @@ import org.apache.catalina.session.StandardSessionFacade;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
@@ -55,9 +54,8 @@ public class RegistrationFilter extends GenericFilterBean {
                     .orElseGet(() -> new Player(name));
 
             player.setAvatarUrl((String) details.get("avatar_url"));
-            RestTemplate restTemplate = new RestTemplate();
-
             playerRepository.save(player);
+
             log.info(String.format("Player %s logged in", player.getNickname()));
             session.setMaxInactiveInterval(60 * 60);
             session.setAttribute(PROFILE_ID_KEY, player.getId());

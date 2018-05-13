@@ -2,6 +2,7 @@ package netcracker.study.monopoly.api.dto.game;
 
 import lombok.Data;
 import netcracker.study.monopoly.api.dto.game.cells.Street;
+import netcracker.study.monopoly.models.entities.Game.GameState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ public class GameChange {
     private List<Gamer> gamersChange = new ArrayList<>();
     private Street streetChange;
     private List<String> changeDescriptions = new ArrayList<>();
+    private GameState currentState;
 
     public void addGamerChange(Gamer gamer) {
         gamersChange.add(gamer);

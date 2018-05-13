@@ -20,9 +20,11 @@ public class GameMsg implements Serializable {
 
     private Date sendAt;
 
+    private Integer offerRqId;
+
     private Type type;
 
     public enum Type {
-        JOIN, LEAVE, CHAT, CHANGE
+        JOIN, LEAVE, CHAT, CHANGE, FINISH, OFFER, DECLINE_OFFER
     }
 }

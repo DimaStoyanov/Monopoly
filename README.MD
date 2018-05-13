@@ -5,8 +5,7 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=netcracker.study%3Amonopoly&metric=coverage)](https://sonarcloud.io/component_measures?id=netcracker.study%3Amonopoly&metric=coverage)
 [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/DimaStoyanov/Monopoly/blob/master/LICENSE)
 
-<img alt="Room" height="300px" src="https://pp.userapi.com/c840426/v840426491/72add/SgoLrv9ctng.jpg">
+### Screenshots
+<img alt="Room" height="200px" src="https://pp.userapi.com/c840426/v840426491/72add/SgoLrv9ctng.jpg"> <img alt="Game" height="200px" src="https://pp.userapi.com/c844722/v844722287/53814/cZOibPV1LlQ.jpg">
 
-### Database
-<img alt="ER Diagram" height="300px" src="https://pp.userapi.com/c846122/v846122199/f9e2/9fF1NnrRPLE.jpg"> 
 

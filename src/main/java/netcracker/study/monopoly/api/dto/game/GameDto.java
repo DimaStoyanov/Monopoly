@@ -13,11 +13,14 @@ import java.util.UUID;
 @NoArgsConstructor
 public class GameDto implements Serializable {
     @NonNull
-    Gamer turnOf;
+    private Gamer turnOf;
     @NonNull
-    List<Gamer> players;
+    private List<Gamer> players;
     @NonNull
-    List<Cell> field;
+    private List<Cell> field;
     @NonNull
-    UUID id;
+    private UUID id;
+    @NonNull
+    private String currentState;
+
 }
