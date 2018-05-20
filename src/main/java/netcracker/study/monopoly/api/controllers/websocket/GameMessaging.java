@@ -39,11 +39,11 @@ public class GameMessaging {
         switch (msg.getType()) {
             case JOIN:
                 Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
-                playersTracking.setPlayerStatus(msg.getIdFrom(), GAME, ONLINE, headerAccessor);
+                playersTracking.setPlayerStatus(msg.getProfileId(), GAME, ONLINE, headerAccessor);
 
                 GameMsg leaveMsg = new GameMsg();
                 leaveMsg.setType(GameMsg.Type.LEAVE);
-                leaveMsg.setIdFrom(msg.getIdFrom());
+                leaveMsg.setIdFrom(msg.getProfileId());
                 Runnable sendMsg = () -> this.processMsg(leaveMsg, gameId, headerAccessor);
                 sessionAttributes.put(LEAVE_MSG_KEY, sendMsg);
                 break;

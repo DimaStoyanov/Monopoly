@@ -16,11 +16,16 @@ public class GameMsg implements Serializable {
 
     private UUID idFrom;
 
+    private UUID receiverId;
+
+    private UUID profileId;
+
     private GameChange gameChange;
 
     private Date sendAt;
 
     private Integer offerRqId;
+
 
     private Type type;
 

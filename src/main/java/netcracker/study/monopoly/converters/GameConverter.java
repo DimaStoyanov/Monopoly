@@ -48,6 +48,7 @@ public class GameConverter {
                     }
                 }).collect(Collectors.toList()));
         gameDto.setId(game.getId());
+        gameDto.setCurrentState(game.getCurrentState().toString());
         return gameDto;
     }
 }

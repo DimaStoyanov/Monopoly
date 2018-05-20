@@ -19,6 +19,10 @@
     margin: 0;
 }
 
+table {
+    overflow: auto;
+}
+
 * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -69,9 +73,14 @@ input {
     outline: none;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3 {
     margin-top: 20px;
     margin-bottom: 20px;
+}
+
+h4, h5, h6 {
+    margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 h1 {
@@ -148,7 +157,7 @@ button.green {
 }
 
 .score-list {
-    height: 100%;
+    height: 75%;
     width: 100%;
     overflow: auto;
 }
@@ -205,6 +214,20 @@ button.green {
     font-size: 14px;
     background: white;
     visibility: hidden;
+}
+
+.offers-list {
+    height: 80%;
+    position: absolute;
+    padding: 5px;
+    overflow: auto;
+    display: block;
+}
+
+.offer-item {
+    text-align: center;
+    max-height: 55%;
+
 }
 
 .auction-container {
@@ -367,10 +390,18 @@ img {
     margin-left: 5px;
 }
 
+div.input-group.clearfix {
+    width: 100%;
+}
+
 .chat-header {
     text-align: center;
     padding: 15px;
     border-bottom: 1px solid #ececec;
+}
+
+.small-header {
+    padding: 5px;
 }
 
 .turnof-header {

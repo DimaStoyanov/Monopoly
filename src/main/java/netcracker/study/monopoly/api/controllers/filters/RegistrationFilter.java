@@ -54,6 +54,10 @@ public class RegistrationFilter extends GenericFilterBean {
                     .orElseGet(() -> new Player(name));
 
             player.setAvatarUrl((String) details.get("avatar_url"));
+            if (player.getId() == null) {
+                log.info(String.format("Player %s signed up", player.getNickname()));
+            }
+
             playerRepository.save(player);
 
             log.info(String.format("Player %s logged in", player.getNickname()));

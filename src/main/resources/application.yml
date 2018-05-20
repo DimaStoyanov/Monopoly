@@ -10,6 +10,9 @@ spring:
     generate-ddl: true
     properties:
       hibernate:
+#        show_sql: true
+#        usq_sql_comments: true
+#        format_sql: true
         ddl-auto: update
         temp:
           use_jdbc_metadata_defaults: false
@@ -19,7 +22,6 @@ logging:
       springframework: info
 server:
   port: 8080
-
 security:
   oauth2:
     client:

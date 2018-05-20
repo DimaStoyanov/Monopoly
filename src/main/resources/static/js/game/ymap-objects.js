@@ -1,24 +1,5 @@
 var autofocus = false;
 
-var panOptions = {
-    // flying: true
-};
-
-
-function setBoundsChangeEvents() {
-    myMap.events.add('boundschange', function () {
-        if ($('#menu').css('display') === 'block') {
-            $('#menu').remove()
-        }
-    });
-
-    myMap.events.add("click", function () {
-        if ($('#menu').css('display') === 'block') {
-            $('#menu').remove()
-        }
-    });
-
-}
 
 
 function drawBtnAutoFocus() {
@@ -59,76 +40,102 @@ function buildRectangle(coords, strokeColor, imgHref) {
         fillMethod: 'stretch',
         fillImageHref: imgHref,
         // Прозрачность обводки.
-        strokeOpacity: 0.5,
+        strokeOpacity: 0.7,
         // Ширина линии.
-        strokeWidth: 2,
+        strokeWidth: 3,
         // Радиус скругления углов.
         // Данная опция принимается только прямоугольником.
-        borderRadius: 6
+        borderRadius: 3
     });
 
 }
 
-function addMenu(rectangle, index) {
-    rectangle.events.add('click', function (e) {
-        if ($('#menu').css('display') === 'block') {
-            $('#menu').remove();
+
+function setBalloon(rectangle, index, canBuy, canSell, canPay) {
+    var cell = game.field[index];
+    var content = '<p>' + cell.name + '</p>';
+
+
+    if (cell.type === 'STREET') {
+        content += '<p>Current cost: M' + cell.cost + '</p>';
+        if (cell.owner) {
+            content += '<p>Owner: ' + cell.owner.name + '</p>';
         } else {
-            // HTML-содержимое контекстного меню.
-            var menuContent =
-                '<div id="menu">\
-            <div align="center"><input id="next" value="Next cell"/></div>\
-            <div align="center"><input id="prev" value="Previous cell"/></div>\
-            </div>';
-
-            // Размещаем контекстное меню на странице
-            $('body').append(menuContent);
-
-            // Задаем позицию меню.
-            $('#menu').css({
-                left: e.get('pagePixels')[0],
-                top: e.get('pagePixels')[1]
-            });
-
-
-            $('#menu').find('input[id="next"]').click(function () {
-                var nextCell = cells[getNextIndexSafely(index)];
-                var coords = nextCell.geometry.getCoordinates()[0];
-                myMap.panTo(coords, panOptions)
-                    .then(function () {
-                        myMap.setZoom(13, {duration: 500})
-                    }, function (reason) {
-                        alert(reason)
-                    }, this);
-                $('#menu').remove();
-            });
-            $('#menu').find('input[id="prev"]').click(function () {
-                var prevCell = cells[getPrevIndexSafely(index)];
-                var coords = prevCell.geometry.getCoordinates()[0];
-                myMap.panTo(coords, panOptions)
-                    .then(function () {
-                        myMap.setZoom(13, {duration: 500})
-                    }, function (reason) {
-                        alert(reason)
-                    }, this);
-                $('#menu').remove();
-            });
+            content += '<p>No owner</p>'
         }
+        if (canBuy) {
+            content += '<button id="btn_buy" class="primary">Buy</button>'
+        }
+        if (canSell) {
+            content += '<h3>Sell street</h3>';
+            content += '<form id="form_offer" style="width: 130px; align-items: center; text-align: center;">';
+            content += '<input style="width: 130px;" placeholder="Cost" id="cost" type="number" required>';
+            content += '<select style="width: 130px; overflow-x: auto" id="buyer" required>';
+            for (var playerId in game.playersMap) {
+                var player = game.playersMap[playerId];
+                if (player.id === selfInfo.id) {
+                    continue;
+                }
+
+                content += '<option value="' + player.id + '">' + player.name + '</option>'
+            }
+            content += '</select>';
+            content += '<button class="accent" id="btn_sell">Send offer</button>';
+            content += '</form>'
+        }
+        if (canPay) {
+            content += '<h3>Pay for rent</h3>';
+            content += '<p>Rent price: M' + cell.cost + '</p>';
+            content += '<button id="btn_pay" class="yellow">Pay</button>'
+        }
+    }
+
+
+    rectangle.properties.set('balloonContent', content);
+
+    rectangle.events.add('balloonopen', function () {
+        $('#btn_buy').click(function () {
+            console.log('Try to buy ' + cell.name);
+            $.ajax({
+                url: '/api/v1/street.buy',
+                type: 'PUT'
+            }).fail(errorHandler);
+        });
+
+
+        $(document).on('submit', '#form_offer', function (event) {
+            console.log('Try to sell ' + cell.name);
+            var cost = $('#cost').val();
+            var buyer = $('#buyer').val();
+            $.ajax({
+                url: '/api/v1/street.sell-offer.send?buyer=' + buyer + '&cost=' + cost,
+                type: 'PUT',
+                success: function () {
+                    alert("Offer sent");
+                    rectangle.balloon.close();
+                }
+            }).fail(errorHandler);
+            event.preventDefault();
+        });
+
+        $('#btn_pay').click(function () {
+            $.ajax({
+                url: '/api/v1/street.pay',
+                type: 'PUT',
+                success: function () {
+                    alert('Rent successfully paid');
+                    rectangle.balloon.close();
+                }
+            })
+        })
+
     });
 
-
-    function getPrevIndexSafely(index) {
-        return index - 1 < 0 ? cells.length - 1 : index - 1;
-    }
-
-    function getNextIndexSafely(index) {
-        return index + 1 >= cells.length ? 0 : index + 1;
-    }
 
 }
 
 
-function buildCircle(coords, imgHref, name, strokeColor, score) {
+function buildCircle(coords, player, strokeColor) {
     // Создаем круг.
     return new ymaps.Circle([
         coords,
@@ -137,11 +144,13 @@ function buildCircle(coords, imgHref, name, strokeColor, score) {
     ], {
         // Описываем свойства круга.
         // Содержимое балуна.
-        balloonContent: '<img height="100px" src=' + imgHref + '>\<' +
-        'br><div align="center">' + name + '</div>' +
-        '<br><div align="center">Score: ' + score + '</div>',
+        balloonContent: '<div style="text-align: center;">' +
+        '<img height="100px" src=' + player.avatarUrl + '>' +
+        '<p>' + player.name + '</p>' +
+        '<p>Score: ' + player.score + '</p>' +
+        '<p>Money: ' + player.money + '</p>',
         // Содержимое хинта.
-        hintContent: name
+        hintContent: player.name
     }, {
         // Задаем опции круга.
         // Включаем возможность перетаскивания круга.
@@ -151,7 +160,7 @@ function buildCircle(coords, imgHref, name, strokeColor, score) {
         // Прозрачность заливки также можно задать используя опцию "fillOpacity".
         // fillOpacity: 0.,
         // fillColor: "#DB7377",
-        fillImageHref: imgHref,
+        fillImageHref: player.avatarUrl,
         // Цвет обводки.
         strokeColor: strokeColor,
         // Прозрачность обводки.
@@ -187,6 +196,29 @@ var buildRoute = function (coords, routeColor) {
 
     });
 };
+
+function drawFinishStepButton() {
+    finishStepBtn = new ymaps.control.Button({
+            data: {
+                content: "Finish step"
+            },
+            options: {
+                maxWidth: 200
+            }
+        }
+    );
+
+
+    finishStepBtn.events.add(['select', 'deselect'], function () {
+        $.ajax({
+            url: '/api/v1/step.finish',
+            type: 'PUT'
+        }).fail(errorHandler);
+        finishStepBtn.deselect();
+    });
+
+    myMap.controls.add(finishStepBtn, {float: 'left'});
+}
 
 
 function drawShowButtons() {
@@ -254,11 +286,10 @@ function drawShowButtons() {
         var listBoxItems = [];
         for (var playerKey in game.playersMap) {
             var player = game.playersMap[playerKey];
-            var coords = game.field[player.position].cellCoordinates[0];
             listBoxItems.push(new ymaps.control.ListBoxItem({
                 data: {
                     content: player.name,
-                    center: coords,
+                    playerId: player.id,
                     zoom: 13
                 }
             }));
@@ -269,11 +300,10 @@ function drawShowButtons() {
     function createCellsItems() {
         var listBoxItems = [];
         game.field.forEach(function (item) {
-            var coords = item.cellCoordinates[0];
             listBoxItems.push(new ymaps.control.ListBoxItem({
                 data: {
                     content: item.name,
-                    center: coords,
+                    position: item.position,
                     zoom: 13
                 }
             }))
@@ -299,34 +329,42 @@ function drawShowButtons() {
         })
     }
 
-    function addEventActions(listBox) {
+    function addEventActions(listBox, centerFunc) {
         listBox.events.add('click', function (e) {
             // Получаем ссылку на объект, по которому кликнули.
             // События элементов списка пропагируются
             // и их можно слушать на родительском элементе.
-            listBox.collapse();
             var item = e.get('target');
+
             // Клик на заголовке выпадающего списка обрабатывать не надо.
+
             if (item !== listBox) {
                 myMap.panTo(
-                    item.data.get('center'),
-                    item.data.get('zoom')
+                    centerFunc(item.data)
                 ).then(function () {
-                    myMap.setZoom(13, {duration: 500})
+                    myMap.setZoom(item.data.get('zoom'), {duration: 500})
                 }, function (reason) {
                     alert(reason)
                 }, this);
             }
         });
+        listBox.collapse();
     }
 
 
-    var playersListBox = createListBox('Show player', createPlayersItems(), 'players-listbox');
-    var cellsListBox = createListBox('Show cell', createCellsItems(), 'cells-listbox');
+    var playersListBox = createListBox('Show player', createPlayersItems(), 'playersCircle-listbox');
+    var cellsListBox = createListBox('Show cell', createCellsItems(), 'cellsRect-listbox');
 
 
-    addEventActions(playersListBox);
-    addEventActions(cellsListBox);
+    addEventActions(playersListBox, function (item) {
+        var player = game.playersMap[item.get('playerId')];
+        var position = player.position;
+        return game.field[position].cellCoordinates[0];
+    });
+    addEventActions(cellsListBox, function (item) {
+        var position = item.get('position');
+        return game.field[position].cellCoordinates[0];
+    });
 
 
     myMap.controls

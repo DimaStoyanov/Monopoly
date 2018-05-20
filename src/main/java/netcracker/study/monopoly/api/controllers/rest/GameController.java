@@ -79,6 +79,7 @@ public class GameController {
         UUID playerId = (UUID) session.getAttribute(PLAYER_STATE_ID_KEY);
 
         GameChange gameChange = gameManager.finishStep(gameId, playerId);
+        sellOfferManager.removeAllOfferInGame(gameId);
         log.info(gameChange.getChangeDescriptions());
 
         GameMsg msg = getGameChangeMsg(gameChange, playerId);
@@ -96,7 +97,8 @@ public class GameController {
         UUID sellerId = (UUID) session.getAttribute(PLAYER_STATE_ID_KEY);
 
         String offerDescription = gameManager.validateOffer(gameId, sellerId, buyerId, cost);
-        int offerRqId = sellOfferManager.createOffer(sellerId, buyerId, cost);
+        log.info(offerDescription);
+        int offerRqId = sellOfferManager.createOffer(gameId, sellerId, buyerId, cost);
 
         GameMsg msg = new GameMsg();
         msg.setType(OFFER);
@@ -104,9 +106,15 @@ public class GameController {
         msg.setSendAt(new Date());
         msg.setOfferRqId(offerRqId);
         msg.setContent(offerDescription);
+        msg.setReceiverId(buyerId);
         messagingTemplate.convertAndSend(TOPIC_PREFIX + gameId, msg);
 
         return offerRqId;
+    }
+
+    @GetMapping("/street.sell-offer.get")
+    public Offer getOffer(@RequestParam(name = "rqId") Integer rqId) {
+        return sellOfferManager.getOffer(rqId);
     }
 
     @PutMapping("/street.sell-offer.accept")
@@ -119,6 +127,7 @@ public class GameController {
         if (buyerId != offer.getBuyerId()) {
             throw new NotAllowedOperationException();
         }
+        sellOfferManager.removeAllOfferInGame(gameId);
 
         GameChange gameChange = gameManager.sellStreet(gameId, offer.getSellerId(), offer.getBuyerId(), offer.getCost());
 
@@ -133,15 +142,28 @@ public class GameController {
         UUID buyerId = (UUID) session.getAttribute(PLAYER_STATE_ID_KEY);
 
 
-        sellOfferManager.removeOffer(rqId, buyerId);
+        Offer offer = sellOfferManager.declineOffer(rqId, buyerId);
 
         GameMsg msg = new GameMsg();
         msg.setType(DECLINE_OFFER);
         msg.setIdFrom(buyerId);
         msg.setOfferRqId(rqId);
+        msg.setReceiverId(offer.getSellerId());
         msg.setContent(comment);
         msg.setSendAt(new Date());
         messagingTemplate.convertAndSend(TOPIC_PREFIX + gameId, msg);
+    }
+
+    @PutMapping("/street.pay")
+    public void payRent(HttpSession session) {
+        UUID gameId = (UUID) session.getAttribute(GAME_ID_KEY);
+        UUID playerId = (UUID) session.getAttribute(PLAYER_STATE_ID_KEY);
+
+        GameChange gameChange = gameManager.payRent(gameId, playerId);
+        log.info(gameChange.getChangeDescriptions());
+
+        GameMsg gameChangeMsg = getGameChangeMsg(gameChange, playerId);
+        messagingTemplate.convertAndSend(TOPIC_PREFIX + gameId, gameChangeMsg);
     }
 
     private GameMsg getGameChangeMsg(GameChange gameChange, UUID idFrom) {

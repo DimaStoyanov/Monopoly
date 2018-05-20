@@ -8,9 +8,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CellStateRepository extends CrudRepository<CellState, UUID> {
-    @Query(value = "SELECT cell " +
-            "FROM cells_state  cell " +
-            "JOIN games game ON cell.field_id = game.id " +
-            "WHERE game.id = ?1 AND cell.position = ?2", nativeQuery = true)
+    @Query(value = "select * from cells_state " +
+            "where field_id = ?1 AND position = ?2", nativeQuery = true)
     Optional<CellState> findByGameIdAndPosition(UUID gameId, Integer position);
+
+    @Query(value = "select * from cells_state " +
+            "where field_id = ?1 AND position = ?2 for update", nativeQuery = true)
+    Optional<CellState> findByGameIdAAndPositionWithLock(UUID gameId, Integer position);
+
 }
