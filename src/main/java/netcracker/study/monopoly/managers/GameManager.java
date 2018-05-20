@@ -294,8 +294,8 @@ public class GameManager {
         if (!Objects.equals(street.getOwner(), seller)) {
             throw new NotAllowedOperationException();
         }
-        // validation that seller is walking player now
-        if (!Objects.equals(game.getTurnOf().getId(), buyer.getId())) {
+        // validation that seller is active player now
+        if (!Objects.equals(game.getTurnOf().getId(), seller.getId())) {
             throw new NotYourStepException();
         }
         if (buyer.getMoney() < cost) {

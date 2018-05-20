@@ -93,8 +93,11 @@ function setBalloon(rectangle, index, canBuy, canSell, canPay) {
 
     rectangle.properties.set('balloonContent', content);
 
+    $(rectangle).off();
     rectangle.events.add('balloonopen', function () {
-        $('#btn_buy').click(function () {
+        var btnBuy = $('#btn_buy');
+        btnBuy.off();
+        btnBuy.click(function () {
             console.log('Try to buy ' + cell.name);
             $.ajax({
                 url: '/api/v1/street.buy',
@@ -102,7 +105,7 @@ function setBalloon(rectangle, index, canBuy, canSell, canPay) {
             }).fail(errorHandler);
         });
 
-
+        $('#form_offer').off();
         $(document).on('submit', '#form_offer', function (event) {
             console.log('Try to sell ' + cell.name);
             var cost = $('#cost').val();
@@ -118,7 +121,9 @@ function setBalloon(rectangle, index, canBuy, canSell, canPay) {
             event.preventDefault();
         });
 
-        $('#btn_pay').click(function () {
+        var btnPay = $('#btn_pay');
+        btnPay.off();
+        btnPay.click(function () {
             $.ajax({
                 url: '/api/v1/street.pay',
                 type: 'PUT',
@@ -209,7 +214,7 @@ function drawFinishStepButton() {
     );
 
 
-    finishStepBtn.events.add(['select', 'deselect'], function () {
+    finishStepBtn.events.add(['select'], function () {
         $.ajax({
             url: '/api/v1/step.finish',
             type: 'PUT'
