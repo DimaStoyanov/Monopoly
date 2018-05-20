@@ -247,7 +247,7 @@ public class GameManager {
         PlayerState seller = playerStateRepository.findById(sellerId).orElseThrow(() ->
                 new PlayerNotFoundException(sellerId));
         PlayerState buyer = playerStateRepository.findById(buyerId).orElseThrow(() ->
-                new PlayerNotFoundException(sellerId));
+                new PlayerNotFoundException(buyerId));
         Game game = gameRepository.findById(gameId).orElseThrow(() ->
                 new GameNotFoundException(gameId));
         CellState street = game.getField().get(seller.getPosition());

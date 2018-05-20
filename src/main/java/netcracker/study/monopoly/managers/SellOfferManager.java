@@ -40,7 +40,7 @@ public class SellOfferManager {
     }
 
     public void removeAllOfferInGame(@NonNull UUID gameId) {
-        offerInGame.get(gameId).forEach(offers::remove);
+        offerInGame.getOrDefault(gameId, Collections.emptyList()).forEach(offers::remove);
     }
 
 
