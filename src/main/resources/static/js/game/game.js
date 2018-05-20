@@ -56,9 +56,9 @@ var playersColors = ['#5d80ca', '#3cc72d', '#b52dc7', '#b52dc7'];
 var neutralColor = '#999966';
 
 function errorHandler(error) {
-    var msg = JSON.parse(error);
-    console.log(msg);
-    return error.message;
+    var resp = error.responseJSON;
+    console.log(resp);
+    alert(resp.message)
 }
 
 $.get('/player/game', function (gameId) {
