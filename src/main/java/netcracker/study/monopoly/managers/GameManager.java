@@ -242,7 +242,9 @@ public class GameManager {
         cellStateRepository.save(street);
     }
 
-    public String validateOffer(UUID gameId, UUID sellerId, @NonNull UUID buyerId, @NonNull Integer cost) {
+
+    public String validateOffer(UUID gameId, UUID sellerId, @NonNull UUID buyerId, @NonNull Integer cost,
+                                @NonNull Integer position) {
         // Retrieve data
         PlayerState seller = playerStateRepository.findById(sellerId).orElseThrow(() ->
                 new PlayerNotFoundException(sellerId));
@@ -250,7 +252,7 @@ public class GameManager {
                 new PlayerNotFoundException(buyerId));
         Game game = gameRepository.findById(gameId).orElseThrow(() ->
                 new GameNotFoundException(gameId));
-        CellState street = game.getField().get(seller.getPosition());
+        CellState street = game.getField().get(position);
 
         validateSellStreet(buyer, seller, street, game, cost);
         return format("%s wants to sell you %s for M%s. Agree to buy?", seller.getPlayer().getNickname(),
@@ -286,7 +288,7 @@ public class GameManager {
         if (cost < 0) {
             throw new SellStreetException("Can't sell street for a negative cost");
         }
-        // validation that both playersCircle play in same game
+        // validation that both players play in same game
         if (!Objects.equals(buyer.getGame().getId(), game.getId())) {
             throw new NotAllowedOperationException();
         }

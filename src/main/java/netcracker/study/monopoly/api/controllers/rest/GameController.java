@@ -2,25 +2,26 @@ package netcracker.study.monopoly.api.controllers.rest;
 
 import io.swagger.annotations.Api;
 import lombok.extern.log4j.Log4j2;
-import netcracker.study.monopoly.api.dto.GameMsg;
+import netcracker.study.monopoly.api.dto.Offer;
 import netcracker.study.monopoly.api.dto.game.GameChange;
 import netcracker.study.monopoly.api.dto.game.GameDto;
+import netcracker.study.monopoly.api.dto.messages.GameMsg;
 import netcracker.study.monopoly.exceptions.NotAllowedOperationException;
 import netcracker.study.monopoly.managers.GameManager;
 import netcracker.study.monopoly.managers.SellOfferManager;
-import netcracker.study.monopoly.managers.SellOfferManager.Offer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import static java.lang.String.format;
 import static netcracker.study.monopoly.api.controllers.rest.PlayerController.GAME_ID_KEY;
 import static netcracker.study.monopoly.api.controllers.rest.PlayerController.PLAYER_STATE_ID_KEY;
-import static netcracker.study.monopoly.api.dto.GameMsg.Type.*;
+import static netcracker.study.monopoly.api.dto.messages.GameMsg.Type.*;
 import static netcracker.study.monopoly.models.entities.Game.GameState.FINISHED;
 
 @RestController
@@ -92,13 +93,20 @@ public class GameController {
 
     @PutMapping("/street.sell-offer.send")
     public Integer sendSellOffer(HttpSession session, @RequestParam(name = "buyer") UUID buyerId,
-                                 @RequestParam(name = "cost") Integer cost) {
+                                 @RequestParam(name = "cost") Integer cost,
+                                 @RequestParam(name = "position") Integer position) {
         UUID gameId = (UUID) session.getAttribute(GAME_ID_KEY);
         UUID sellerId = (UUID) session.getAttribute(PLAYER_STATE_ID_KEY);
 
-        String offerDescription = gameManager.validateOffer(gameId, sellerId, buyerId, cost);
+        String offerDescription = gameManager.validateOffer(gameId, sellerId, buyerId, cost, position);
         log.info(offerDescription);
-        int offerRqId = sellOfferManager.createOffer(gameId, sellerId, buyerId, cost);
+        Offer.OfferBuilder offerBuilder = Offer.builder()
+                .sellerId(sellerId)
+                .buyerId(buyerId)
+                .cost(cost)
+                .streetPosition(position);
+        int offerRqId = sellOfferManager.saveOffer(offerBuilder, gameId);
+
 
         GameMsg msg = new GameMsg();
         msg.setType(OFFER);
@@ -127,11 +135,12 @@ public class GameController {
         if (buyerId != offer.getBuyerId()) {
             throw new NotAllowedOperationException();
         }
-        sellOfferManager.removeAllOfferInGame(gameId);
+        List<Integer> offersIds = sellOfferManager.removeAllOfferInPosition(gameId, offer.getStreetPosition());
 
         GameChange gameChange = gameManager.sellStreet(gameId, offer.getSellerId(), offer.getBuyerId(), offer.getCost());
 
         GameMsg gameChangeMsg = getGameChangeMsg(gameChange, buyerId);
+        gameChangeMsg.setCancelledOffersRqId(offersIds);
         messagingTemplate.convertAndSend(TOPIC_PREFIX + gameId, gameChangeMsg);
     }
 

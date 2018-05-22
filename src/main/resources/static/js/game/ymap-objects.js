@@ -105,13 +105,17 @@ function setBalloon(rectangle, index, canBuy, canSell, canPay) {
             }).fail(errorHandler);
         });
 
-        $('#form_offer').off();
+        $(document).off('submit', '#form_offer');
         $(document).on('submit', '#form_offer', function (event) {
             console.log('Try to sell ' + cell.name);
             var cost = $('#cost').val();
             var buyer = $('#buyer').val();
             $.ajax({
-                url: '/api/v1/street.sell-offer.send?buyer=' + buyer + '&cost=' + cost,
+                url: makeUrl('/api/v1/street.sell-offer.send', {
+                    buyer: buyer,
+                    cost: cost,
+                    position: position
+                }),
                 type: 'PUT',
                 success: function () {
                     alert("Offer sent");
@@ -344,16 +348,12 @@ function drawShowButtons() {
             // Клик на заголовке выпадающего списка обрабатывать не надо.
 
             if (item !== listBox) {
-                myMap.panTo(
-                    centerFunc(item.data)
-                ).then(function () {
+                listBox.collapse();
+                myMap.panTo(centerFunc(item.data)).then(function () {
                     myMap.setZoom(item.data.get('zoom'), {duration: 500})
-                }, function (reason) {
-                    alert(reason)
-                }, this);
+                }, alert, this);
             }
         });
-        listBox.collapse();
     }
 
 

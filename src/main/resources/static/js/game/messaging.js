@@ -64,12 +64,7 @@ function onMessageReceived(payload) {
         if (gameChange.turnOf) {
             game.turnOf = game.playersMap[gameChange.turnOf];
             updateTurnOfFrame();
-            if (autofocus || game.turnOf.id === selfInfo.id) {
-                showActivePlayer();
-                if (game.turnOf.id === selfInfo.id) {
-                    showCurrentCellBalloon()
-                }
-            }
+            clearOffers()
         } else {
             game.turnOf = game.playersMap[game.turnOf.id]
         }
@@ -86,6 +81,18 @@ function onMessageReceived(payload) {
         }
         updateCells();
         drawStreetFrame();
+
+        if (message.cancelledOffersRqId) {
+            for (var offerId in message.cancelledOffersRqId) {
+                removeOffer(offerId)
+            }
+        }
+
+        if (gameChange.turnOf) {
+            if (autofocus || isYourTurn()) {
+                showActivePlayer(isYourTurn());
+            }
+        }
 
         messageElement.classList.add('event-message');
         message.content = '';
@@ -104,7 +111,7 @@ function onMessageReceived(payload) {
         }
         return
     } else if (message.type === 'DECLINE_OFFER') {
-        if (message.recieverId === selfInfo.id) {
+        if (message.receiverId === selfInfo.id) {
             messageElement.classList.add('event-message');
             var buyer = game.playersMap[message.idFrom];
             // TODO Show details of accepted/declined offers in offers tab
@@ -139,14 +146,33 @@ function onMessageReceived(payload) {
     messageArea.scrollTop = messageArea.scrollHeight;
 }
 
+function clearOffers() {
+    while (offersList.firstChild) {
+        offersList.removeChild(offersList.firstChild);
+    }
+    noOfferTitle.css({visibility: 'inherit'});
+    scoreBtn.click()
+}
+
+function removeOffer(offerId) {
+    var offerItem = offerItem[offerId];
+    if (offerItem) {
+        offerItem.remove();
+        if (offersList.childElementCount === 0) {
+            noOfferTitle.css({visibility: 'inherit'});
+            scoreBtn.click()
+        }
+    }
+}
+
 function addOffer(offer) {
     offersBtn.click();
     noOfferTitle.css({visibility: 'hidden'});
-
     var offerItem = document.createElement('div');
-    offerItem.className = 'offer-item';
 
+    offerItem.className = 'offer-item';
     var offerDescription = document.createElement('h4');
+
     var seller = game.playersMap[offer.sellerId];
     var cost = offer.cost;
     var streetName = game.field[seller.position].name;
@@ -160,10 +186,7 @@ function addOffer(offer) {
     acceptBtn.addEventListener('click', function () {
         $.ajax({
             url: '/api/v1/street.sell-offer.accept?rqId=' + offer.rqId,
-            type: 'PUT',
-            success: function () {
-                offerItem.remove();
-            }
+            type: 'PUT'
         }).fail(errorHandler)
     });
     offerItem.appendChild(acceptBtn);
@@ -191,6 +214,7 @@ function addOffer(offer) {
     offersDelimiter.className = 'chat-header small-header';
     offerItem.appendChild(offersDelimiter);
 
+    offers[offer.rqId] = offerItem;
     offersList.appendChild(offerItem);
 }
 

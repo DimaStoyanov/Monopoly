@@ -1,4 +1,4 @@
-package netcracker.study.monopoly.api.dto;
+package netcracker.study.monopoly.api.dto.messages;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

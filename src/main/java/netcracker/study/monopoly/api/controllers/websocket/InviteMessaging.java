@@ -1,7 +1,7 @@
 package netcracker.study.monopoly.api.controllers.websocket;
 
 import lombok.extern.log4j.Log4j2;
-import netcracker.study.monopoly.api.dto.InviteMsg;
+import netcracker.study.monopoly.api.dto.messages.InviteMsg;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

@@ -1,7 +1,7 @@
 package netcracker.study.monopoly.managers;
 
-import lombok.Data;
 import lombok.NonNull;
+import netcracker.study.monopoly.api.dto.Offer;
 import netcracker.study.monopoly.exceptions.NotAllowedOperationException;
 import org.springframework.stereotype.Service;
 
@@ -9,21 +9,24 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Service
 public class SellOfferManager {
 
-    private final AtomicInteger lastId = new AtomicInteger();
+    private static final AtomicInteger lastId = new AtomicInteger();
     private final Map<Integer, Offer> offers = new ConcurrentHashMap<>();
     private final Map<UUID, List<Integer>> offerInGame = new ConcurrentHashMap<>();
 
 
-    public int createOffer(UUID gameId, UUID sellerId, UUID buyerId, Integer cost) {
-        Offer offer = new Offer(sellerId, buyerId, cost);
-        offers.put(offer.rqId, offer);
+    public int saveOffer(Offer.OfferBuilder offerBuilder, UUID gameId) {
+        offerBuilder.rqId(lastId.incrementAndGet());
+        offerBuilder.createdAt(LocalDate.now());
+        Offer offer = offerBuilder.build();
+        offers.put(offer.getRqId(), offer);
         offerInGame.putIfAbsent(gameId, new ArrayList<>());
-        offerInGame.get(gameId).add(offer.rqId);
-        return offer.rqId;
+        offerInGame.get(gameId).add(offer.getRqId());
+        return offer.getRqId();
     }
 
     public Offer getOffer(@NonNull Integer rqId) {
@@ -43,21 +46,16 @@ public class SellOfferManager {
         offerInGame.getOrDefault(gameId, Collections.emptyList()).forEach(offers::remove);
     }
 
-
-    @Data
-    public class Offer {
-        int rqId;
-        UUID sellerId;
-        UUID buyerId;
-        Integer cost;
-        LocalDate createdAt;
-
-        Offer(UUID sellerId, UUID buyerId, Integer cost) {
-            rqId = lastId.incrementAndGet();
-            this.sellerId = sellerId;
-            this.buyerId = buyerId;
-            this.cost = cost;
-            createdAt = LocalDate.now();
-        }
+    public List<Integer> removeAllOfferInPosition(@NonNull UUID gameId, Integer position) {
+        List<Integer> ids = offerInGame.getOrDefault(gameId, Collections.emptyList())
+                .stream()
+                .filter(o -> offers.get(o).getStreetPosition().equals(position))
+                .collect(Collectors.toList());
+        ids.forEach(offers::remove);
+        return ids;
     }
+
+
+
+
 }

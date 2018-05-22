@@ -13,6 +13,7 @@ var stompClient = null;
 var cellsRect = [];
 var playersCircle = [];
 var myMap = null;
+var offers = {};
 
 var cellLength = 0.01;
 
@@ -238,16 +239,18 @@ function drawPlayers() {
     }
 }
 
-function showActivePlayer() {
+function showActivePlayer(openBalloon) {
     var position = game.turnOf.position;
     var coords = game.field[position].cellCoordinates[0];
     myMap.panTo(
         coords
     ).then(function () {
-        myMap.setZoom(13, {duration: 500})
-    }, function (reason) {
-        alert(reason)
-    }, this);
+        myMap.setZoom(13, {duration: 500}).then(function () {
+            if (openBalloon) {
+                showCurrentCellBalloon()
+            }
+        }, alert, this)
+    }, alert, this);
 }
 
 function showCurrentCellBalloon() {
@@ -255,6 +258,7 @@ function showCurrentCellBalloon() {
     var cell = cellsRect[position];
     cell.balloon.open()
 }
+
 
 function drawStreetFrame() {
     streetTable.innerHTML = '';
@@ -284,4 +288,9 @@ function startGame() {
             type: 'PUT'
         }).fail(errorHandler)
     }
+}
+
+
+function makeUrl(path, params) {
+    return path + '?' + jQuery.params(params)
 }

@@ -4,12 +4,13 @@ import lombok.Data;
 import netcracker.study.monopoly.api.dto.game.cells.Street;
 import netcracker.study.monopoly.models.entities.Game.GameState;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Data
-public class GameChange {
+public class GameChange implements Serializable {
     private UUID turnOf;
     private List<Gamer> gamersChange = new ArrayList<>();
     private Street streetChange;

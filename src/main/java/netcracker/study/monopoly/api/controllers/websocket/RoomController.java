@@ -2,8 +2,8 @@ package netcracker.study.monopoly.api.controllers.websocket;
 
 import lombok.extern.log4j.Log4j2;
 import netcracker.study.monopoly.api.dto.PlayerInfo;
-import netcracker.study.monopoly.api.dto.RoomMsg;
 import netcracker.study.monopoly.api.dto.game.GameDto;
+import netcracker.study.monopoly.api.dto.messages.RoomMsg;
 import netcracker.study.monopoly.converters.PlayerInfoConverter;
 import netcracker.study.monopoly.managers.GameManager;
 import netcracker.study.monopoly.models.entities.Player;
@@ -24,10 +24,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static netcracker.study.monopoly.api.controllers.websocket.WebSocketEventListener.LEAVE_MSG_KEY;
-import static netcracker.study.monopoly.api.dto.OnlineStatusMsg.Place.ROOM;
-import static netcracker.study.monopoly.api.dto.OnlineStatusMsg.Status.OFFLINE;
-import static netcracker.study.monopoly.api.dto.OnlineStatusMsg.Status.ONLINE;
-import static netcracker.study.monopoly.api.dto.RoomMsg.Type.LEAVE;
+import static netcracker.study.monopoly.api.dto.messages.OnlineStatusMsg.Place.ROOM;
+import static netcracker.study.monopoly.api.dto.messages.OnlineStatusMsg.Status.OFFLINE;
+import static netcracker.study.monopoly.api.dto.messages.OnlineStatusMsg.Status.ONLINE;
+import static netcracker.study.monopoly.api.dto.messages.RoomMsg.Type.LEAVE;
 
 @Controller
 @Log4j2

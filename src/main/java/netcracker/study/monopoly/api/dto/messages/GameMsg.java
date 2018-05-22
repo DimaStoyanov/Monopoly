@@ -1,10 +1,11 @@
-package netcracker.study.monopoly.api.dto;
+package netcracker.study.monopoly.api.dto.messages;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import netcracker.study.monopoly.api.dto.game.GameChange;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 
@@ -26,6 +27,7 @@ public class GameMsg implements Serializable {
 
     private Integer offerRqId;
 
+    private Collection<Integer> cancelledOffersRqId;
 
     private Type type;
 

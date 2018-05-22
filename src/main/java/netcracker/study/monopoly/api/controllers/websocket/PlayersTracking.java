@@ -1,7 +1,7 @@
 package netcracker.study.monopoly.api.controllers.websocket;
 
 import lombok.extern.log4j.Log4j2;
-import netcracker.study.monopoly.api.dto.OnlineStatusMsg;
+import netcracker.study.monopoly.api.dto.messages.OnlineStatusMsg;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -14,10 +14,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static netcracker.study.monopoly.api.controllers.websocket.WebSocketEventListener.LEAVE_MSG_KEY;
-import static netcracker.study.monopoly.api.dto.OnlineStatusMsg.Place.GAME;
-import static netcracker.study.monopoly.api.dto.OnlineStatusMsg.Place.ROOM;
-import static netcracker.study.monopoly.api.dto.OnlineStatusMsg.Status.OFFLINE;
-import static netcracker.study.monopoly.api.dto.OnlineStatusMsg.Status.ONLINE;
+import static netcracker.study.monopoly.api.dto.messages.OnlineStatusMsg.Place.GAME;
+import static netcracker.study.monopoly.api.dto.messages.OnlineStatusMsg.Place.ROOM;
+import static netcracker.study.monopoly.api.dto.messages.OnlineStatusMsg.Status.OFFLINE;
+import static netcracker.study.monopoly.api.dto.messages.OnlineStatusMsg.Status.ONLINE;
 
 @Controller
 @Log4j2
