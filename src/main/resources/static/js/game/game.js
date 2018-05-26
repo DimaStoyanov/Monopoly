@@ -292,5 +292,5 @@ function startGame() {
 
 
 function makeUrl(path, params) {
-    return path + '?' + jQuery.params(params)
+    return path + '?' + jQuery.param(params)
 }

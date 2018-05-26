@@ -36,7 +36,7 @@ function init() {
     stompClient.connect({}, onConnected, onError);
 
     getAndDrawFriends();
-    setInterval(getAndDrawFriends, 10000);
+    setInterval(getAndDrawFriends, 5000);
 
     $.get('/rooms/' + roomId + '/participants', function (players) {
         players.forEach(addInRoom)

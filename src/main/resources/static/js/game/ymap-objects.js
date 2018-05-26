@@ -52,7 +52,8 @@ function buildRectangle(coords, strokeColor, imgHref) {
 
 function setBalloon(rectangle, index, canBuy, canSell, canPay) {
     var cell = game.field[index];
-    var content = '<p>' + cell.name + '</p>';
+    var content = '<div class="balloon-content">';
+    content += '<p>' + cell.name + '</p>';
 
 
     if (cell.type === 'STREET') {
@@ -66,10 +67,10 @@ function setBalloon(rectangle, index, canBuy, canSell, canPay) {
             content += '<button id="btn_buy" class="primary">Buy</button>'
         }
         if (canSell) {
-            content += '<h3>Sell street</h3>';
-            content += '<form id="form_offer" style="width: 130px; align-items: center; text-align: center;">';
-            content += '<input style="width: 130px;" placeholder="Cost" id="cost" type="number" required>';
-            content += '<select style="width: 130px; overflow-x: auto" id="buyer" required>';
+            content += '<h4 >Sell street</h4>';
+            content += '<p><input style="width: 100%;" placeholder="Cost" id="cost" type="number" required></p>';
+            content += '<p><select style="width: 100%;" id="buyer" required></p>';
+            content += '<option value="" disabled selected>Select buyer</option>';
             for (var playerId in game.playersMap) {
                 var player = game.playersMap[playerId];
                 if (player.id === selfInfo.id) {
@@ -79,33 +80,37 @@ function setBalloon(rectangle, index, canBuy, canSell, canPay) {
                 content += '<option value="' + player.id + '">' + player.name + '</option>'
             }
             content += '</select>';
-            content += '<button class="accent" id="btn_sell">Send offer</button>';
+            content += '<p><button class="accent" id="btn_sell">Send offer</button></p>';
         }
         if (canPay) {
-            content += '<h3>Pay for rent</h3>';
+            content += '<h4>Pay for rent</h4>';
             content += '<p>Rent price: M' + cell.cost + '</p>';
             content += '<button id="btn_pay" class="yellow">Pay</button>'
         }
     }
-
+    content += '</div>';
 
     rectangle.properties.set('balloonContent', content);
 
     $(rectangle).off();
     rectangle.events.add('balloonopen', function () {
+
         var btnBuy = $('#btn_buy');
         btnBuy.off();
         btnBuy.click(function () {
             console.log('Try to buy ' + cell.name);
             $.ajax({
                 url: '/api/v1/street.buy',
-                type: 'PUT'
+                type: 'PUT',
+                success: function () {
+                    rectangle.balloon.close();
+                }
             }).fail(errorHandler);
         });
 
         var btnSell = $('#btn_sell');
         btnSell.off();
-        btnSell.click(function (event) {
+        btnSell.click(function () {
             console.log('Try to sell ' + cell.name);
             var cost = $('#cost').val();
             var buyer = $('#buyer').val();
@@ -117,6 +122,7 @@ function setBalloon(rectangle, index, canBuy, canSell, canPay) {
                 alert("You should specify buyer");
                 return
             }
+
             if (cost < 0) {
                 alert("Cost should be positive");
                 return
@@ -127,7 +133,7 @@ function setBalloon(rectangle, index, canBuy, canSell, canPay) {
                 url: makeUrl('/api/v1/street.sell-offer.send', {
                     buyer: buyer,
                     cost: cost,
-                    position: position
+                    position: index
                 }),
                 type: 'PUT',
                 success: function () {
@@ -135,7 +141,6 @@ function setBalloon(rectangle, index, canBuy, canSell, canPay) {
                     rectangle.balloon.close();
                 }
             }).fail(errorHandler);
-            event.preventDefault();
         });
 
         var btnPay = $('#btn_pay');

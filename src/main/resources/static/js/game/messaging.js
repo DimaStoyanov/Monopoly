@@ -1,5 +1,6 @@
 function connectSocket() {
     var socket = new SockJS('/lobby');
+
     stompClient = Stomp.over(socket);
     stompClient.connect({}, onConnected, onError);
     messageForm.addEventListener('submit', sendMessage, true);
@@ -98,7 +99,7 @@ function onMessageReceived(payload) {
         message.content = '';
         gameChange.changeDescriptions.forEach(function (item) {
             message.content += item;
-            message.content += '\n';
+            message.content += '\t\n';
         });
 
     } else if (message.type === 'OFFER') {

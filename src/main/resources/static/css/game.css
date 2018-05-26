@@ -188,6 +188,12 @@ button.green {
     background: white;
 }
 
+.balloon-content {
+    text-align: center;
+    max-width: 150px;
+    overflow-x: auto;
+}
+
 .turnof-container {
     width: 10%;
     position: absolute;
