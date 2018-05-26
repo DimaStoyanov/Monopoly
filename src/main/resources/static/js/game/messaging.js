@@ -117,10 +117,10 @@ function onMessageReceived(payload) {
             var buyer = game.playersMap[message.idFrom];
             // TODO Show details of accepted/declined offers in offers tab
             var description = buyer.name + ' declined your offer';
-            if (msg.content) {
+            if (message.content) {
                 description += ' with comment: "' + message.content + '"'
             }
-            msg.content = description;
+            message.content = description;
         } else return
     } else {
         messageElement.classList.add('chat-message');
@@ -184,6 +184,8 @@ function addOffer(offer) {
     var acceptBtn = document.createElement('button');
     acceptBtn.className = 'primary';
     acceptBtn.innerHTML = 'Accept';
+    $(acceptBtn).css('margin-right', '5px');
+
     acceptBtn.addEventListener('click', function () {
         $.ajax({
             url: '/api/v1/street.sell-offer.accept?rqId=' + offer.rqId,
@@ -191,11 +193,12 @@ function addOffer(offer) {
         }).fail(errorHandler)
     });
     offerItem.appendChild(acceptBtn);
-    offerItem.innerHTML += '  ';
+
 
     var declineBtn = document.createElement('button');
     declineBtn.className = 'accent';
     declineBtn.innerHTML = 'Decline';
+    $(declineBtn).css('margin-left', '5px');
     declineBtn.addEventListener('click', function () {
         $.ajax({
             url: '/api/v1/street.sell-offer.decline?rqId=' + offer.rqId,
