@@ -282,7 +282,7 @@ function drawStreetFrame() {
 
 
 function startGame() {
-    if (game.currentState === 'NOT_STARTED') {
+    if (game.currentState === 'NOT_STARTED' && isYourTurn()) {
         $.ajax({
             url: '/api/v1/game.start',
             type: 'PUT'

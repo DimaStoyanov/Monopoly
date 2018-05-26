@@ -43,12 +43,13 @@ public class GameMessaging {
 
                 GameMsg leaveMsg = new GameMsg();
                 leaveMsg.setType(GameMsg.Type.LEAVE);
-                leaveMsg.setIdFrom(msg.getProfileId());
+                leaveMsg.setIdFrom(msg.getIdFrom());
+                leaveMsg.setProfileId(msg.getProfileId());
                 Runnable sendMsg = () -> this.processMsg(leaveMsg, gameId, headerAccessor);
                 sessionAttributes.put(LEAVE_MSG_KEY, sendMsg);
                 break;
             case LEAVE:
-                playersTracking.setPlayerStatus(msg.getIdFrom(), GAME, OFFLINE, headerAccessor);
+                playersTracking.setPlayerStatus(msg.getProfileId(), GAME, OFFLINE, headerAccessor);
                 msg.setSendAt(new Date());
                 break;
         }

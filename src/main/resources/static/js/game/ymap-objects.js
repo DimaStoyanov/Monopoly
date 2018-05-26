@@ -1,7 +1,6 @@
 var autofocus = false;
 
 
-
 function drawBtnAutoFocus() {
     var btnAutoFocus = new ymaps.control.Button({
             data: {
@@ -81,7 +80,6 @@ function setBalloon(rectangle, index, canBuy, canSell, canPay) {
             }
             content += '</select>';
             content += '<button class="accent" id="btn_sell">Send offer</button>';
-            content += '</form>'
         }
         if (canPay) {
             content += '<h3>Pay for rent</h3>';
@@ -105,11 +103,26 @@ function setBalloon(rectangle, index, canBuy, canSell, canPay) {
             }).fail(errorHandler);
         });
 
-        $(document).off('submit', '#form_offer');
-        $(document).on('submit', '#form_offer', function (event) {
+        var btnSell = $('#btn_sell');
+        btnSell.off();
+        btnSell.click(function (event) {
             console.log('Try to sell ' + cell.name);
             var cost = $('#cost').val();
             var buyer = $('#buyer').val();
+            if (!cost) {
+                alert("You should specify cost");
+                return
+            }
+            if (!buyer) {
+                alert("You should specify buyer");
+                return
+            }
+            if (cost < 0) {
+                alert("Cost should be positive");
+                return
+            }
+
+
             $.ajax({
                 url: makeUrl('/api/v1/street.sell-offer.send', {
                     buyer: buyer,
