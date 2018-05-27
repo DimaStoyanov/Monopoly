@@ -1,7 +1,7 @@
 package netcracker.study.monopoly.models.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import netcracker.study.monopoly.models.entities.Player.PlayerType;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -36,14 +36,15 @@ public class PlayerState extends AbstractIdentifiableObject implements Serializa
     @ManyToOne
     @JoinColumn
     @NonNull
-    @JsonIgnore
     private Player player;
 
     @ManyToOne
     @JoinColumn
-    @JsonIgnore
     @Setter
     private Game game;
+
+    @Setter
+    private PlayerType currentType;
 
     public void addScore(@NonNull Integer score) {
         this.score += score;
@@ -65,5 +66,6 @@ public class PlayerState extends AbstractIdentifiableObject implements Serializa
         this.money = 2000;
         this.order = order;
         this.player = player;
+        currentType = player.getPlayerType();
     }
 }

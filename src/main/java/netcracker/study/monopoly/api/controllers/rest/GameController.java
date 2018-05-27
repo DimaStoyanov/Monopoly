@@ -30,17 +30,23 @@ import static netcracker.study.monopoly.models.entities.Game.GameState.FINISHED;
 @Log4j2
 public class GameController {
 
-    private final GameManager gameManager;
-    public final static String TOPIC_PREFIX = "/topic/games/";
+    public static final String TOPIC_PREFIX = "/topic/games/";
+    private GameManager gameManager;
     private final SellOfferManager sellOfferManager;
 
     private final SimpMessagingTemplate messagingTemplate;
 
+
     @Autowired
-    public GameController(GameManager gameManager, SellOfferManager sellOfferManager, SimpMessagingTemplate messagingTemplate) {
-        this.gameManager = gameManager;
+    public GameController(SellOfferManager sellOfferManager,
+                          SimpMessagingTemplate messagingTemplate) {
         this.sellOfferManager = sellOfferManager;
         this.messagingTemplate = messagingTemplate;
+    }
+
+    @Autowired
+    public void setGameManager(GameManager gameManager) {
+        this.gameManager = gameManager;
     }
 
     @GetMapping("/game.get")
@@ -105,19 +111,20 @@ public class GameController {
                 .buyerId(buyerId)
                 .cost(cost)
                 .streetPosition(position);
-        int offerRqId = sellOfferManager.saveOffer(offerBuilder, gameId);
+        Offer offer = sellOfferManager.saveOffer(offerBuilder, gameId);
 
 
         GameMsg msg = new GameMsg();
         msg.setType(OFFER);
         msg.setIdFrom(sellerId);
         msg.setSendAt(new Date());
-        msg.setOfferRqId(offerRqId);
+        msg.setOfferRqId(offer.getRqId());
         msg.setContent(offerDescription);
         msg.setReceiverId(buyerId);
         messagingTemplate.convertAndSend(TOPIC_PREFIX + gameId, msg);
 
-        return offerRqId;
+        gameManager.triggerOfferSent(gameId, offer);
+        return offer.getRqId();
     }
 
     @GetMapping("/street.sell-offer.get")
@@ -142,6 +149,8 @@ public class GameController {
         GameMsg gameChangeMsg = getGameChangeMsg(gameChange, buyerId);
         gameChangeMsg.setCancelledOffersRqId(offersIds);
         messagingTemplate.convertAndSend(TOPIC_PREFIX + gameId, gameChangeMsg);
+
+        gameManager.triggerOfferAccept(gameId, offer);
     }
 
     @PutMapping("/street.sell-offer.decline")
@@ -161,6 +170,8 @@ public class GameController {
         msg.setContent(comment);
         msg.setSendAt(new Date());
         messagingTemplate.convertAndSend(TOPIC_PREFIX + gameId, msg);
+
+        gameManager.triggerOfferDeclaim(gameId, offer);
     }
 
     @PutMapping("/street.pay")

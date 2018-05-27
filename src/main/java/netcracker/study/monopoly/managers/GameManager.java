@@ -2,6 +2,7 @@ package netcracker.study.monopoly.managers;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
+import netcracker.study.monopoly.api.dto.Offer;
 import netcracker.study.monopoly.api.dto.game.GameChange;
 import netcracker.study.monopoly.api.dto.game.GameDto;
 import netcracker.study.monopoly.api.dto.game.Gamer;
@@ -10,10 +11,12 @@ import netcracker.study.monopoly.converters.CellConverter;
 import netcracker.study.monopoly.converters.GameConverter;
 import netcracker.study.monopoly.converters.PlayerConverter;
 import netcracker.study.monopoly.exceptions.*;
+import netcracker.study.monopoly.managers.ai.PassiveBotManager;
 import netcracker.study.monopoly.models.GameCreator;
 import netcracker.study.monopoly.models.entities.CellState;
 import netcracker.study.monopoly.models.entities.Game;
 import netcracker.study.monopoly.models.entities.Player;
+import netcracker.study.monopoly.models.entities.Player.PlayerType;
 import netcracker.study.monopoly.models.entities.PlayerState;
 import netcracker.study.monopoly.models.repositories.CellStateRepository;
 import netcracker.study.monopoly.models.repositories.GameRepository;
@@ -24,20 +27,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
 import static netcracker.study.monopoly.models.entities.CellState.CellType.STREET;
 import static netcracker.study.monopoly.models.entities.Game.GameState.*;
+import static netcracker.study.monopoly.models.entities.Player.PlayerType.PASSIVE_BOT;
+import static netcracker.study.monopoly.models.entities.Player.PlayerType.PLAYER;
 
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Service
 @Log4j2
 @Transactional
-// TODO return GameChange from most of methods
 public class GameManager {
 
     private static final int FIELD_SIZE = 23;
+    private static final int BOT_DELAY = 5;
     private final Random random = new Random();
+    private final ScheduledExecutorService scheduledExecutorService =
+            new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
+
     @Autowired
     private PlayerStateRepository playerStateRepository;
     @Autowired
@@ -52,6 +63,8 @@ public class GameManager {
     private PlayerConverter playerConverter;
     @Autowired
     private CellConverter cellConverter;
+    @Autowired
+    private PassiveBotManager passiveBotManager;
 
     private GameCreator gameCreator = GameCreator.INSTANCE;
 
@@ -69,9 +82,14 @@ public class GameManager {
     }
 
     public GameChange startGame(UUID gameId, UUID playerId) {
-        Game game = gameRepository.findById(gameId).orElseThrow(() -> new GameNotFoundException(gameId));
-        if (game.getCurrentState() != NOT_STARTED || !Objects.equals(playerId, game.getTurnOf().getId())) {
-            throw new NotAllowedOperationException();
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new GameNotFoundException(gameId));
+        return startGame(game);
+    }
+
+    private GameChange startGame(Game game) {
+        if (game.getCurrentState() != NOT_STARTED) {
+            throw new IllegalStateException("Game already started");
         }
 
         GameChange gameChange = new GameChange();
@@ -83,6 +101,11 @@ public class GameManager {
         gameChange.addChangeDescription(format("%s move to %s", dtoPlayer.getName(), game.getField().get(dtoPlayer.getPosition()).getName()));
         gameRepository.save(game);
 
+        PlayerType playerType = game.getTurnOf().getCurrentType();
+        if (playerType == PASSIVE_BOT) {
+            scheduledExecutorService.schedule(() -> passiveBotManager.makeStep(game), BOT_DELAY, TimeUnit.SECONDS);
+        }
+
         return gameChange;
     }
 
@@ -90,6 +113,11 @@ public class GameManager {
         Game game = gameRepository.findById(gameId).orElseThrow(() ->
                 new GameNotFoundException(gameId));
         log.trace("Get game " + game);
+
+        if (game.getTurnOf().getCurrentType() != PLAYER) {
+            startGame(game);
+        }
+
         return gameConverter.toDto(game);
     }
 
@@ -104,18 +132,14 @@ public class GameManager {
         }
     }
 
-    private GameChange firstStep(GameChange gameChange, UUID gameId, UUID playerId) {
 
-        PlayerState player = playerStateRepository.findById(playerId).orElseThrow(() ->
-                new PlayerNotFoundException(playerId));
-        Game game = gameRepository.findById(gameId).orElseThrow(() ->
-                new GameNotFoundException(gameId));
+    private GameChange firstStep(GameChange gameChange, Game game, PlayerState player) {
         changePlayerPosition(player, gameChange);
         updateGameState(game);
 
         Integer position = player.getPosition();
-        CellState cell = cellStateRepository.findByGameIdAndPosition(gameId, position)
-                .orElseThrow(() -> new CellNotFoundException(gameId, position));
+        CellState cell = cellStateRepository.findByGameIdAndPosition(game.getId(), position)
+                .orElseThrow(() -> new CellNotFoundException(game.getId(), position));
         gameChange.addChangeDescription(format("%s moved to %s", player.getPlayer().getNickname(), cell.getName()));
 
 
@@ -128,11 +152,23 @@ public class GameManager {
                 break;
             default:
                 if (cell.getOwner() != null) {
-                    if (Objects.equals(cell.getOwner().getId(), playerId)) {
+                    if (Objects.equals(cell.getOwner().getId(), player.getId())) {
                         game.setCurrentState(CAN_ONLY_SELL);
                     } else {
                         if (!payToOwner(player, cell, gameChange)) {
-                            game.setCurrentState(NEED_TO_PAY_OWNER);
+                            if (checkHasOwns(game, player)) {
+                                game.setCurrentState(NEED_TO_PAY_OWNER);
+                            } else {
+                                // TODO maybe add gameChange parameter to method
+
+                                log.info(format("%s is bankrupt", player.getPlayer().getNickname()));
+                                //TODO
+                                GameChange bankruptGameChange = finishStep(game.getId(), player.getId());
+                                bankruptGameChange.getGamersChange().forEach(gameChange::addGamerChange);
+                                gameChange.setStreetChange(bankruptGameChange.getStreetChange());
+                                gameChange.setTurnOf(bankruptGameChange.getTurnOf());
+                                bankruptGameChange.getChangeDescriptions().forEach(gameChange::addChangeDescription);
+                            }
                         }
                     }
                 }
@@ -146,12 +182,29 @@ public class GameManager {
         return gameChange;
     }
 
+    private GameChange firstStep(GameChange gameChange, UUID gameId, UUID playerId) {
+
+        PlayerState player = playerStateRepository.findById(playerId).orElseThrow(() ->
+                new PlayerNotFoundException(playerId));
+        Game game = gameRepository.findById(gameId).orElseThrow(() ->
+                new GameNotFoundException(gameId));
+        return firstStep(gameChange, game, player);
+    }
+
+    private boolean checkHasOwns(Game game, PlayerState player) {
+        return game.getField().stream()
+                .anyMatch(c -> c.getOwner() != null && Objects.equals(c.getOwner().getId(), player.getId()));
+    }
+
     private void changePlayerPosition(PlayerState playerState, GameChange gameChange) {
         int step = random.nextInt(6) + random.nextInt(6) + 2;
         int position = playerState.getPosition() + step;
+        log.info(format("%s move: %s+%s", playerState.getPlayer().getNickname(),
+                playerState.getPosition(), step));
+
         if (position >= FIELD_SIZE) {
             giveSalary(playerState, gameChange);
-            playerState.setPosition(position - playerState.getPosition());
+            playerState.setPosition(position % FIELD_SIZE);
         } else {
             playerState.setPosition(position);
         }
@@ -159,9 +212,9 @@ public class GameManager {
 
     private void giveSalary(PlayerState playerState, GameChange gameChange) {
         int salary = 200;
+        log.info(format("%s money: %s+%s", playerState.getPlayer().getNickname(), playerState.getMoney(), salary));
         playerState.setMoney(playerState.getMoney() + salary);
         gameChange.addChangeDescription(format("%s get salary: M%s", playerState.getPlayer().getNickname(), salary));
-
     }
 
     public GameChange payRent(UUID gameId, UUID playerId) {
@@ -193,6 +246,8 @@ public class GameManager {
         if (playerState.getMoney() < money) {
             return false;
         }
+        log.info(format("%s money: %s-%s", playerState.getPlayer().getNickname(), playerState.getMoney(), money));
+        log.info(format("%s money: %s+%s", owner.getPlayer().getNickname(), owner.getMoney(), money));
         playerState.setMoney(playerState.getMoney() - money);
         owner.setMoney(owner.getMoney() + money);
         playerStateRepository.save(owner);
@@ -259,6 +314,56 @@ public class GameManager {
                 street.getName(), cost);
     }
 
+    public void triggerOfferSent(UUID gameId, Offer offer) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new GameNotFoundException(gameId));
+
+        PlayerState player = playerStateRepository.findById(offer.getBuyerId())
+                .orElseThrow(() -> new PlayerNotFoundException(offer.getSellerId()));
+
+        switch (player.getCurrentType()) {
+            case PLAYER:
+                break;
+            case PASSIVE_BOT:
+                passiveBotManager.processOffer(offer, game);
+                break;
+        }
+    }
+
+    public void triggerOfferAccept(UUID gameId, Offer offer) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new GameNotFoundException(gameId));
+
+        PlayerState player = playerStateRepository.findById(offer.getBuyerId())
+                .orElseThrow(() -> new PlayerNotFoundException(offer.getSellerId()));
+
+        switch (player.getCurrentType()) {
+            case PLAYER:
+                break;
+            case PASSIVE_BOT:
+                passiveBotManager.triggerAcceptOffer(offer, game);
+                break;
+        }
+
+    }
+
+    public void triggerOfferDeclaim(UUID gameId, Offer offer) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new GameNotFoundException(gameId));
+        log.info("Trigger on " + offer);
+        PlayerState player = playerStateRepository.findById(offer.getSellerId())
+                .orElseThrow(() -> new PlayerNotFoundException(offer.getSellerId()));
+        System.out.println(player);
+
+        switch (player.getCurrentType()) {
+            case PLAYER:
+                break;
+            case PASSIVE_BOT:
+                passiveBotManager.triggerDeclaimedOffer(offer, game);
+                break;
+        }
+    }
+
     public GameChange sellStreet(UUID gameId, UUID sellerId, @NonNull UUID buyerId, @NonNull Integer cost) {
         // Retrieve data
         PlayerState seller = playerStateRepository.findById(sellerId).orElseThrow(() ->
@@ -293,7 +398,7 @@ public class GameManager {
             throw new NotAllowedOperationException();
         }
         // validation that seller owns street
-        if (!Objects.equals(street.getOwner(), seller)) {
+        if (!Objects.equals(street.getOwner().getId(), seller.getId())) {
             throw new NotAllowedOperationException();
         }
         // validation that seller is active player now
@@ -317,21 +422,29 @@ public class GameManager {
         return gameChange;
     }
 
+
     public GameChange finishStep(UUID gameId, UUID playerId) {
         Game game = gameRepository.findById(gameId).orElseThrow(() -> new GameNotFoundException(gameId));
         PlayerState turnOf = game.getTurnOf();
-        if (!Objects.equals(turnOf.getId(), playerId)) {
+        return finishStep(game, turnOf);
+    }
+
+    private GameChange finishStep(Game game, PlayerState turnOf) {
+        if (!Objects.equals(turnOf.getId(), turnOf.getId())) {
             throw new NotYourStepException();
         }
         String nickname = turnOf.getPlayer().getNickname();
-        log.info("%s end turn in game {%s}", nickname, gameId);
+        log.info(format("%s end turn in game {%s}", nickname, game.getId()));
         GameChange gameChange = new GameChange();
 
         if (game.getCurrentState() == NEED_TO_PAY_OWNER) {
-            turnOf.setIsBankrupt(true);
-            gameChange.addGamerChange(playerConverter.toDto(turnOf));
-            gameChange.addChangeDescription(format("%s is a bankrupt now", nickname));
-            log.debug(format("%s didn't pay for rent ant became a bankrupt", nickname));
+            if (!payToOwner(turnOf, game.getField().get(turnOf.getPosition()), gameChange)) {
+                log.info(format("%s is a bankrupt", turnOf.getPlayer().getNickname()));
+                turnOf.setIsBankrupt(true);
+                gameChange.addGamerChange(playerConverter.toDto(turnOf));
+                gameChange.addChangeDescription(format("%s is a bankrupt now", nickname));
+                log.debug(format("%s didn't pay for rent ant became a bankrupt", nickname));
+            }
         }
 
 
@@ -354,8 +467,16 @@ public class GameManager {
         gameChange.setTurnOf(turnId);
         nickname = game.getTurnOf().getPlayer().getNickname();
         gameChange.addChangeDescription(format("Now it's %s turn", nickname));
-        return firstStep(gameChange, gameId, turnId);
+        firstStep(gameChange, game, turnOf);
+
+        PlayerType currentType = game.getTurnOf().getCurrentType();
+        if (currentType == PASSIVE_BOT) {
+            scheduledExecutorService.schedule(() -> passiveBotManager.makeStep(game), BOT_DELAY, TimeUnit.SECONDS);
+        }
+
+        return gameChange;
     }
+
 
     private PlayerState findNextPlayer(Game game) {
         PlayerState turnOf = game.getTurnOf();

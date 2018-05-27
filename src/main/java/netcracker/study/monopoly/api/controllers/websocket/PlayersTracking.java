@@ -44,21 +44,30 @@ public class PlayersTracking {
 
     void setPlayerStatus(UUID playerId, OnlineStatusMsg.Place place, OnlineStatusMsg.Status status,
                          SimpMessageHeaderAccessor headerAccessor) {
-        Set<UUID> onlinePlayers = place == GAME ? inGamesPlayers :
-                place == ROOM ? inRoomsPlayers : inSitePlayers;
+
+        Set<UUID> onlinePlayers;
+        if (place == GAME) {
+            onlinePlayers = inGamesPlayers;
+        } else if (place == ROOM) {
+            onlinePlayers = inRoomsPlayers;
+        } else {
+            onlinePlayers = inSitePlayers;
+        }
 
 
         if (status == ONLINE) {
             onlinePlayers.add(playerId);
 
-            OnlineStatusMsg offlineMsg = new OnlineStatusMsg();
-            offlineMsg.setPlace(place);
-            offlineMsg.setStatus(OFFLINE);
-            offlineMsg.setPlayerId(playerId);
-            Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
-            Runnable sendMsg = () -> this.getOnlineStatusMessage(
-                    offlineMsg, headerAccessor);
-            sessionAttributes.put(LEAVE_MSG_KEY, sendMsg);
+            if (headerAccessor != null) {
+                OnlineStatusMsg offlineMsg = new OnlineStatusMsg();
+                offlineMsg.setPlace(place);
+                offlineMsg.setStatus(OFFLINE);
+                offlineMsg.setPlayerId(playerId);
+                Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
+                Runnable sendMsg = () -> this.getOnlineStatusMessage(
+                        offlineMsg, headerAccessor);
+                sessionAttributes.put(LEAVE_MSG_KEY, sendMsg);
+            }
         } else {
             onlinePlayers.remove(playerId);
         }
@@ -68,9 +77,15 @@ public class PlayersTracking {
 
 
     public String getPlayerStatus(UUID playerId) {
-        return inGamesPlayers.contains(playerId) ? "In game" :
-                inRoomsPlayers.contains(playerId) ? "In room" :
-                        inSitePlayers.contains(playerId) ? "Online" :
-                                "Offline";
+        if (inGamesPlayers.contains(playerId)) {
+            return "In game";
+        }
+        if (inRoomsPlayers.contains(playerId)) {
+            return "In room";
+        }
+        if (inSitePlayers.contains(playerId)) {
+            return "Online";
+        }
+        return "Offline";
     }
 }

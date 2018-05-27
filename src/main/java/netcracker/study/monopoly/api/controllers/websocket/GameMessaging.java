@@ -36,22 +36,21 @@ public class GameMessaging {
     private void processMsg(@Payload GameMsg msg, @DestinationVariable UUID gameId,
                             SimpMessageHeaderAccessor headerAccessor) {
         log.info(msg);
-        switch (msg.getType()) {
-            case JOIN:
-                Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
-                playersTracking.setPlayerStatus(msg.getProfileId(), GAME, ONLINE, headerAccessor);
+        if (msg.getType() == GameMsg.Type.JOIN) {
+            Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
+            playersTracking.setPlayerStatus(msg.getProfileId(), GAME, ONLINE, headerAccessor);
 
-                GameMsg leaveMsg = new GameMsg();
-                leaveMsg.setType(GameMsg.Type.LEAVE);
-                leaveMsg.setIdFrom(msg.getIdFrom());
-                leaveMsg.setProfileId(msg.getProfileId());
-                Runnable sendMsg = () -> this.processMsg(leaveMsg, gameId, headerAccessor);
-                sessionAttributes.put(LEAVE_MSG_KEY, sendMsg);
-                break;
-            case LEAVE:
-                playersTracking.setPlayerStatus(msg.getProfileId(), GAME, OFFLINE, headerAccessor);
-                msg.setSendAt(new Date());
-                break;
+            GameMsg leaveMsg = new GameMsg();
+            leaveMsg.setType(GameMsg.Type.LEAVE);
+            leaveMsg.setIdFrom(msg.getIdFrom());
+            leaveMsg.setProfileId(msg.getProfileId());
+            Runnable sendMsg = () -> this.processMsg(leaveMsg, gameId, headerAccessor);
+            sessionAttributes.put(LEAVE_MSG_KEY, sendMsg);
+
+        } else if (msg.getType() == GameMsg.Type.LEAVE) {
+            playersTracking.setPlayerStatus(msg.getProfileId(), GAME, OFFLINE, headerAccessor);
+            msg.setSendAt(new Date());
+
         }
         messagingTemplate.convertAndSend(TOPIC_PREFIX + gameId, msg);
     }

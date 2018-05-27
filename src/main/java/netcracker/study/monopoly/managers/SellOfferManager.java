@@ -19,14 +19,14 @@ public class SellOfferManager {
     private final Map<UUID, List<Integer>> offerInGame = new ConcurrentHashMap<>();
 
 
-    public int saveOffer(Offer.OfferBuilder offerBuilder, UUID gameId) {
+    public Offer saveOffer(Offer.OfferBuilder offerBuilder, UUID gameId) {
         offerBuilder.rqId(lastId.incrementAndGet());
         offerBuilder.createdAt(LocalDate.now());
         Offer offer = offerBuilder.build();
         offers.put(offer.getRqId(), offer);
         offerInGame.putIfAbsent(gameId, new ArrayList<>());
         offerInGame.get(gameId).add(offer.getRqId());
-        return offer.getRqId();
+        return offer;
     }
 
     public Offer getOffer(@NonNull Integer rqId) {

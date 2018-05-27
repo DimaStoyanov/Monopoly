@@ -24,7 +24,7 @@ function onConnected() {
     );
 
     connectingElement.classList.add('hidden');
-    setTimeout(startGame(), 500)
+    setTimeout(startGame(), 2000)
 
 }
 

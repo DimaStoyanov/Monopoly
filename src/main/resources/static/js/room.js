@@ -15,6 +15,13 @@ var roomId = null;
 var stompClient = null;
 var inRoom = [];
 
+function errorHandler(error) {
+    var resp = error.responseJSON;
+    console.log(resp);
+    alert(resp.message)
+}
+
+
 $.get('/player/info', function (data) {
         selfInfo = data;
         $.get('/player/room', function (data) {
@@ -35,7 +42,7 @@ function init() {
     stompClient = Stomp.over(socket);
     stompClient.connect({}, onConnected, onError);
 
-    getAndDrawFriends();
+    setTimeout(getAndDrawFriends(), 500);
     setInterval(getAndDrawFriends, 5000);
 
     $.get('/rooms/' + roomId + '/participants', function (players) {
@@ -51,9 +58,7 @@ function onAddFriendClick() {
     $.ajax({
         url: '/player/add_friend?nickname=' + friendNickname.value,
         type: 'PUT',
-        success: function (data) {
-            alert(data)
-        }
+        success: alert
     }).fail(function () {
         alert("Player not found")
     });
@@ -190,10 +195,43 @@ function onConnected() {
     connectingElement.classList.add('hidden');
     setTimeout(function () {
 
+        function getBotTypeName(botType) {
+            if (botType === 'PASSIVE_BOT') {
+                return "PASSIVE"
+            } else if (botType === 'ACTIVE_BOT') {
+                return 'ACTIVE';
+            } else if (botType === 'RANDOM_BOT') {
+                return 'RANDOM'
+            }
+        }
+
         $.get('/rooms/' + roomId + '/host', function (data) {
             hostId = data;
             if (hostId === selfInfo.id) {
-                startButton.removeAttribute("hidden");
+                $('#host_frame').removeAttr('hidden');
+                $('#in_room_frame').css({
+                    height: "70%"
+                });
+
+                var botTypeSelect = $('#bot_types');
+                $.get('/ai/types', function (types) {
+                    types.forEach(function (botType) {
+                        botTypeSelect.append($("<option></option>")
+                            .attr("value", botType)
+                            .text(getBotTypeName(botType)))
+                    })
+                });
+                $('#btn_add_bot').click(function () {
+                    var botType = botTypeSelect.val();
+                    if (!botType) {
+                        alert("You should specify type of bot");
+                        return
+                    }
+
+                    $.post('/rooms/' + roomId + '/add-bot?type=' + botType, alert)
+                        .fail(errorHandler)
+                });
+
                 startButton.addEventListener('click', function () {
                     $.post('/rooms/' + roomId + '/start', function (gameId) {
 
@@ -205,7 +243,7 @@ function onConnected() {
                             gameId: gameId
                         }))
 
-                    })
+                    }).fail(errorHandler)
                 })
 
             }

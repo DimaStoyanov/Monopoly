@@ -157,8 +157,8 @@ public class PlayerController {
         Map details = (Map) authentication.getUserAuthentication().getDetails();
 
         RestTemplate restTemplate = new RestTemplate();
-        String followers_url = (String) details.get("followers_url");
-        GithubUser[] githubFollowers = restTemplate.getForObject(followers_url, GithubUser[].class, new HashMap<>());
+        String followersUrl = (String) details.get("followers_url");
+        GithubUser[] githubFollowers = restTemplate.getForObject(followersUrl, GithubUser[].class, new HashMap<>());
 
         for (GithubUser githubUser : githubFollowers) {
             // TODO: not add followers, that user   already removes from friends

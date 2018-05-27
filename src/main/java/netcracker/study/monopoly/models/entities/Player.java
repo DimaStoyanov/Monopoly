@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import static netcracker.study.monopoly.models.entities.Player.PlayerType.PLAYER;
+
 @Entity
 @ToString(exclude = "friends")
 @NoArgsConstructor
@@ -40,6 +42,9 @@ public class Player extends AbstractIdentifiableObject implements Serializable {
     @Setter
     private String avatarUrl = "https://avatars3.githubusercontent.com/u/4161866?s=200&v=4";
 
+    @Setter
+    private PlayerType playerType = PLAYER;
+
     public Player(String nickname) {
         this.nickname = nickname;
         this.createdAt = new Date();
@@ -58,5 +63,10 @@ public class Player extends AbstractIdentifiableObject implements Serializable {
         friends = new HashSet<>();
     }
 
+
+    public enum PlayerType {
+        PLAYER, PASSIVE_BOT
+//        , ACTIVE_BOT, RANDOM_BOT
+    }
 
 }
