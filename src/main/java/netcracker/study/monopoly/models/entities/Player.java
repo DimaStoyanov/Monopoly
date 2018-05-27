@@ -43,6 +43,7 @@ public class Player extends AbstractIdentifiableObject implements Serializable {
     private String avatarUrl = "https://avatars3.githubusercontent.com/u/4161866?s=200&v=4";
 
     @Setter
+    @Enumerated(EnumType.STRING)
     private PlayerType playerType = PLAYER;
 
     public Player(String nickname) {
@@ -65,8 +66,8 @@ public class Player extends AbstractIdentifiableObject implements Serializable {
 
 
     public enum PlayerType {
-        PLAYER, PASSIVE_BOT
-//        , ACTIVE_BOT, RANDOM_BOT
+        PLAYER, PASSIVE_BOT, ACTIVE_BOT
+//        , RANDOM_BOT
     }
 
 }

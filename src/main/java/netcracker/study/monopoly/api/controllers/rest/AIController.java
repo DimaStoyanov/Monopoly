@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static netcracker.study.monopoly.models.entities.Player.PlayerType.ACTIVE_BOT;
 import static netcracker.study.monopoly.models.entities.Player.PlayerType.PASSIVE_BOT;
 
 @RestController
@@ -19,13 +20,13 @@ import static netcracker.study.monopoly.models.entities.Player.PlayerType.PASSIV
 @Log4j2
 public class AIController {
 
-    public static EnumMap<PlayerType, Set<UUID>> bots;
+    public final static Map<PlayerType, Set<UUID>> bots = new EnumMap<>(PlayerType.class);
     private final PlayerRepository playerRepository;
 
     public AIController(PlayerRepository playerRepository) {
         this.playerRepository = playerRepository;
-        bots = new EnumMap<>(PlayerType.class);
-        createPassiveBot();
+        createPassiveBots();
+        createActiveBots();
     }
 
     @GetMapping("/types")
@@ -48,7 +49,7 @@ public class AIController {
                 .collect(Collectors.toList());
     }
 
-    private void createPassiveBot() {
+    private void createPassiveBots() {
 
         saveBot(PASSIVE_BOT, "Kyle (Bot)",
                 "https://cdn1.iconfinder.com/data/icons/bots/280/bot-9-2-512.png");
@@ -64,6 +65,20 @@ public class AIController {
 
     }
 
+    private void createActiveBots() {
+        saveBot(ACTIVE_BOT, "Poncho (Bot)",
+                "https://i.pinimg.com/originals/bb/c1/2b/bbc12bff3a544b88c3d408669231073a.png");
+
+        saveBot(ACTIVE_BOT, "Armstrong (Bot)",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfMVHyR2t73tZxc1i3hNCej1NJRgso-sLP1Uo_peIxP0d1UlWH");
+
+        saveBot(ACTIVE_BOT, "Viper (Bot)",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXtJOZh9ZMSwgtMIvUFnXXyOXENY6wCDF9xK5biQQ-1RBwWvNTNg");
+
+        saveBot(ACTIVE_BOT, "Imp (Bot)",
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRV3-H9POQTftpCKSkhpCCmGG5QFxERkT7YzzsHvBhPlMe-UuIBoA");
+    }
+
     private void saveBot(PlayerType botType, String name, String avatarUrl) {
         bots.computeIfAbsent(botType, t -> new HashSet<>());
         Set<UUID> botIds = bots.get(botType);
@@ -72,7 +87,7 @@ public class AIController {
         if (!botOpt.isPresent()) {
             log.info(String.format("Create bot %s", name));
             Player bot = new Player(name);
-            bot.setPlayerType(PASSIVE_BOT);
+            bot.setPlayerType(botType);
             bot.setAvatarUrl(avatarUrl);
             playerRepository.save(bot);
             botIds.add(bot.getId());

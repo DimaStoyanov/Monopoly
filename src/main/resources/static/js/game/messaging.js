@@ -156,7 +156,7 @@ function clearOffers() {
 }
 
 function removeOffer(offerId) {
-    var offerItem = offerItem[offerId];
+    var offerItem = offers[offerId];
     if (offerItem) {
         offerItem.remove();
         if (offersList.childElementCount === 0) {
@@ -176,7 +176,7 @@ function addOffer(offer) {
 
     var seller = game.playersMap[offer.sellerId];
     var cost = offer.cost;
-    var streetName = game.field[seller.position].name;
+    var streetName = game.field[offer.streetPosition].name;
     offerDescription.innerHTML = '<i>' + seller.name + '</i> offers to buy <b>' +
         streetName + '</b> for <b>' + cost + '</b>';
     offerItem.appendChild(offerDescription);

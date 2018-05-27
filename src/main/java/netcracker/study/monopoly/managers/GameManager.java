@@ -11,6 +11,7 @@ import netcracker.study.monopoly.converters.CellConverter;
 import netcracker.study.monopoly.converters.GameConverter;
 import netcracker.study.monopoly.converters.PlayerConverter;
 import netcracker.study.monopoly.exceptions.*;
+import netcracker.study.monopoly.managers.ai.ActiveBotManager;
 import netcracker.study.monopoly.managers.ai.PassiveBotManager;
 import netcracker.study.monopoly.models.GameCreator;
 import netcracker.study.monopoly.models.entities.CellState;
@@ -34,8 +35,7 @@ import java.util.concurrent.TimeUnit;
 import static java.lang.String.format;
 import static netcracker.study.monopoly.models.entities.CellState.CellType.STREET;
 import static netcracker.study.monopoly.models.entities.Game.GameState.*;
-import static netcracker.study.monopoly.models.entities.Player.PlayerType.PASSIVE_BOT;
-import static netcracker.study.monopoly.models.entities.Player.PlayerType.PLAYER;
+import static netcracker.study.monopoly.models.entities.Player.PlayerType.*;
 
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Service
@@ -65,6 +65,9 @@ public class GameManager {
     private CellConverter cellConverter;
     @Autowired
     private PassiveBotManager passiveBotManager;
+    @Autowired
+    private ActiveBotManager activeBotManager;
+
 
     private GameCreator gameCreator = GameCreator.INSTANCE;
 
@@ -104,6 +107,8 @@ public class GameManager {
         PlayerType playerType = game.getTurnOf().getCurrentType();
         if (playerType == PASSIVE_BOT) {
             scheduledExecutorService.schedule(() -> passiveBotManager.makeStep(game), BOT_DELAY, TimeUnit.SECONDS);
+        } else if (playerType == ACTIVE_BOT) {
+            scheduledExecutorService.schedule(() -> activeBotManager.makeStep(game), BOT_DELAY, TimeUnit.SECONDS);
         }
 
         return gameChange;
@@ -114,7 +119,7 @@ public class GameManager {
                 new GameNotFoundException(gameId));
         log.trace("Get game " + game);
 
-        if (game.getTurnOf().getCurrentType() != PLAYER) {
+        if (game.getCurrentState() == NOT_STARTED && game.getTurnOf().getCurrentType() != PLAYER) {
             startGame(game);
         }
 
@@ -321,12 +326,11 @@ public class GameManager {
         PlayerState player = playerStateRepository.findById(offer.getBuyerId())
                 .orElseThrow(() -> new PlayerNotFoundException(offer.getSellerId()));
 
-        switch (player.getCurrentType()) {
-            case PLAYER:
-                break;
-            case PASSIVE_BOT:
-                passiveBotManager.processOffer(offer, game);
-                break;
+
+        if (player.getCurrentType() == PlayerType.PASSIVE_BOT) {
+            passiveBotManager.processOffer(offer, game);
+        } else if (player.getCurrentType() == PlayerType.ACTIVE_BOT) {
+            activeBotManager.processOffer(offer, game);
         }
     }
 
@@ -337,12 +341,11 @@ public class GameManager {
         PlayerState player = playerStateRepository.findById(offer.getBuyerId())
                 .orElseThrow(() -> new PlayerNotFoundException(offer.getSellerId()));
 
-        switch (player.getCurrentType()) {
-            case PLAYER:
-                break;
-            case PASSIVE_BOT:
-                passiveBotManager.triggerAcceptOffer(offer, game);
-                break;
+        if (player.getCurrentType() == PlayerType.PASSIVE_BOT) {
+            passiveBotManager.triggerAcceptOffer(offer, game);
+
+        } else if (player.getCurrentType() == PlayerType.ACTIVE_BOT) {
+            activeBotManager.triggerAcceptOffer(offer, game);
         }
 
     }
@@ -355,16 +358,16 @@ public class GameManager {
                 .orElseThrow(() -> new PlayerNotFoundException(offer.getSellerId()));
         System.out.println(player);
 
-        switch (player.getCurrentType()) {
-            case PLAYER:
-                break;
-            case PASSIVE_BOT:
-                passiveBotManager.triggerDeclaimedOffer(offer, game);
-                break;
+        if (player.getCurrentType() == PlayerType.PASSIVE_BOT) {
+            passiveBotManager.triggerDeclaimedOffer(offer, game);
+
+        } else if (player.getCurrentType() == PlayerType.ACTIVE_BOT) {
+            activeBotManager.triggerDeclaimedOffer(offer, game);
         }
     }
 
-    public GameChange sellStreet(UUID gameId, UUID sellerId, @NonNull UUID buyerId, @NonNull Integer cost) {
+    public GameChange sellStreet(UUID gameId, UUID sellerId, @NonNull UUID buyerId, @NonNull Integer cost,
+                                 @NonNull Integer streetPosition) {
         // Retrieve data
         PlayerState seller = playerStateRepository.findById(sellerId).orElseThrow(() ->
                 new PlayerNotFoundException(sellerId));
@@ -372,9 +375,8 @@ public class GameManager {
                 new PlayerNotFoundException(sellerId));
         Game game = gameRepository.findById(gameId).orElseThrow(() ->
                 new GameNotFoundException(gameId));
-        Integer position = seller.getPosition();
-        CellState street = cellStateRepository.findByGameIdAAndPositionWithLock(gameId, position)
-                .orElseThrow(() -> new CellNotFoundException(gameId, position));
+        CellState street = cellStateRepository.findByGameIdAAndPositionWithLock(gameId, streetPosition)
+                .orElseThrow(() -> new CellNotFoundException(gameId, streetPosition));
         // Validating
         validateSellStreet(buyer, seller, street, game, cost);
         // Business logic
@@ -395,11 +397,14 @@ public class GameManager {
         }
         // validation that both players play in same game
         if (!Objects.equals(buyer.getGame().getId(), game.getId())) {
-            throw new NotAllowedOperationException();
+            throw new NotAllowedOperationException("Buyers and seller should be in the same game");
+        }
+        if (street.getOwner() == null) {
+            throw new IllegalStateException("Street doesn't have owner");
         }
         // validation that seller owns street
         if (!Objects.equals(street.getOwner().getId(), seller.getId())) {
-            throw new NotAllowedOperationException();
+            throw new NotAllowedOperationException("Seller should own street");
         }
         // validation that seller is active player now
         if (!Objects.equals(game.getTurnOf().getId(), seller.getId())) {
@@ -419,18 +424,20 @@ public class GameManager {
         gameChange.setCurrentState(game.getCurrentState());
         gameChange.addChangeDescription(format("%s sell %s to %s for M%s", seller.getPlayer().getNickname(),
                 street.getName(), buyer.getPlayer().getNickname(), street.getCost()));
+        log.info(gameChange.getChangeDescriptions());
         return gameChange;
     }
 
 
     public GameChange finishStep(UUID gameId, UUID playerId) {
         Game game = gameRepository.findById(gameId).orElseThrow(() -> new GameNotFoundException(gameId));
-        PlayerState turnOf = game.getTurnOf();
+        PlayerState turnOf = playerStateRepository.findById(playerId)
+                .orElseThrow(() -> new PlayerNotFoundException(playerId));
         return finishStep(game, turnOf);
     }
 
     private GameChange finishStep(Game game, PlayerState turnOf) {
-        if (!Objects.equals(turnOf.getId(), turnOf.getId())) {
+        if (!Objects.equals(game.getTurnOf().getId(), turnOf.getId())) {
             throw new NotYourStepException();
         }
         String nickname = turnOf.getPlayer().getNickname();
@@ -472,6 +479,8 @@ public class GameManager {
         PlayerType currentType = game.getTurnOf().getCurrentType();
         if (currentType == PASSIVE_BOT) {
             scheduledExecutorService.schedule(() -> passiveBotManager.makeStep(game), BOT_DELAY, TimeUnit.SECONDS);
+        } else if (currentType == ACTIVE_BOT) {
+            scheduledExecutorService.schedule(() -> activeBotManager.makeStep(game), BOT_DELAY, TimeUnit.SECONDS);
         }
 
         return gameChange;

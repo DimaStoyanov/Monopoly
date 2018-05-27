@@ -44,6 +44,7 @@ public class PlayerState extends AbstractIdentifiableObject implements Serializa
     private Game game;
 
     @Setter
+    @Enumerated(EnumType.STRING)
     private PlayerType currentType;
 
     public void addScore(@NonNull Integer score) {

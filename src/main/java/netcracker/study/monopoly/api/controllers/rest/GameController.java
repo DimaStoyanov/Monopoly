@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static java.lang.String.format;
@@ -139,12 +140,13 @@ public class GameController {
 
 
         Offer offer = sellOfferManager.getOffer(rqId);
-        if (buyerId != offer.getBuyerId()) {
-            throw new NotAllowedOperationException();
+        if (!Objects.equals(buyerId, offer.getBuyerId())) {
+            throw new NotAllowedOperationException("Only buyer can accept it's offer");
         }
         List<Integer> offersIds = sellOfferManager.removeAllOfferInPosition(gameId, offer.getStreetPosition());
 
-        GameChange gameChange = gameManager.sellStreet(gameId, offer.getSellerId(), offer.getBuyerId(), offer.getCost());
+        GameChange gameChange = gameManager.sellStreet(gameId, offer.getSellerId(),
+                offer.getBuyerId(), offer.getCost(), offer.getStreetPosition());
 
         GameMsg gameChangeMsg = getGameChangeMsg(gameChange, buyerId);
         gameChangeMsg.setCancelledOffersRqId(offersIds);

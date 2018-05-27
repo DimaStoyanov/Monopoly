@@ -228,7 +228,7 @@ function onConnected() {
                         return
                     }
 
-                    $.post('/rooms/' + roomId + '/add-bot?type=' + botType, alert)
+                    $.post('/rooms/' + roomId + '/add-bot?type=' + botType, errorHandler)
                         .fail(errorHandler)
                 });
 

@@ -49,13 +49,12 @@ public class SellOfferManager {
     public List<Integer> removeAllOfferInPosition(@NonNull UUID gameId, Integer position) {
         List<Integer> ids = offerInGame.getOrDefault(gameId, Collections.emptyList())
                 .stream()
-                .filter(o -> offers.get(o).getStreetPosition().equals(position))
+                .filter(id -> offers.get(id) != null
+                        && Objects.equals(offers.get(id).getStreetPosition(), position))
                 .collect(Collectors.toList());
         ids.forEach(offers::remove);
         return ids;
     }
-
-
 
 
 }
