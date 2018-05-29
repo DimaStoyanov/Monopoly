@@ -1,5 +1,5 @@
 var autofocus = false;
-
+var currentBalloon = null;
 
 function drawBtnAutoFocus() {
     var btnAutoFocus = new ymaps.control.Button({
@@ -39,7 +39,7 @@ function buildRectangle(coords, strokeColor, imgHref) {
         fillMethod: 'stretch',
         fillImageHref: imgHref,
         // Прозрачность обводки.
-        strokeOpacity: 0.7,
+        strokeOpacity: 0.9,
         // Ширина линии.
         strokeWidth: 3,
         // Радиус скругления углов.
@@ -94,6 +94,7 @@ function setBalloon(rectangle, index, canBuy, canSell, canPay) {
 
     $(rectangle).off();
     rectangle.events.add('balloonopen', function () {
+        currentBalloon = rectangle.balloon;
 
         var btnBuy = $('#btn_buy');
         btnBuy.off();
@@ -191,7 +192,7 @@ function buildCircle(coords, player, strokeColor) {
         // Цвет обводки.
         strokeColor: strokeColor,
         // Прозрачность обводки.
-        strokeOpacity: 0.5,
+        strokeOpacity: 0.8,
         // Ширина обводки в пикселях.
         strokeWidth: 5
 

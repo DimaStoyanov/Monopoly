@@ -65,6 +65,7 @@ public class ProfileController {
         model.addAttribute("city", details.get("location"));
         model.addAttribute("avatar_url", player.getAvatarUrl());
         model.addAttribute("friends", friends);
+        model.addAttribute("self", player);
         model.addAttribute("games", games);
 
         return "profile";

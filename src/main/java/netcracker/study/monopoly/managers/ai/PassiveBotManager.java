@@ -71,7 +71,7 @@ public class PassiveBotManager implements BotManager {
         List<CellState> owns = findYourOwns(game, self);
         int totalOwnsCost = owns.stream().mapToInt(CellState::getCost).sum();
         int needToPay = game.getField().get(self.getPosition()).getCost();
-        double costRatio = needToPay / totalOwnsCost;
+        double costRatio = (double) needToPay / totalOwnsCost;
 
 
         if (needToPay > totalOwnsCost) {

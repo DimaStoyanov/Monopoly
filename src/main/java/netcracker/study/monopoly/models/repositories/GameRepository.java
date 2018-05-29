@@ -13,7 +13,7 @@ public interface GameRepository extends CrudRepository<Game, UUID> {
             "from Game g " +
             "join PlayerState ps on g = ps.game " +
             "join Player p on ps.player = p " +
-            "where p = ?1 " +
+            "where p = ?1 and g.currentState = 'FINISHED' " +
             "order by g.startedAt desc")
     List<Game> findByPlayer(Player player);
 }

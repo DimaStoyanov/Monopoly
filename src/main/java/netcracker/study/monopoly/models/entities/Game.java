@@ -50,6 +50,7 @@ public class Game extends AbstractIdentifiableObject implements Serializable {
     private Player winner;
 
     @Setter
+    @Enumerated(EnumType.STRING)
     private GameState currentState = NOT_STARTED;
 
     public enum GameState {

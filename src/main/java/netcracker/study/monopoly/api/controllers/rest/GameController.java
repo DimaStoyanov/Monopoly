@@ -93,7 +93,6 @@ public class GameController {
         GameMsg msg = getGameChangeMsg(gameChange, playerId);
         if (gameChange.getCurrentState() == FINISHED) {
             msg.setType(FINISH);
-            session.setAttribute(GAME_ID_KEY, null);
         }
         messagingTemplate.convertAndSend(TOPIC_PREFIX + gameId, msg);
     }
@@ -140,6 +139,10 @@ public class GameController {
 
 
         Offer offer = sellOfferManager.getOffer(rqId);
+
+        if (offer == null) {
+            throw new NotAllowedOperationException("Offer RqID is not correct");
+        }
         if (!Objects.equals(buyerId, offer.getBuyerId())) {
             throw new NotAllowedOperationException("Only buyer can accept it's offer");
         }
@@ -174,6 +177,7 @@ public class GameController {
         messagingTemplate.convertAndSend(TOPIC_PREFIX + gameId, msg);
 
         gameManager.triggerOfferDeclaim(gameId, offer);
+        log.info("Decline offer " + offer);
     }
 
     @PutMapping("/street.pay")

@@ -53,8 +53,16 @@ function onMessageReceived(payload) {
 
 
     } else if (message.type === 'CHANGE' || message.type === 'FINISH') {
+        if (currentBalloon) {
+            currentBalloon.close();
+        }
+
         var gameChange = message.gameChange;
         game.currentState = gameChange.currentState;
+
+        if (game.currentState === "FINISHED") {
+            finishStepBtn.disable();
+        }
 
 
         gameChange.gamersChange.forEach(function (player) {
@@ -76,10 +84,11 @@ function onMessageReceived(payload) {
             finishStepBtn.disable();
         }
 
-        var streetChange = gameChange.streetChange;
-        if (streetChange) {
+        var streetChanges = gameChange.streetChanges;
+        streetChanges.forEach(function (streetChange) {
             game.field[streetChange.position] = streetChange;
-        }
+        });
+
         updateCells();
         drawStreetFrame();
 
@@ -95,12 +104,15 @@ function onMessageReceived(payload) {
             }
         }
 
-        messageElement.classList.add('event-message');
-        message.content = '';
-        gameChange.changeDescriptions.forEach(function (item) {
-            message.content += item;
-            message.content += '\t\n';
+        gameChange.changeDescriptions.forEach(function (descr) {
+            addGameChangeMessage(descr)
         });
+
+
+        if (game.currentState === 'FINISHED' && confirm('Game is finished. Do you want to leave?')) {
+            $(location).attr('href', '/');
+        }
+        return
 
     } else if (message.type === 'OFFER') {
         if (message.receiverId === selfInfo.id) {
@@ -135,7 +147,9 @@ function onMessageReceived(payload) {
         var usernameText = document.createTextNode(player.name);
         usernameElement.appendChild(usernameText);
         messageElement.appendChild(usernameElement);
+
     }
+
 
     var textElement = document.createElement('p');
     var messageText = document.createTextNode(message.content);
@@ -145,6 +159,21 @@ function onMessageReceived(payload) {
 
     messageArea.appendChild(messageElement);
     messageArea.scrollTop = messageArea.scrollHeight;
+}
+
+function addGameChangeMessage(text) {
+    var messageElement = document.createElement('li');
+    messageElement.classList.add('event-message');
+
+    var textElement = document.createElement('p');
+    var messageText = document.createTextNode(text);
+    textElement.appendChild(messageText);
+
+    messageElement.appendChild(textElement);
+
+    messageArea.appendChild(messageElement);
+    messageArea.scrollTop = messageArea.scrollHeight;
+
 }
 
 function clearOffers() {
@@ -167,8 +196,7 @@ function removeOffer(offerId) {
 }
 
 function addOffer(offer) {
-    offersBtn.click();
-    noOfferTitle.css({visibility: 'hidden'});
+
     var offerItem = document.createElement('div');
 
     offerItem.className = 'offer-item';
@@ -185,6 +213,8 @@ function addOffer(offer) {
     acceptBtn.className = 'primary';
     acceptBtn.innerHTML = 'Accept';
     $(acceptBtn).css('margin-right', '5px');
+    offersBtn.click();
+    noOfferTitle.css({visibility: 'hidden'});
 
     acceptBtn.addEventListener('click', function () {
         $.ajax({
@@ -258,3 +288,4 @@ function sendMessage(event) {
     }
     event.preventDefault();
 }
+

@@ -70,7 +70,7 @@ public class AIController {
                 "https://i.pinimg.com/originals/bb/c1/2b/bbc12bff3a544b88c3d408669231073a.png");
 
         saveBot(ACTIVE_BOT, "Armstrong (Bot)",
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfMVHyR2t73tZxc1i3hNCej1NJRgso-sLP1Uo_peIxP0d1UlWH");
+                "https://www.voicebot.net/ImagesCommon/Icons/256x256/VoiceBot.png");
 
         saveBot(ACTIVE_BOT, "Viper (Bot)",
                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXtJOZh9ZMSwgtMIvUFnXXyOXENY6wCDF9xK5biQQ-1RBwWvNTNg");

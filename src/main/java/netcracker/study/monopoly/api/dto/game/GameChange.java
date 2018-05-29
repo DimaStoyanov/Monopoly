@@ -13,12 +13,16 @@ import java.util.UUID;
 public class GameChange implements Serializable {
     private UUID turnOf;
     private List<Gamer> gamersChange = new ArrayList<>();
-    private Street streetChange;
+    private List<Street> streetChanges = new ArrayList<>();
     private List<String> changeDescriptions = new ArrayList<>();
     private GameState currentState;
 
     public void addGamerChange(Gamer gamer) {
         gamersChange.add(gamer);
+    }
+
+    public void addStreetChange(Street street) {
+        streetChanges.add(street);
     }
 
     public void addChangeDescription(String description) {

@@ -53,7 +53,12 @@ offersBtn.addEventListener('click', function () {
     onFrameButtonClick(offersBtn, scoreBtn, offersContainer, scoreContainer)
 });
 
-var playersColors = ['#5d80ca', '#3cc72d', '#b52dc7', '#b52dc7'];
+var playersColors = [
+    '#5d80ca',
+    '#3cc72d',
+    '#b52dc7',
+    '#c43c3c'
+];
 var neutralColor = '#999966';
 
 function errorHandler(error) {
@@ -74,8 +79,16 @@ $.get('/player/info', function (data) {
 
 function drawScoreTable() {
     scoreTable.innerHTML = '';
+    game.players = [];
     for (var playerKey in game.playersMap) {
         var player = game.playersMap[playerKey];
+        game.players.push(player)
+    }
+    game.players.sort(function (a, b) {
+        return b.score - a.score
+    });
+
+    game.players.forEach(function (player) {
         var row = scoreTable.insertRow();
 
         var avatarCell = row.insertCell();
@@ -89,7 +102,12 @@ function drawScoreTable() {
 
         var scoreCell = row.insertCell();
         scoreCell.innerHTML = player.score;
-    }
+
+        if (player.isBankrupt) {
+            nameCell.innerHTML = '<span style="color: red; ">' + nameCell.innerHTML + '</span>';
+            scoreCell.innerHTML = '<span style="color: red; ">' + scoreCell.innerHTML + '</span>'
+        }
+    })
 }
 
 setInterval(drawScoreTable, 5000);
@@ -145,7 +163,6 @@ function init() {
         var fullscreenControl = new ymaps.control.FullscreenControl();
         myMap.controls.add(fullscreenControl, {float: 'left'});
         updateCells();
-        drawPlayers();
         updateTurnOfFrame();
         drawPlayers();
         drawStreetFrame();
@@ -182,7 +199,8 @@ function updateCells() {
             if (cell.owner) {
                 if (cell.owner.id === selfInfo.id) {
                     canSell = true;
-                } else if (game.currentState === 'NEED_TO_PAY_OWNER') {
+                } else if (game.currentState === 'NEED_TO_PAY_OWNER'
+                    && cell.position === game.playersMap[selfInfo.id].position) {
                     canPay = true;
                 }
             } else {

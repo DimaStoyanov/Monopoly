@@ -1,48 +1,205 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:dt="http://www.thymeleaf.org/dandelion/datatables"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" lang="en"
-      xsi:schemaLocation="http://www.thymeleaf.org/dandelion/datatables
-http://www.thymeleaf.org/dandelion/datatables ">
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en"
+>
 <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<link href="https://yandex.st/bootstrap/2.2.2/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .profile {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 100%;
+        height: 100%;
+    }
+
+    .profile-info {
+        max-width: 40%;
+        left: 15%;
+        padding: 20px;
+        position: absolute;
+        font-family: monospace;
+        font-size: xx-large;
+        height: 30%;
+    }
+
+    .profile-avatar {
+        top: 10px;
+        left: 10px;
+        position: absolute;
+    }
+
+    .games {
+        position: absolute;
+        top: 30%;
+        width: 70%;
+        height: calc(70% - 10px);
+    }
+
+    .games-list {
+        display: block;
+        height: 83%;
+        overflow: auto;
+    }
+
+    .friends {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        height: 100%;
+    }
+
+    .controls {
+        position: absolute;
+        margin: 20px;
+        top: 10px;
+        left: 45%
+    }
+
+    button {
+        box-shadow: none;
+        border: 1px solid transparent;
+        font-size: 14px;
+        outline: none;
+        line-height: 100%;
+        white-space: nowrap;
+        vertical-align: middle;
+        padding: 0.6rem 1rem;
+        border-radius: 2px;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+        min-height: 38px;
+    }
+
+    button.default {
+        background-color: #e8e8e8;
+        color: #333;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    button.primary {
+        background-color: #128ff2;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12);
+        color: #fff;
+    }
+
+    button.accent {
+        background-color: #ff4743;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12);
+        color: #fff;
+    }
+
+    button.yellow {
+        background-color: gold;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12);
+        color: #fff;
+    }
+
+    button.cyan {
+        background-color: darkcyan;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12);
+        color: #fff;
+    }
+
+    button.green {
+        background-color: limegreen;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12);
+        color: #fff;
+    }
+
+</style>
 <head>
     <meta charset="UTF-8">
     <title>Monopoly profile</title>
 </head>
 <body>
+<div class="profile">
+    <div class="profile-info">
+        <!--/*@thymesVar id="player" status="java.lang.String"*/-->
+        <p th:text="'Player: ' +  ${player}"></p>
+        <p th:if="${name}" th:text="'Name: ' + ${name}"></p>
+        <!--/*@thymesVar id="city" status="java.lang.String"*/-->
+        <p id="city" th:if="${city}" th:text="'City: ' +  ${city}"></p>
+        <p th:text="'Total score: ' + ${self.stat.totalScore}"></p>
+        <p th:text="'Total wins: ' + ${self.stat.totalWins}"></p>
+        <p th:text="'Total games: ' + ${self.stat.totalGames}"></p>
+    </div>
+    <div class="profile-avatar">
+        <!--/*@thymesVar id="avatar_url" status="java.lang.String"*/-->
+        <img th:if="${avatar_url}" style="height: 200px" th:src="${avatar_url}">
+    </div>
 
-<!--/*@thymesVar id="player" status="java.lang.String"*/-->
-<p th:text="'Player: ' +  ${player}"></p>
-<p th:if="${name}" th:text="'Name: ' + ${name}"></p>
-<!--/*@thymesVar id="city" status="java.lang.String"*/-->
-<p id="city" th:if="${city}" th:text="'City: ' +  ${city}"></p>
-<!--/*@thymesVar id="avatar_url" status="java.lang.String"*/-->
-<img th:if="${avatar_url}" height="150" th:src="${avatar_url}">
 
-<h2> Friends: </h2>
-<table border="1" dt:table="true">
-    <tbody>
-    <!--/*@thymesVar id="friends" status="java.util.List"*/-->
-    <tr th:each="friend : ${friends}">
-        <td><img height="80" th:src="${friend[0]}"></td>
-        <td th:text="${friend[1]}"></td>
-        <td th:text="${friend[2]}"></td>
-        <td>
-            <button onclick="onRemoveFriendClick(this)"
-                    th:id="'remove_' + ${friend[1]}">Remove
+    <div class="games">
+        <h2>Games</h2>
+        <ul class="games-list">
+            <li th:each="game: ${games}">
+                <p th:text="'Started at: ' + ${game.startedAt}"></p>
+                <p th:text="'Finished at: ' + ${game.finishedAt}"></p>
+                <p th:text="'Winner: '  + ${game.winner.nickname} "></p>
+                <table border="1" class="table table-striped` table-bordered">
+                    <thead>
+                    <tr>
+                        <td>Avatar</td>
+                        <td>Nickname</td>
+                        <td>Money</td>
+                        <td>Score</td>
+                        <td>Bankrupt</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="playerState: ${game.playerStates}">
+                        <td><img style="height:80px" th:src="${playerState.player.avatarUrl}"></td>
+                        <td th:text="${playerState.player.nickname}"></td>
+                        <td th:text="${playerState.money}"></td>
+                        <td th:text="${playerState.score}"></td>
+                        <td th:text="${playerState.isBankrupt}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </li>
+        </ul>
+    </div>
+    <div class="friends">
+        <h2> Friends</h2>
+        <table border="1" style="overflow: auto; display: block; max-height: 70%"
+               class="table table-stripped table-bordered">
+            <thead></thead>
+            <tbody>
+            <!--/*@thymesVar id="friends" status="java.util.List"*/-->
+            <tr th:each="friend : ${friends}">
+                <td><img style="height: 100px;" th:src="${friend[0]}"></td>
+                <td th:text="${friend[1]}"></td>
+                <td th:text="${friend[2]}"></td>
+                <td>
+                    <button class="accent" onclick="onRemoveFriendClick(this)"
+                            th:id="'remove_' + ${friend[1]}">Remove
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <input id="friend_nickname" type="text" title="Nickname">
+        <button class="primary" onclick="onAddFriendClick()"> Add friend</button>
+        <p style="padding-top:  10px">
+            <button class="yellow" onclick="onAddFollowersClick()">Add followers to friends</button>
+            <button class="accent" style="margin-left: 10px" onclick="onRemoveAllFriendsClick()">Remove all friends
             </button>
-        </td>
-    </tr>
-    </tbody>
-</table>
-<input id="friend_nickname" type="text" title="Nickname">
-<button onclick="onAddFriendClick()"> Add friend</button>
+        </p>
+    </div>
+    <div class="controls">
 
-<button onclick="onAddFollowersClick()">Add followers to friends</button>
-<button onclick="onRemoveAllFriendsClick()">Remove all friends</button>
-
-<button onclick="onCreateRoomClick()">Create room</button>
+        <p style="text-align: center;">
+            <button class="green" style="margin-top: 30px; width: 200px" onclick="onCreateRoomClick()">Create room
+            </button>
+        </p>
+        <p style="margin-top: 20px; text-align: center;">
+            <button class="cyan" style="width: 200px">Auto search</button>
+        </p>
+    </div>
+</div>
 
 <script>
 
@@ -147,6 +304,8 @@ http://www.thymeleaf.org/dandelion/datatables ">
 
         }
     }
+
+
 </script>
 </body>
 </html>

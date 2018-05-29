@@ -84,6 +84,7 @@ public class GameManager {
         return gameConverter.toDto(game);
     }
 
+    // TODO playerId
     public GameChange startGame(UUID gameId, UUID playerId) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new GameNotFoundException(gameId));
@@ -148,36 +149,29 @@ public class GameManager {
         gameChange.addChangeDescription(format("%s moved to %s", player.getPlayer().getNickname(), cell.getName()));
 
 
-        switch (cell.getType()) {
-            case START:
-                break;
-            case FLIGHT:
-                break;
-            case JAIL:
-                break;
-            default:
-                if (cell.getOwner() != null) {
-                    if (Objects.equals(cell.getOwner().getId(), player.getId())) {
-                        game.setCurrentState(CAN_ONLY_SELL);
-                    } else {
-                        if (!payToOwner(player, cell, gameChange)) {
-                            if (checkHasOwns(game, player)) {
-                                game.setCurrentState(NEED_TO_PAY_OWNER);
-                            } else {
-                                // TODO maybe add gameChange parameter to method
-
-                                log.info(format("%s is bankrupt", player.getPlayer().getNickname()));
-                                //TODO
-                                GameChange bankruptGameChange = finishStep(game.getId(), player.getId());
-                                bankruptGameChange.getGamersChange().forEach(gameChange::addGamerChange);
-                                gameChange.setStreetChange(bankruptGameChange.getStreetChange());
-                                gameChange.setTurnOf(bankruptGameChange.getTurnOf());
-                                bankruptGameChange.getChangeDescriptions().forEach(gameChange::addChangeDescription);
-                            }
+        if (cell.getType() == CellState.CellType.STREET) {
+            if (cell.getOwner() != null) {
+                if (Objects.equals(cell.getOwner().getId(), player.getId())) {
+                    game.setCurrentState(CAN_ONLY_SELL);
+                } else {
+                    log.info(format("%s need to pay owner", player.getPlayer().getNickname()));
+                    if (!payToOwner(player, cell, gameChange)) {
+                        game.setCurrentState(NEED_TO_PAY_OWNER);
+                        if (!checkHasOwns(game, player)) {
+                            // TODO maybe add gameChange parameter to method
+                            log.info(format("%s will become bankrupt", player.getPlayer().getNickname()));
+                            //TODO
+                            GameChange bankruptGameChange = finishStep(game, player);
+                            bankruptGameChange.getGamersChange().forEach(gameChange::addGamerChange);
+                            gameChange.setStreetChanges(bankruptGameChange.getStreetChanges());
+                            gameChange.setTurnOf(bankruptGameChange.getTurnOf());
+                            bankruptGameChange.getChangeDescriptions().forEach(gameChange::addChangeDescription);
                         }
                     }
+
                 }
-                break;
+            }
+
         }
         playerStateRepository.save(player);
         Gamer gamer = playerConverter.toDto(player);
@@ -187,14 +181,6 @@ public class GameManager {
         return gameChange;
     }
 
-    private GameChange firstStep(GameChange gameChange, UUID gameId, UUID playerId) {
-
-        PlayerState player = playerStateRepository.findById(playerId).orElseThrow(() ->
-                new PlayerNotFoundException(playerId));
-        Game game = gameRepository.findById(gameId).orElseThrow(() ->
-                new GameNotFoundException(gameId));
-        return firstStep(gameChange, game, player);
-    }
 
     private boolean checkHasOwns(Game game, PlayerState player) {
         return game.getField().stream()
@@ -280,7 +266,7 @@ public class GameManager {
         Gamer gamer = playerConverter.toDto(playerState);
         gameChange.addGamerChange(gamer);
         Street street = cellConverter.toStreet(cell);
-        gameChange.setStreetChange(street);
+        gameChange.addStreetChange(street);
         return gameChange;
     }
 
@@ -338,7 +324,7 @@ public class GameManager {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new GameNotFoundException(gameId));
 
-        PlayerState player = playerStateRepository.findById(offer.getBuyerId())
+        PlayerState player = playerStateRepository.findById(offer.getSellerId())
                 .orElseThrow(() -> new PlayerNotFoundException(offer.getSellerId()));
 
         if (player.getCurrentType() == PlayerType.PASSIVE_BOT) {
@@ -419,7 +405,7 @@ public class GameManager {
         GameChange gameChange = new GameChange();
         gameChange.addGamerChange(playerConverter.toDto(buyer));
         gameChange.addGamerChange(playerConverter.toDto(seller));
-        gameChange.setStreetChange(cellConverter.toStreet(street));
+        gameChange.addStreetChange(cellConverter.toStreet(street));
         gameChange.setTurnOf(game.getTurnOf().getId());
         gameChange.setCurrentState(game.getCurrentState());
         gameChange.addChangeDescription(format("%s sell %s to %s for M%s", seller.getPlayer().getNickname(),
@@ -448,6 +434,8 @@ public class GameManager {
             if (!payToOwner(turnOf, game.getField().get(turnOf.getPosition()), gameChange)) {
                 log.info(format("%s is a bankrupt", turnOf.getPlayer().getNickname()));
                 turnOf.setIsBankrupt(true);
+                removeAllOwns(game, turnOf, gameChange);
+                turnOf.setScore(0);
                 gameChange.addGamerChange(playerConverter.toDto(turnOf));
                 gameChange.addChangeDescription(format("%s is a bankrupt now", nickname));
                 log.debug(format("%s didn't pay for rent ant became a bankrupt", nickname));
@@ -484,6 +472,16 @@ public class GameManager {
         }
 
         return gameChange;
+    }
+
+
+    private void removeAllOwns(Game game, PlayerState player, GameChange gameChange) {
+        game.getField().stream()
+                .filter(c -> c.getOwner() != null && Objects.equals(c.getOwner().getId(), player.getId()))
+                .forEach(c -> {
+                    c.setOwner(null);
+                    gameChange.addStreetChange(cellConverter.toStreet(c));
+                });
     }
 
 
@@ -527,7 +525,7 @@ public class GameManager {
 
     private PlayerState findWinner(Game game) {
         return game.getPlayerStates().stream().max(Comparator.comparing(PlayerState::getScore)).orElseThrow(() ->
-                new IllegalStateException("Game has no playersCircle"));
+                new IllegalStateException("Game has no players"));
     }
 
 
