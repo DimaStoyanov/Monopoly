@@ -109,9 +109,11 @@ function onMessageReceived(payload) {
         });
 
 
-        if (game.currentState === 'FINISHED' && confirm('Game is finished. Do you want to leave?')) {
-            $(location).attr('href', '/');
-        }
+        setTimeout(function () {
+            if (game.currentState === 'FINISHED' && confirm('Game is finished. Do you want to leave?')) {
+                $(location).attr('href', '/');
+            }
+        }, 1000);
         return
 
     } else if (message.type === 'OFFER') {

@@ -280,6 +280,18 @@ function showCurrentCellBalloon() {
 
 function drawStreetFrame() {
     streetTable.innerHTML = '';
+
+    function drawHeader() {
+        var headerRow = streetTable.insertRow();
+        ['Name', 'Cost', 'Column'].forEach(function (rowName) {
+            var headerCell = document.createElement('TH');
+            headerCell.innerHTML = rowName;
+            headerRow.appendChild(headerCell)
+        });
+    }
+
+
+    drawHeader();
     game.field.forEach(function (cell) {
         if (cell.type === 'STREET') {
             var row = streetTable.insertRow();

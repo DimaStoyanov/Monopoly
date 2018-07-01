@@ -388,6 +388,9 @@ public class GameManager {
         if (street.getOwner() == null) {
             throw new IllegalStateException("Street doesn't have owner");
         }
+        if (seller.getIsBankrupt()) {
+            throw new IllegalStateException("Can't sell street to the bankrupt");
+        }
         // validation that seller owns street
         if (!Objects.equals(street.getOwner().getId(), seller.getId())) {
             throw new NotAllowedOperationException("Seller should own street");

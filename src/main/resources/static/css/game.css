@@ -1,6 +1,8 @@
 #map {
-    width: 100%;
+    width: 70%;
     height: 100%;
+    position: absolute;
+    left: 30%;
 }
 
 #menu {
@@ -163,10 +165,10 @@ button.green {
 }
 
 .score-container {
-    width: 25%;
+    width: 30%;
     position: absolute;
     height: 40%;
-    left: 75%;
+    left: 70%;
     bottom: 0;
     opacity: 0.8;
     padding: 0;
@@ -176,10 +178,10 @@ button.green {
 }
 
 .owns-container {
-    width: 35%;
+    width: 40%;
     position: absolute;
     height: 40%;
-    left: 40%;
+    left: 30%;
     bottom: 0;
     opacity: 0.8;
     padding: 0;
@@ -209,10 +211,10 @@ button.green {
 }
 
 .offers-container {
-    width: 25%;
+    width: 30%;
     position: absolute;
     height: 40%;
-    left: 75%;
+    left: 70%;
     bottom: 0;
     opacity: 0.8;
     padding: 0;
@@ -237,10 +239,10 @@ button.green {
 }
 
 .auction-container {
-    width: 35%;
+    width: 40%;
     position: absolute;
     height: 40%;
-    left: 40%;
+    left: 30%;
     bottom: 0;
     opacity: 0.8;
     padding: 0;
@@ -252,15 +254,15 @@ button.green {
 
 .owns-buttons {
     position: absolute;
-    left: calc(40% + 5px);
-    bottom: calc(40% - 52px);
+    left: calc(30% + 5px);
+    bottom: 32% ;
     padding: 5px;
 }
 
 .score-buttons {
     position: absolute;
-    left: 75%;
-    bottom: calc(40% - 52px);
+    left: 70%;
+    bottom: 32%;
     padding: 5px;
 }
 
@@ -275,12 +277,11 @@ button.green {
 }
 
 .chat-container {
-    width: 40%;
+    width: 30%;
     position: absolute;
-    height: 40%;
+    height: 100%;
     left: 0;
     bottom: 0;
-    opacity: 0.8;
     padding: 0;
     font-family: Courier, sans-serif;
     font-size: 14px;
@@ -295,7 +296,7 @@ button.green {
     overflow: auto;
     /*overflow-y: ;*/
     padding: 0 20px 0 20px;
-    height: calc(50%);
+    height: calc(80%);
 }
 
 #frames #messageForm {

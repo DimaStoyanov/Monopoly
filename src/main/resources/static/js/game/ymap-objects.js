@@ -73,7 +73,8 @@ function setBalloon(rectangle, index, canBuy, canSell, canPay) {
             content += '<option value="" disabled selected>Select buyer</option>';
             for (var playerId in game.playersMap) {
                 var player = game.playersMap[playerId];
-                if (player.id === selfInfo.id) {
+                // Add all players except yourself and already loosed
+                if (player.id === selfInfo.id || player.isBankrupt) {
                     continue;
                 }
 
@@ -175,6 +176,7 @@ function buildCircle(coords, player, strokeColor) {
         balloonContent: '<div style="text-align: center;">' +
         '<img height="100px" src=' + player.avatarUrl + '>' +
         '<p>' + player.name + '</p>' +
+        (player.isBankrupt ? '<p><span style="color: red; ">Bankrupt</span></p>' : '') +
         '<p>Score: ' + player.score + '</p>' +
         '<p>Money: ' + player.money + '</p>',
         // Содержимое хинта.
