@@ -48,7 +48,10 @@ public class GameManager {
     private final Random random = new Random();
     private final ScheduledExecutorService scheduledExecutorService =
             new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
-
+    
+    @Value("${mononopoly.salary}")
+    private final int salary; 
+    
     @Autowired
     private PlayerStateRepository playerStateRepository;
     @Autowired
@@ -202,7 +205,6 @@ public class GameManager {
     }
 
     private void giveSalary(PlayerState playerState, GameChange gameChange) {
-        int salary = 200;
         log.info(format("%s money: %s+%s", playerState.getPlayer().getNickname(), playerState.getMoney(), salary));
         playerState.setMoney(playerState.getMoney() + salary);
         gameChange.addChangeDescription(format("%s get salary: M%s", playerState.getPlayer().getNickname(), salary));
