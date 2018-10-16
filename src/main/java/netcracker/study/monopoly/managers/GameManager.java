@@ -383,7 +383,7 @@ public class GameManager {
         }
         // validation that both players play in same game
         if (!Objects.equals(buyer.getGame().getId(), game.getId())) {
-            throw new NotAllowedOperationException("Buyers and seller should be in the same game");
+            throw new NotAllowedOperationException("Buyers and seller must be in the same game");
         }
         if (street.getOwner() == null) {
             throw new IllegalStateException("Street doesn't have owner");
@@ -393,7 +393,7 @@ public class GameManager {
         }
         // validation that seller owns street
         if (!Objects.equals(street.getOwner().getId(), seller.getId())) {
-            throw new NotAllowedOperationException("Seller should own street");
+            throw new NotAllowedOperationException("Seller must own street");
         }
         // validation that seller is active player now
         if (!Objects.equals(game.getTurnOf().getId(), seller.getId())) {
@@ -441,7 +441,7 @@ public class GameManager {
                 turnOf.setScore(0);
                 gameChange.addGamerChange(playerConverter.toDto(turnOf));
                 gameChange.addChangeDescription(format("%s is a bankrupt now", nickname));
-                log.debug(format("%s didn't pay for rent ant became a bankrupt", nickname));
+                log.debug(format("%s didn't pay for the rent and became a bankrupt", nickname));
             }
         }
 
